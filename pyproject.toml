@@ -1,0 +1,28 @@
+[project]
+name = "embodied-ecosystem-gym"
+version = "0.0.1"
+description = "A reproducible embodied-agent benchmark with a virtual toy viewer."
+readme = "README.md"
+requires-python = ">=3.11,<3.14"
+dependencies = [
+  "gymnasium>=1.2,<2.0",
+  "numpy>=2.0,<3.0",
+]
+
+[dependency-groups]
+dev = ["pytest>=8.0"]
+
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["ecosystem_gym"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 110
+target-version = "py311"
