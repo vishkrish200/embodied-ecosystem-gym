@@ -22,5 +22,13 @@ class Drives:
             boredom=float(np.clip(self.boredom + config.boredom_gain_per_second * elapsed_seconds, 0.0, 1.0)),
         )
 
+    def relieve_boredom(self, amount: float) -> "Drives":
+        """Apply a bounded positive play effect without changing survival drives."""
+        return Drives(
+            satiety=self.satiety,
+            energy=self.energy,
+            boredom=float(np.clip(self.boredom - amount, 0.0, 1.0)),
+        )
+
     def as_array(self) -> np.ndarray:
         return np.asarray([self.satiety, self.energy, self.boredom], dtype=np.float32)
