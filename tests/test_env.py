@@ -41,6 +41,15 @@ def test_find_eat_transition_is_explicit() -> None:
     assert reward > 0
 
 
+def test_relative_walk_moves_from_the_current_pose_without_an_oracle_target() -> None:
+    env = EcosystemEnv()
+    observation, _ = env.reset(seed=7)
+    start = observation["agent_xy"].copy()
+    observation, _, _, _, info = env.step(action(ActionKind.WALK_RELATIVE, np.asarray((0.3, -0.2)), duration=2.0))
+    assert info["outcome"] == "success"
+    assert np.allclose(observation["agent_xy"], start + np.asarray((0.3, -0.2)), atol=1e-5)
+
+
 def test_mujoco_world_renders_a_room() -> None:
     env = EcosystemEnv(render_mode="rgb_array")
     env.reset(seed=7)

@@ -245,6 +245,9 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
         if action.kind is ActionKind.WALK_TO:
             self._walk_toward(action.target_xy, action.duration_seconds)
             return ActionOutcome.SUCCESS, False
+        if action.kind is ActionKind.WALK_RELATIVE:
+            self._walk_toward(self._agent_xy() + action.target_xy, action.duration_seconds)
+            return ActionOutcome.SUCCESS, False
         if action.kind is ActionKind.PICK_UP:
             if state.food_consumed or self._distance_to_food() > self.config.pickup_radius:
                 self._advance_physics(action.duration_seconds)

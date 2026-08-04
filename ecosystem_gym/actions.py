@@ -13,6 +13,7 @@ class ActionKind(IntEnum):
     PLACE = 3
     RUN_AROUND = 4
     IDLE = 5
+    WALK_RELATIVE = 6
 
 
 class ActionOutcome(StrEnum):

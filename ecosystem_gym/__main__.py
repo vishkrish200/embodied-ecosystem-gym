@@ -9,6 +9,7 @@ from .learned_rgb import learned_rgb_gate
 from .m3 import collect_rgb_behavior_cloning_data, write_perception_report
 from .m4 import write_drive_report
 from .m6 import run_m6_viewer_demo, write_m6_report
+from .m7 import run_m7_viewer_demo, write_m7_report
 from .policies import evaluate_scripted_policy
 from .trajectory import replay_and_validate
 from .video import write_find_and_eat_regression_video
@@ -16,7 +17,7 @@ from .viewer import LocalViewerServer, ViewerSession
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Embodied Ecosystem Gym M2 tools")
+    parser = argparse.ArgumentParser(description="Embodied Ecosystem Gym tools")
     subparsers = parser.add_subparsers(dest="command", required=True)
     evaluate = subparsers.add_parser("evaluate", help="run the fixed-seed scripted baseline")
     evaluate.add_argument("--trajectory-dir", type=Path)
@@ -45,6 +46,13 @@ def main() -> None:
     m6_demo.add_argument("--trace", type=Path, required=True)
     m6_demo.add_argument("--task", choices=("play_when_bored", "competing_drives"), default="competing_drives")
     m6_demo.add_argument("--training-episodes", type=int, default=1200)
+    m7_benchmark = subparsers.add_parser("m7-benchmark", help="train and evaluate RGB drive arbitration")
+    m7_benchmark.add_argument("--output", type=Path, required=True)
+    m7_benchmark.add_argument("--training-episodes", type=int, default=400)
+    m7_demo = subparsers.add_parser("m7-demo", help="record and replay one learned RGB drive rollout")
+    m7_demo.add_argument("--trace", type=Path, required=True)
+    m7_demo.add_argument("--task", choices=("play_when_bored", "competing_drives"), default="competing_drives")
+    m7_demo.add_argument("--training-episodes", type=int, default=400)
     viewer = subparsers.add_parser("viewer", help="start the thin local live Gym viewer")
     viewer.add_argument("--trace", type=Path)
     viewer.add_argument("--port", type=int, default=8765)
@@ -75,6 +83,11 @@ def main() -> None:
         print(json.dumps(report["gate"]))
     elif args.command == "m6-demo":
         print(run_m6_viewer_demo(args.trace, task_id=args.task, training_episodes=args.training_episodes))
+    elif args.command == "m7-benchmark":
+        report = write_m7_report(args.output, training_episodes=args.training_episodes)
+        print(json.dumps(report["gate"]))
+    elif args.command == "m7-demo":
+        print(run_m7_viewer_demo(args.trace, task_id=args.task, training_episodes=args.training_episodes))
     elif args.command == "viewer":
         with ViewerSession(trace_path=args.trace) as session:
             server = LocalViewerServer(session, port=args.port)

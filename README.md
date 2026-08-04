@@ -12,6 +12,8 @@ Milestone 4 adds a visible toy, boredom-relieving play, a competing-drives task,
 
 Milestone 6 closes the remaining control gap with one learned state-oracle policy that chooses between pursuing food and pursuing play from public object positions, held state, and drives. It is evaluated against a same-budget no-drive Q-learning ablation, a macro-random baseline, and the scripted M4 oracle; this is learned drive arbitration, not RGB-driven multi-drive control.
 
+Milestone 7 moves that macro decision to RGB observations. A fixed, inspectable colour adapter extracts local food/toy offsets and grounds them through relative walking, while a compact tabular classifier learns food-versus-play selection from task-teacher macro labels and public drive values at inference. Its visual-held-out gate changes object appearance and movement dynamics on each task's seen layout; held-out spawn layouts are reported as a diagnostic rather than claimed as a navigation-generalization result.
+
 ```bash
 uv sync --group dev
 uv run pytest
@@ -42,10 +44,14 @@ uv run python -m ecosystem_gym m4-benchmark --output artifacts/reports/m4-drive-
 uv run python -m ecosystem_gym m6-benchmark --output artifacts/reports/m6-learned-drives.json
 uv run python -m ecosystem_gym m6-demo --trace artifacts/trajectories/m6-competing-demo.jsonl
 
+# Train/evaluate RGB drive arbitration and record one replayable RGB viewer trace.
+uv run python -m ecosystem_gym m7-benchmark --output artifacts/reports/m7-rgb-drives.json
+uv run python -m ecosystem_gym m7-demo --trace artifacts/trajectories/m7-competing-demo.jsonl
+
 # Open the same environment loop in a local browser, with optional replayable logging.
 uv run python -m ecosystem_gym viewer --trace artifacts/trajectories/viewer.jsonl
 ```
 
-The M1 evaluation command reports a 1.0 success rate on its fixed in-distribution seed suite. The M2 report records registered layout IDs, the exact reward configuration, fixed evaluation seeds, terminal-reason counts, and train/held-out metrics for both baselines. M3's original visual policies remain calibrated color-servo baselines, while the separate learned-RGB gate is intentionally modest: it learns the image-geometry-to-local-target mapping over fixed RGB candidate features, so it proves the declared color shift rather than broad end-to-end visual generalization. M4's drive-aware oracle controller proves task/reset-condition mechanics. M6 is the learned counterpart: its selector receives no task ID, reset options, `info`, or private environment state, and a counterfactual same-geometry probe checks food-first versus play-first behavior. Version 0.2 viewer traces persist reset options and the full configuration so replay reconstructs non-default episodes exactly, and `replay` continues to accept legacy 0.1 step-only traces.
+The M1 evaluation command reports a 1.0 success rate on its fixed in-distribution seed suite. The M2 report records registered layout IDs, the exact reward configuration, fixed evaluation seeds, terminal-reason counts, and train/held-out metrics for both baselines. M3's original visual policies remain calibrated color-servo baselines, while the separate learned-RGB gate is intentionally modest: it learns the image-geometry-to-local-target mapping over fixed RGB candidate features, so it proves the declared color shift rather than broad end-to-end visual generalization. M4's drive-aware oracle controller proves task/reset-condition mechanics. M6 is the learned counterpart: its selector receives no task ID, reset options, `info`, or private environment state, and a counterfactual same-geometry probe checks food-first versus play-first behavior. M7 keeps task IDs out of selector inference too, but its offline macro labels come from the training-task teacher, so it is a learned RGB macro classifier rather than end-to-end RL. Version 0.2 viewer traces persist reset options and the full configuration so replay reconstructs non-default episodes exactly, and `replay` continues to accept legacy 0.1 step-only traces.
 
 Read [the PRD](docs/PRD.md) for the product boundary and [the milestones](docs/MILESTONES.md) for the delivery plan.

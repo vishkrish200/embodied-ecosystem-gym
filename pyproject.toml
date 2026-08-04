@@ -1,6 +1,6 @@
 [project]
 name = "embodied-ecosystem-gym"
-version = "0.6.0"
+version = "0.7.0"
 description = "A reproducible embodied-agent benchmark with a virtual toy viewer."
 readme = "README.md"
 requires-python = ">=3.11,<3.14"
