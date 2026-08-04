@@ -1,5 +1,51 @@
 # Embodied Ecosystem Gym
 
-A reproducible embodied-agent benchmark with a first-party virtual-toy experience. The Gym owns state transitions, physics, tasks, evaluation, and trajectory logs; the toy room is a thin human-facing client over the same environment.
+A reproducible embodied-agent benchmark with a first-party virtual-toy experience. The Gym owns MuJoCo state transitions, tasks, evaluation, and trajectory logs; the toy room is a thin human-facing client over the same environment.
+
+Milestone 1 provides one deterministic MuJoCo room, one creature, one food item, normalized satiety/energy/boredom drives, and a complete `walk_to` -> `pick_up` -> `consume` task. The public Gymnasium contract remains state-oracle only for now; hybrid and RGB observations arrive in M3.
+
+Milestone 2 turns that vertical slice into a small benchmark. It evaluates a raw random-action policy against a learned tabular state-oracle Q-learning policy over fixed training and held-out spawn-layout splits, then writes one comparable JSON report.
+
+Milestone 3 adds an agent-mounted RGB camera, a hybrid mode whose food detection is computed from those pixels, controlled camera offsets, and a deterministic food-relocation disturbance. Its report keeps state-oracle, hybrid, and RGB results separate. The M3.5 gate trains a deterministic NumPy behavior-cloning controller from RGB-derived local image features, then evaluates red/orange training appearances separately from blue/purple held-out appearances.
+
+Milestone 4 adds a visible toy, boredom-relieving play, a competing-drives task, and fixed train/held-out appearance, object, dynamics, and spawn-layout conditions. Milestone 5 provides a local browser viewer that forwards every reset, action, render, and trace write to the same Gym session; it does not own simulation state.
+
+Milestone 6 closes the remaining control gap with one learned state-oracle policy that chooses between pursuing food and pursuing play from public object positions, held state, and drives. It is evaluated against a same-budget no-drive Q-learning ablation, a macro-random baseline, and the scripted M4 oracle; this is learned drive arbitration, not RGB-driven multi-drive control.
+
+```bash
+uv sync --group dev
+uv run pytest
+
+# Run the fixed 20-seed scripted baseline and retain replayable JSONL logs.
+uv run python -m ecosystem_gym evaluate --trajectory-dir artifacts/trajectories/m1
+
+# Validate any saved trace against a clean reset of the same seed.
+uv run python -m ecosystem_gym replay artifacts/trajectories/m1/find-eat_seed-0007.jsonl
+
+# Record the MuJoCo regression video through the public skill API.
+uv run python -m ecosystem_gym record-video artifacts/regression/find-and-eat_seed-0007.mp4
+
+# Train/evaluate both baselines and write the M2 benchmark artifact.
+uv run python -m ecosystem_gym benchmark --output artifacts/reports/m2-find-and-eat.json
+
+# Report state-oracle, hybrid, and RGB performance under camera/layout variation and recovery.
+uv run python -m ecosystem_gym perception-benchmark --output artifacts/reports/m3-perception.json
+
+# Write RGB frames and privileged teacher labels, then run the learned appearance gate.
+uv run python -m ecosystem_gym collect-bc --output artifacts/datasets/m35-rgb-bc.npz
+uv run python -m ecosystem_gym learned-rgb-gate --dataset artifacts/datasets/m35-rgb-bc.npz --output artifacts/reports/m35-learned-rgb.json
+
+# Evaluate play/competing-drive tasks across held-out conditions.
+uv run python -m ecosystem_gym m4-benchmark --output artifacts/reports/m4-drive-benchmark.json
+
+# Train and evaluate learned food-versus-play arbitration, then record its viewer trace.
+uv run python -m ecosystem_gym m6-benchmark --output artifacts/reports/m6-learned-drives.json
+uv run python -m ecosystem_gym m6-demo --trace artifacts/trajectories/m6-competing-demo.jsonl
+
+# Open the same environment loop in a local browser, with optional replayable logging.
+uv run python -m ecosystem_gym viewer --trace artifacts/trajectories/viewer.jsonl
+```
+
+The M1 evaluation command reports a 1.0 success rate on its fixed in-distribution seed suite. The M2 report records registered layout IDs, the exact reward configuration, fixed evaluation seeds, terminal-reason counts, and train/held-out metrics for both baselines. M3's original visual policies remain calibrated color-servo baselines, while the separate learned-RGB gate is intentionally modest: it learns the image-geometry-to-local-target mapping over fixed RGB candidate features, so it proves the declared color shift rather than broad end-to-end visual generalization. M4's drive-aware oracle controller proves task/reset-condition mechanics. M6 is the learned counterpart: its selector receives no task ID, reset options, `info`, or private environment state, and a counterfactual same-geometry probe checks food-first versus play-first behavior. Version 0.2 viewer traces persist reset options and the full configuration so replay reconstructs non-default episodes exactly, and `replay` continues to accept legacy 0.1 step-only traces.
 
 Read [the PRD](docs/PRD.md) for the product boundary and [the milestones](docs/MILESTONES.md) for the delivery plan.

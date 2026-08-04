@@ -1,11 +1,12 @@
 [project]
 name = "embodied-ecosystem-gym"
-version = "0.0.1"
+version = "0.6.0"
 description = "A reproducible embodied-agent benchmark with a virtual toy viewer."
 readme = "README.md"
 requires-python = ">=3.11,<3.14"
 dependencies = [
   "gymnasium>=1.2,<2.0",
+  "mujoco>=3.2,<4.0",
   "numpy>=2.0,<3.0",
 ]
 
