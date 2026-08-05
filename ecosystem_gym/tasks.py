@@ -59,6 +59,10 @@ LAYOUTS: dict[str, LayoutSpec] = {
     # deliberately not part of M8.1 training or its original held-out matrix.
     "m82_northwest": LayoutSpec("m82_northwest", (0.38, -0.42), (-0.82, 0.25), (-0.40, 0.72)),
     "m82_southeast": LayoutSpec("m82_southeast", (-0.38, 0.42), (0.30, -0.82), (0.82, -0.25)),
+    # M8.3 separates agent pose from food position so transfer failures can be
+    # attributed to one spatial change at a time rather than a compound row.
+    "m83_agent_northwest": LayoutSpec("m83_agent_northwest", (0.38, -0.42), (0.25, 0.50), (0.50, 0.70)),
+    "m83_food_northwest": LayoutSpec("m83_food_northwest", (0.0, 0.0), (-0.82, 0.25), (-0.40, 0.72)),
 }
 
 TASKS: dict[str, TaskSpec] = {

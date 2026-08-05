@@ -64,6 +64,9 @@ uv run python -m ecosystem_gym m81-demo --trace artifacts/trajectories/m81-recur
 uv run python -m ecosystem_gym m82-benchmark --output artifacts/reports/m82-external-validity.json
 uv run python -m ecosystem_gym m82-demo --trace artifacts/trajectories/m82-frozen-rnn-demo.jsonl
 
+# Diagnose one factor at a time before training any successor policy.
+uv run python -m ecosystem_gym m83-diagnostics --output artifacts/reports/m83-one-factor-diagnostics.json
+
 # Open the same environment loop in a local browser, with optional replayable logging.
 uv run python -m ecosystem_gym viewer --trace artifacts/trajectories/viewer.jsonl
 ```
