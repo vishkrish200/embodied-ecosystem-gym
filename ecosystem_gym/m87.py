@@ -8,6 +8,7 @@ M8.5 remains excluded from every training and validation choice.
 
 from __future__ import annotations
 
+import hashlib
 import json
 from dataclasses import dataclass
 from pathlib import Path
@@ -185,6 +186,33 @@ def fit_m87_grounder() -> BlueBalancedGrounder:
     frames = _collect_frames(M87_TRAIN_CONDITIONS, seeds=M87_TRAIN_SEEDS)
     hidden, hidden_bias, output, output_bias = _fit_pixel_mlp(frames)
     return BlueBalancedGrounder(hidden, hidden_bias, output, output_bias, _fit_pixel_map(frames))
+
+
+def m87_policy_fingerprint(grounder: BlueBalancedGrounder) -> str:
+    digest = hashlib.sha256()
+    for values in (grounder.hidden, grounder.hidden_bias, grounder.output, grounder.output_bias, grounder.pixel_map):
+        array = np.asarray(values, dtype=np.float64)
+        digest.update(np.asarray(array.shape, dtype=np.int64).tobytes())
+        digest.update(array.tobytes())
+    return digest.hexdigest()
+
+
+def m87_protocol_fingerprint() -> str:
+    payload = {
+        "protocol_version": M87_PROTOCOL_VERSION,
+        "train_seeds": M87_TRAIN_SEEDS,
+        "train_conditions": M87_TRAIN_CONDITIONS,
+        "patch_radius": M87_PATCH_RADIUS,
+        "hidden_units": M87_HIDDEN_UNITS,
+        "train_steps": M87_TRAIN_STEPS,
+        "batch_size": M87_BATCH_SIZE,
+        "learning_rate": M87_LEARNING_RATE,
+        "samples_per_class": M87_SAMPLES_PER_CLASS,
+        "confidence_threshold": M87_CONFIDENCE_THRESHOLD,
+        "minimum_component_pixels": M87_MIN_COMPONENT_PIXELS,
+    }
+    encoded = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
 
 
 def m87_validation(*, seeds: tuple[int, ...] = M87_VALIDATION_SEEDS) -> dict[str, object]:

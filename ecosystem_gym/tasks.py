@@ -85,6 +85,11 @@ LAYOUTS: dict[str, LayoutSpec] = {
     "m87_train_northwest": LayoutSpec("m87_train_northwest", (0.42, -0.30), (-0.50, 0.10), (-0.12, 0.48)),
     "m87_validation_northwest": LayoutSpec("m87_validation_northwest", (0.50, -0.40), (-0.70, 0.18), (-0.32, 0.56)),
     "m87_validation_southeast": LayoutSpec("m87_validation_southeast", (-0.50, 0.40), (0.32, -0.70), (0.70, -0.32)),
+    # M8.8 is the fresh external audit for M8.7 and shares no M8.7 or M8.5 layouts.
+    "m88_northeast": LayoutSpec("m88_northeast", (-0.62, -0.50), (0.24, 0.30), (0.66, 0.70)),
+    "m88_southwest": LayoutSpec("m88_southwest", (0.62, 0.50), (-0.70, -0.70), (-0.28, -0.28)),
+    "m88_northwest": LayoutSpec("m88_northwest", (0.56, -0.44), (-0.66, 0.24), (-0.30, 0.62)),
+    "m88_southeast": LayoutSpec("m88_southeast", (-0.62, 0.50), (0.30, -0.74), (0.72, -0.32)),
 }
 
 TASKS: dict[str, TaskSpec] = {

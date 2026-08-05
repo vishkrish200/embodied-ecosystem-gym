@@ -18,6 +18,7 @@ from .m84 import run_m84_viewer_demo, write_m84_report
 from .m85 import run_m85_viewer_demo, write_m85_report
 from .m86 import run_m86_viewer_demo, write_m86_report
 from .m87 import run_m87_viewer_demo, write_m87_report
+from .m88 import run_m88_viewer_demo, write_m88_report
 from .policies import evaluate_scripted_policy
 from .trajectory import replay_and_validate
 from .video import write_find_and_eat_regression_video
@@ -92,6 +93,10 @@ def main() -> None:
     m87_validation.add_argument("--output", type=Path, required=True)
     m87_demo = subparsers.add_parser("m87-demo", help="record and replay one M8.7 blue-grounding rollout")
     m87_demo.add_argument("--trace", type=Path, required=True)
+    m88_benchmark = subparsers.add_parser("m88-benchmark", help="run the sealed M8.8 scan_v2 external audit")
+    m88_benchmark.add_argument("--output", type=Path, required=True)
+    m88_demo = subparsers.add_parser("m88-demo", help="record and replay one frozen M8.8 rollout")
+    m88_demo.add_argument("--trace", type=Path, required=True)
     viewer = subparsers.add_parser("viewer", help="start the thin local live Gym viewer")
     viewer.add_argument("--trace", type=Path)
     viewer.add_argument("--port", type=int, default=8765)
@@ -165,6 +170,11 @@ def main() -> None:
         print(json.dumps(report["validation_gate"]))
     elif args.command == "m87-demo":
         print(run_m87_viewer_demo(args.trace))
+    elif args.command == "m88-benchmark":
+        report = write_m88_report(args.output)
+        print(json.dumps(report["external_validity_gate"]))
+    elif args.command == "m88-demo":
+        print(run_m88_viewer_demo(args.trace))
     elif args.command == "viewer":
         with ViewerSession(trace_path=args.trace) as session:
             server = LocalViewerServer(session, port=args.port)
