@@ -16,6 +16,8 @@ Milestone 7 moves that macro decision to RGB observations. A fixed, inspectable 
 
 Milestone 8 freezes a 20-seed sequential-RGB recovery protocol before selecting a policy. It reports camera-sector occlusion, a blocked food-like distractor, mid-episode food relocation, a withheld visual-geometry shift, and camera-pose variation with Wilson confidence intervals and a separately labeled state-oracle ceiling. Its RGB controller is a fixed colour-component scan/recovery baseline, not learned perception or physics robustness.
 
+M8.1 asks the project’s actual research question: on disjoint training seeds, does prior action/outcome memory improve RGB recovery over an equal-output feed-forward behavior-cloning policy? It compares those two small NumPy learned action classifiers against the M8 fixed controller and an oracle ceiling on frozen 20-seed conditions. The colour-component target adapter remains fixed, so this is learned action selection with short-horizon memory, not end-to-end representation learning.
+
 ```bash
 uv sync --group dev
 uv run pytest
@@ -53,6 +55,9 @@ uv run python -m ecosystem_gym m7-demo --trace artifacts/trajectories/m7-competi
 # Run the frozen sequential RGB-recovery protocol and replay one adverse trace.
 uv run python -m ecosystem_gym m8-benchmark --output artifacts/reports/m8-rgb-recovery.json
 uv run python -m ecosystem_gym m8-demo --trace artifacts/trajectories/m8-rgb-recovery-demo.jsonl
+
+uv run python -m ecosystem_gym m81-benchmark --output artifacts/reports/m81-rgb-memory.json
+uv run python -m ecosystem_gym m81-demo --trace artifacts/trajectories/m81-recurrent-demo.jsonl
 
 # Open the same environment loop in a local browser, with optional replayable logging.
 uv run python -m ecosystem_gym viewer --trace artifacts/trajectories/viewer.jsonl

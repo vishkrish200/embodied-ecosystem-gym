@@ -11,6 +11,7 @@ from .m4 import write_drive_report
 from .m6 import run_m6_viewer_demo, write_m6_report
 from .m7 import run_m7_viewer_demo, write_m7_report
 from .m8 import run_m8_viewer_demo, write_m8_report
+from .m81 import run_m81_viewer_demo, write_m81_report
 from .policies import evaluate_scripted_policy
 from .trajectory import replay_and_validate
 from .video import write_find_and_eat_regression_video
@@ -59,6 +60,10 @@ def main() -> None:
     m8_demo = subparsers.add_parser("m8-demo", help="record and replay one M8 RGB recovery trace")
     m8_demo.add_argument("--trace", type=Path, required=True)
     m8_demo.add_argument("--seed", type=int, default=7)
+    m81_benchmark = subparsers.add_parser("m81-benchmark", help="compare feed-forward and recurrent RGB recovery policies")
+    m81_benchmark.add_argument("--output", type=Path, required=True)
+    m81_demo = subparsers.add_parser("m81-demo", help="record and replay one recurrent M8.1 rollout")
+    m81_demo.add_argument("--trace", type=Path, required=True)
     viewer = subparsers.add_parser("viewer", help="start the thin local live Gym viewer")
     viewer.add_argument("--trace", type=Path)
     viewer.add_argument("--port", type=int, default=8765)
@@ -99,6 +104,11 @@ def main() -> None:
         print(json.dumps({condition: result["fixed_rgb_scan_recovery_baseline"] for condition, result in report["results"].items()}))
     elif args.command == "m8-demo":
         print(run_m8_viewer_demo(args.trace, seed=args.seed))
+    elif args.command == "m81-benchmark":
+        report = write_m81_report(args.output)
+        print(json.dumps(report["recurrence_verdict"]))
+    elif args.command == "m81-demo":
+        print(run_m81_viewer_demo(args.trace))
     elif args.command == "viewer":
         with ViewerSession(trace_path=args.trace) as session:
             server = LocalViewerServer(session, port=args.port)

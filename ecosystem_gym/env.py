@@ -79,6 +79,7 @@ _MODEL_XML = """
       <geom name="distractor_geom" type="sphere" size="0.06" contype="0" conaffinity="0" rgba="0.92 0.20 0.16 0"/>
     </body>
     <geom name="m8_geometry_geom" type="box" pos="0 0 0.18" size="0.18 0.18 0.18" contype="0" conaffinity="0" rgba="0.32 0.32 0.34 0"/>
+    <geom name="m81_landmark_geom" type="capsule" pos="-0.56 0.46 0.16" size="0.06 0.16" contype="0" conaffinity="0" rgba="0.20 0.70 0.34 0"/>
     <camera name="overview" pos="0 -2.8 2.8" xyaxes="1 0 0 0 0.7 0.7"/>
   </worldbody>
 </mujoco>
@@ -190,8 +191,8 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
             raise ValueError(f"initial_scan_sector must be one of {self._SCAN_SECTORS}")
         self._blocked_distractor = bool(reset_options.get("blocked_distractor", False))
         self._geometry_variant = str(reset_options.get("geometry_variant", "default"))
-        if self._geometry_variant not in {"default", "unseen_block"}:
-            raise ValueError("geometry_variant must be default or unseen_block")
+        if self._geometry_variant not in {"default", "unseen_block", "m81_landmark"}:
+            raise ValueError("geometry_variant must be default, unseen_block, or m81_landmark")
         mujoco.mj_resetData(self.model, self.data)
         self._configure_variants(
             food_variant=str(reset_options.get("food_variant", "red")),
@@ -580,9 +581,11 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
     def _configure_m8_scene(self) -> None:
         distractor_geom = self.model.geom("distractor_geom").id
         geometry_geom = self.model.geom("m8_geometry_geom").id
+        landmark_geom = self.model.geom("m81_landmark_geom").id
         self.model.geom_rgba[distractor_geom, :3] = self.model.geom_rgba[self.model.geom("food_geom").id, :3]
         self.model.geom_rgba[distractor_geom, 3] = 1.0 if self._blocked_distractor else 0.0
         self.model.geom_rgba[geometry_geom, 3] = 1.0 if self._geometry_variant == "unseen_block" else 0.0
+        self.model.geom_rgba[landmark_geom, 3] = 1.0 if self._geometry_variant == "m81_landmark" else 0.0
 
     def _nearest_pickup_candidate(self, target_xy: np.ndarray) -> str | None:
         candidates = [("food", self._food_xy())]
