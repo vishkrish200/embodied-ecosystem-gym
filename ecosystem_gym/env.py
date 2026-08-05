@@ -32,6 +32,11 @@ _DYNAMICS_VARIANTS = {
     "grippy": (0.90, 1.2),
     "slippery": (1.10, 0.25),
 }
+_LIGHTING_VARIANTS = {
+    "nominal": ((0.10, 0.10, 0.10), (0.40, 0.40, 0.40)),
+    # This reduces illumination without changing the cyan agent's visibility.
+    "dim": ((0.06, 0.06, 0.06), (0.28, 0.28, 0.28)),
+}
 
 
 _MODEL_XML = """
@@ -80,6 +85,7 @@ _MODEL_XML = """
     </body>
     <geom name="m8_geometry_geom" type="box" pos="0 0 0.18" size="0.18 0.18 0.18" contype="0" conaffinity="0" rgba="0.32 0.32 0.34 0"/>
     <geom name="m81_landmark_geom" type="capsule" pos="-0.56 0.46 0.16" size="0.06 0.16" contype="0" conaffinity="0" rgba="0.20 0.70 0.34 0"/>
+    <geom name="m82_landmark_geom" type="box" pos="0.62 -0.56 0.12" size="0.08 0.08 0.12" contype="0" conaffinity="0" rgba="0.24 0.76 0.48 0"/>
     <camera name="overview" pos="0 -2.8 2.8" xyaxes="1 0 0 0 0.7 0.7"/>
   </worldbody>
 </mujoco>
@@ -154,6 +160,7 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
         self._food_variant = "red"
         self._toy_variant = "ball"
         self._dynamics_variant = "nominal"
+        self._lighting_variant = "nominal"
         self._movement_speed_scale = 1.0
         self._camera_control = "fixed"
         self._scan_sector = "north"
@@ -191,13 +198,14 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
             raise ValueError(f"initial_scan_sector must be one of {self._SCAN_SECTORS}")
         self._blocked_distractor = bool(reset_options.get("blocked_distractor", False))
         self._geometry_variant = str(reset_options.get("geometry_variant", "default"))
-        if self._geometry_variant not in {"default", "unseen_block", "m81_landmark"}:
-            raise ValueError("geometry_variant must be default, unseen_block, or m81_landmark")
+        if self._geometry_variant not in {"default", "unseen_block", "m81_landmark", "m82_landmark"}:
+            raise ValueError("geometry_variant must be default, unseen_block, m81_landmark, or m82_landmark")
         mujoco.mj_resetData(self.model, self.data)
         self._configure_variants(
             food_variant=str(reset_options.get("food_variant", "red")),
             toy_variant=str(reset_options.get("toy_variant", "ball")),
             dynamics_variant=str(reset_options.get("dynamics_variant", "nominal")),
+            lighting_variant=str(reset_options.get("lighting_variant", "nominal")),
         )
         self._set_agent_xy(np.asarray(self._active_layout.agent_xy, dtype=np.float32))
         self._set_food_xy(self._active_layout.sample_food_xy(self.np_random))
@@ -229,6 +237,7 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
             "food_variant": self._food_variant,
             "toy_variant": self._toy_variant,
             "dynamics_variant": self._dynamics_variant,
+            "lighting_variant": self._lighting_variant,
             "camera_control": self._camera_control,
             "camera_sector": self._scan_sector if self._camera_control == "scan" else None,
             "blocked_distractor": self._blocked_distractor,
@@ -556,7 +565,9 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
     def _environment_version(self) -> str:
         return "0.5.0" if self._camera_control == "scan" else ("0.4.0" if self._is_m4_task() else "0.3.0")
 
-    def _configure_variants(self, *, food_variant: str, toy_variant: str, dynamics_variant: str) -> None:
+    def _configure_variants(
+        self, *, food_variant: str, toy_variant: str, dynamics_variant: str, lighting_variant: str
+    ) -> None:
         try:
             food_rgba = FOOD_VARIANTS[food_variant]
         except KeyError as exc:
@@ -569,23 +580,32 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
             movement_scale, floor_friction = _DYNAMICS_VARIANTS[dynamics_variant]
         except KeyError as exc:
             raise ValueError(f"unknown dynamics_variant '{dynamics_variant}'; expected one of {sorted(_DYNAMICS_VARIANTS)}") from exc
+        try:
+            ambient, diffuse = _LIGHTING_VARIANTS[lighting_variant]
+        except KeyError as exc:
+            raise ValueError(f"unknown lighting_variant '{lighting_variant}'; expected one of {sorted(_LIGHTING_VARIANTS)}") from exc
         self.model.geom_rgba[self.model.geom("food_geom").id] = food_rgba
         for variant, geom_name in _TOY_VARIANTS.items():
             self.model.geom_rgba[self.model.geom(geom_name).id, 3] = 1.0 if geom_name == active_toy_geom else 0.0
         self.model.geom_friction[self.model.geom("floor").id, 0] = floor_friction
+        self.model.vis.headlight.ambient[:] = ambient
+        self.model.vis.headlight.diffuse[:] = diffuse
         self._food_variant = food_variant
         self._toy_variant = toy_variant
         self._dynamics_variant = dynamics_variant
+        self._lighting_variant = lighting_variant
         self._movement_speed_scale = movement_scale
 
     def _configure_m8_scene(self) -> None:
         distractor_geom = self.model.geom("distractor_geom").id
         geometry_geom = self.model.geom("m8_geometry_geom").id
         landmark_geom = self.model.geom("m81_landmark_geom").id
+        m82_landmark_geom = self.model.geom("m82_landmark_geom").id
         self.model.geom_rgba[distractor_geom, :3] = self.model.geom_rgba[self.model.geom("food_geom").id, :3]
         self.model.geom_rgba[distractor_geom, 3] = 1.0 if self._blocked_distractor else 0.0
         self.model.geom_rgba[geometry_geom, 3] = 1.0 if self._geometry_variant == "unseen_block" else 0.0
         self.model.geom_rgba[landmark_geom, 3] = 1.0 if self._geometry_variant == "m81_landmark" else 0.0
+        self.model.geom_rgba[m82_landmark_geom, 3] = 1.0 if self._geometry_variant == "m82_landmark" else 0.0
 
     def _nearest_pickup_candidate(self, target_xy: np.ndarray) -> str | None:
         candidates = [("food", self._food_xy())]

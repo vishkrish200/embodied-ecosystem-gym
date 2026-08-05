@@ -12,6 +12,7 @@ from .m6 import run_m6_viewer_demo, write_m6_report
 from .m7 import run_m7_viewer_demo, write_m7_report
 from .m8 import run_m8_viewer_demo, write_m8_report
 from .m81 import run_m81_viewer_demo, write_m81_report
+from .m82 import run_m82_viewer_demo, write_m82_report
 from .policies import evaluate_scripted_policy
 from .trajectory import replay_and_validate
 from .video import write_find_and_eat_regression_video
@@ -64,6 +65,10 @@ def main() -> None:
     m81_benchmark.add_argument("--output", type=Path, required=True)
     m81_demo = subparsers.add_parser("m81-demo", help="record and replay one recurrent M8.1 rollout")
     m81_demo.add_argument("--trace", type=Path, required=True)
+    m82_benchmark = subparsers.add_parser("m82-benchmark", help="run the sealed M8.2 external-validity audit")
+    m82_benchmark.add_argument("--output", type=Path, required=True)
+    m82_demo = subparsers.add_parser("m82-demo", help="record and replay one frozen recurrent M8.2 rollout")
+    m82_demo.add_argument("--trace", type=Path, required=True)
     viewer = subparsers.add_parser("viewer", help="start the thin local live Gym viewer")
     viewer.add_argument("--trace", type=Path)
     viewer.add_argument("--port", type=int, default=8765)
@@ -109,6 +114,11 @@ def main() -> None:
         print(json.dumps(report["recurrence_verdict"]))
     elif args.command == "m81-demo":
         print(run_m81_viewer_demo(args.trace))
+    elif args.command == "m82-benchmark":
+        report = write_m82_report(args.output)
+        print(json.dumps(report["transfer_verdict"]))
+    elif args.command == "m82-demo":
+        print(run_m82_viewer_demo(args.trace))
     elif args.command == "viewer":
         with ViewerSession(trace_path=args.trace) as session:
             server = LocalViewerServer(session, port=args.port)

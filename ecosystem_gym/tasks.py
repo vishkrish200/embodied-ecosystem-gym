@@ -55,6 +55,10 @@ LAYOUTS: dict[str, LayoutSpec] = {
     # M8 uses this fixed-distribution protocol layout so the relocation event
     # always happens before a food pickup can succeed.
     "m8_protocol": LayoutSpec("m8_protocol", (0.0, 0.0), (0.25, 0.50), (0.50, 0.70)),
+    # M8.2's post-result suite uses separate agent/food quadrants.  These are
+    # deliberately not part of M8.1 training or its original held-out matrix.
+    "m82_northwest": LayoutSpec("m82_northwest", (0.38, -0.42), (-0.82, 0.25), (-0.40, 0.72)),
+    "m82_southeast": LayoutSpec("m82_southeast", (-0.38, 0.42), (0.30, -0.82), (0.82, -0.25)),
 }
 
 TASKS: dict[str, TaskSpec] = {

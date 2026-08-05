@@ -8,6 +8,7 @@ receives memory containing only its previous action and observed outcome.
 
 from __future__ import annotations
 
+import hashlib
 import json
 from dataclasses import dataclass
 from pathlib import Path
@@ -185,6 +186,43 @@ def fit_m81_policies(*, ridge: float = 1e-3) -> tuple[FeedForwardRgbBCPolicy, Re
         return np.linalg.solve(gram + ridge * np.eye(gram.shape[0]), features.T @ targets)
 
     return FeedForwardRgbBCPolicy(fit(visual)), RecurrentRgbBCPolicy(fit(np.concatenate([visual, temporal], axis=1)))
+
+
+def m81_policy_fingerprint(
+    feed_forward: FeedForwardRgbBCPolicy,
+    recurrent: RecurrentRgbBCPolicy,
+    *,
+    ridge: float = 1e-3,
+) -> str:
+    """Fingerprint the frozen M8.1 trainer configuration and fitted weights."""
+
+    digest = hashlib.sha256()
+    payload = {
+        "protocol_version": M81_PROTOCOL_VERSION,
+        "train_seeds": M81_TRAIN_SEEDS,
+        "conditions": M81_CONDITIONS,
+        "ridge": ridge,
+    }
+    digest.update(json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8"))
+    for policy in (feed_forward, recurrent):
+        weights = np.asarray(policy.weights, dtype=np.float64)
+        digest.update(str(weights.shape).encode("ascii"))
+        digest.update(weights.tobytes(order="C"))
+    return digest.hexdigest()
+
+
+def m81_protocol_fingerprint(*, ridge: float = 1e-3) -> str:
+    """Fingerprint the complete M8.1 train and evaluation protocol."""
+
+    payload = {
+        "protocol_version": M81_PROTOCOL_VERSION,
+        "train_seeds": M81_TRAIN_SEEDS,
+        "test_seeds": M81_TEST_SEEDS,
+        "conditions": M81_CONDITIONS,
+        "diagnostic_conditions": M81_DIAGNOSTIC_CONDITIONS,
+        "ridge": ridge,
+    }
+    return hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
 
 
 @dataclass(frozen=True, slots=True)
