@@ -212,6 +212,9 @@ class ViewerSession:
                     raise ValueError(f"reward mismatch at step {step}")
                 if bool(terminated) != expected["terminated"] or bool(truncated) != expected["truncated"]:
                     raise ValueError(f"terminal state mismatch at step {step}")
+                for key in ("disturbance", "post_disturbance_completion", "camera_sector"):
+                    if key in expected and info.get(key) != expected[key]:
+                        raise ValueError(f"{key} mismatch at step {step}")
                 if _json_value(observation) != expected["observation"]:
                     raise ValueError(f"observation mismatch at step {step}")
             return ReplayResult(steps=len(records), task_success=bool(records[-1]["task_success"]))

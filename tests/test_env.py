@@ -50,6 +50,28 @@ def test_relative_walk_moves_from_the_current_pose_without_an_oracle_target() ->
     assert np.allclose(observation["agent_xy"], start + np.asarray((0.3, -0.2)), atol=1e-5)
 
 
+def test_post_disturbance_completion_is_action_agnostic_while_m3_metric_stays_legacy() -> None:
+    env = EcosystemEnv()
+    try:
+        observation, _ = env.reset(seed=7, options={"disturbance_step": 1})
+        original_target = observation["food_xy"] - observation["agent_xy"]
+        observation, _, _, _, info = env.step(action(ActionKind.WALK_RELATIVE, original_target, duration=5.0))
+        assert info["disturbance"] == "food_relocated"
+        assert not info["post_disturbance_completion"]
+        assert not info["recovery_action"]
+
+        relocated_target = observation["food_xy"] - observation["agent_xy"]
+        observation, _, _, _, info = env.step(action(ActionKind.WALK_RELATIVE, relocated_target, duration=5.0))
+        assert not info["post_disturbance_completion"]
+        observation, _, _, _, info = env.step(action(ActionKind.PICK_UP))
+        assert info["outcome"] == "success"
+        _, _, terminated, _, info = env.step(action(ActionKind.CONSUME))
+        assert terminated
+        assert info["post_disturbance_completion"]
+    finally:
+        env.close()
+
+
 def test_mujoco_world_renders_a_room() -> None:
     env = EcosystemEnv(render_mode="rgb_array")
     env.reset(seed=7)

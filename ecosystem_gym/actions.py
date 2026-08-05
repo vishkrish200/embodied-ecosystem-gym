@@ -14,6 +14,8 @@ class ActionKind(IntEnum):
     RUN_AROUND = 4
     IDLE = 5
     WALK_RELATIVE = 6
+    SCAN = 7
+    PICK_UP_RELATIVE = 8
 
 
 class ActionOutcome(StrEnum):

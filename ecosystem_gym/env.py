@@ -56,6 +56,10 @@ _MODEL_XML = """
       <camera name="agent_cam_center" pos="0 0 1.5" fovy="75"/>
       <camera name="agent_cam_left" pos="-0.08 0.04 1.5" fovy="75"/>
       <camera name="agent_cam_right" pos="0.08 -0.04 1.5" fovy="75"/>
+      <camera name="agent_cam_scan_north" pos="0 0.52 1.15" fovy="48" xyaxes="1 0 0 0 1 0"/>
+      <camera name="agent_cam_scan_east" pos="0.52 0 1.15" fovy="48" xyaxes="1 0 0 0 1 0"/>
+      <camera name="agent_cam_scan_south" pos="0 -0.52 1.15" fovy="48" xyaxes="1 0 0 0 1 0"/>
+      <camera name="agent_cam_scan_west" pos="-0.52 0 1.15" fovy="48" xyaxes="1 0 0 0 1 0"/>
     </body>
     <body name="food" pos="0 0 0.06">
       <joint name="food_x" type="slide" axis="1 0 0" range="-0.9 0.9"/>
@@ -69,6 +73,12 @@ _MODEL_XML = """
       <geom name="toy_cube_geom" type="box" size="0.075 0.075 0.075" contype="0" conaffinity="0" rgba="0.95 0.78 0.10 0"/>
       <geom name="toy_capsule_geom" type="capsule" size="0.055 0.10" contype="0" conaffinity="0" rgba="0.95 0.78 0.10 0"/>
     </body>
+    <body name="distractor" pos="0 0 0.06">
+      <joint name="distractor_x" type="slide" axis="1 0 0" range="-0.9 0.9"/>
+      <joint name="distractor_y" type="slide" axis="0 1 0" range="-0.9 0.9"/>
+      <geom name="distractor_geom" type="sphere" size="0.06" contype="0" conaffinity="0" rgba="0.92 0.20 0.16 0"/>
+    </body>
+    <geom name="m8_geometry_geom" type="box" pos="0 0 0.18" size="0.18 0.18 0.18" contype="0" conaffinity="0" rgba="0.32 0.32 0.34 0"/>
     <camera name="overview" pos="0 -2.8 2.8" xyaxes="1 0 0 0 0.7 0.7"/>
   </worldbody>
 </mujoco>
@@ -97,6 +107,7 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
     """
 
     metadata = {"render_modes": ["rgb_array"], "render_fps": 50}
+    _SCAN_SECTORS = ("north", "east", "south", "west")
 
     def __init__(
         self,
@@ -127,6 +138,7 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
         self._agent_qpos = self._qpos_indices("agent_x", "agent_y")
         self._food_qpos = self._qpos_indices("food_x", "food_y")
         self._toy_qpos = self._qpos_indices("toy_x", "toy_y")
+        self._distractor_qpos = self._qpos_indices("distractor_x", "distractor_y")
         self._state: WorldState | None = None
         self._prior_outcome = ActionOutcome.SUCCESS
         self._active_layout: LayoutSpec = get_layout("default")
@@ -136,11 +148,16 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
         self._disturbance_step: int | None = None
         self._disturbance_occurred = False
         self._recovery_pending = False
+        self._post_disturbance_pending = False
         self._active_task: TaskSpec = get_task("find_and_eat")
         self._food_variant = "red"
         self._toy_variant = "ball"
         self._dynamics_variant = "nominal"
         self._movement_speed_scale = 1.0
+        self._camera_control = "fixed"
+        self._scan_sector = "north"
+        self._blocked_distractor = False
+        self._geometry_variant = "default"
 
     def reset(
         self,
@@ -164,6 +181,17 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
         self._disturbance_step = int(disturbance_step) if disturbance_step is not None else None
         self._disturbance_occurred = False
         self._recovery_pending = False
+        self._post_disturbance_pending = False
+        self._camera_control = str(reset_options.get("camera_control", "fixed"))
+        if self._camera_control not in {"fixed", "scan"}:
+            raise ValueError("camera_control must be fixed or scan")
+        self._scan_sector = str(reset_options.get("initial_scan_sector", "north"))
+        if self._scan_sector not in self._SCAN_SECTORS:
+            raise ValueError(f"initial_scan_sector must be one of {self._SCAN_SECTORS}")
+        self._blocked_distractor = bool(reset_options.get("blocked_distractor", False))
+        self._geometry_variant = str(reset_options.get("geometry_variant", "default"))
+        if self._geometry_variant not in {"default", "unseen_block"}:
+            raise ValueError("geometry_variant must be default or unseen_block")
         mujoco.mj_resetData(self.model, self.data)
         self._configure_variants(
             food_variant=str(reset_options.get("food_variant", "red")),
@@ -173,6 +201,11 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
         self._set_agent_xy(np.asarray(self._active_layout.agent_xy, dtype=np.float32))
         self._set_food_xy(self._active_layout.sample_food_xy(self.np_random))
         self._set_toy_xy(np.asarray(self._active_layout.toy_xy, dtype=np.float32))
+        distractor_xy = np.asarray(reset_options.get("distractor_xy", (-0.55, 0.0)), dtype=np.float32)
+        if distractor_xy.shape != (2,):
+            raise ValueError("distractor_xy must have shape (2,)")
+        self._set_distractor_xy(distractor_xy)
+        self._configure_m8_scene()
         self._state = WorldState(
             holding_food=False,
             food_consumed=False,
@@ -195,6 +228,10 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
             "food_variant": self._food_variant,
             "toy_variant": self._toy_variant,
             "dynamics_variant": self._dynamics_variant,
+            "camera_control": self._camera_control,
+            "camera_sector": self._scan_sector if self._camera_control == "scan" else None,
+            "blocked_distractor": self._blocked_distractor,
+            "geometry_variant": self._geometry_variant,
         }
 
     def step(
@@ -208,6 +245,9 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
         recovery_action = self._recovery_pending and skill.kind is ActionKind.WALK_TO and outcome is ActionOutcome.SUCCESS
         if recovery_action:
             self._recovery_pending = False
+        post_disturbance_completion = self._post_disturbance_pending and task_success
+        if post_disturbance_completion:
+            self._post_disturbance_pending = False
         disturbance = self._apply_disturbance_if_due(state)
         self._prior_outcome = outcome
         terminated = task_success or state.drives.satiety <= 0.0 or state.drives.energy <= 0.0
@@ -217,12 +257,16 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
             reward -= self.config.invalid_action_penalty
         if task_success:
             reward += self.config.play_success_reward if self._active_task.success_condition == "relieve_boredom" else self.config.task_success_reward
-        if recovery_action:
+        if recovery_action or post_disturbance_completion:
             reward += self.config.disturbance_recovery_reward
         if state.drives.satiety <= 0.0 or state.drives.energy <= 0.0:
             reward -= self.config.task_success_reward
         return self._observation(), float(reward), terminated, truncated, self._info(
-            outcome, task_success, disturbance=disturbance, recovery_action=recovery_action
+            outcome,
+            task_success,
+            disturbance=disturbance,
+            recovery_action=recovery_action,
+            post_disturbance_completion=post_disturbance_completion,
         )
 
     def render(self) -> np.ndarray | None:
@@ -248,8 +292,23 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
         if action.kind is ActionKind.WALK_RELATIVE:
             self._walk_toward(self._agent_xy() + action.target_xy, action.duration_seconds)
             return ActionOutcome.SUCCESS, False
+        if action.kind is ActionKind.SCAN:
+            if self._camera_control == "scan":
+                current = self._SCAN_SECTORS.index(self._scan_sector)
+                self._scan_sector = self._SCAN_SECTORS[(current + 1) % len(self._SCAN_SECTORS)]
+            self._advance_physics(action.duration_seconds)
+            return ActionOutcome.SUCCESS, False
         if action.kind is ActionKind.PICK_UP:
             if state.food_consumed or self._distance_to_food() > self.config.pickup_radius:
+                self._advance_physics(action.duration_seconds)
+                return ActionOutcome.BLOCKED, False
+            state.holding_food = True
+            self._set_food_xy(self._agent_xy())
+            self._advance_physics(action.duration_seconds)
+            return ActionOutcome.SUCCESS, False
+        if action.kind is ActionKind.PICK_UP_RELATIVE:
+            candidate = self._nearest_pickup_candidate(self._agent_xy() + action.target_xy)
+            if candidate != "food" or self._distance_to_food() > self.config.pickup_radius:
                 self._advance_physics(action.duration_seconds)
                 return ActionOutcome.BLOCKED, False
             state.holding_food = True
@@ -359,7 +418,13 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
         return {"rgb": rgb, **common}
 
     def _info(
-        self, outcome: ActionOutcome, task_success: bool, *, disturbance: str | None, recovery_action: bool
+        self,
+        outcome: ActionOutcome,
+        task_success: bool,
+        *,
+        disturbance: str | None,
+        recovery_action: bool,
+        post_disturbance_completion: bool,
     ) -> dict[str, Any]:
         state = self._require_state()
         return {
@@ -372,6 +437,7 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
             "camera_variant": self._camera_variant,
             "disturbance": disturbance,
             "recovery_action": recovery_action,
+            "post_disturbance_completion": post_disturbance_completion,
             "failure_reason": self._failure_reason(outcome),
             "task_id": self._active_task.name,
             "food_variant": self._food_variant,
@@ -380,6 +446,10 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
             "toy_played": state.toy_played,
             "boundary_contacts": state.boundary_contacts,
             "survived": state.drives.satiety > 0.0 and state.drives.energy > 0.0,
+            "camera_control": self._camera_control,
+            "camera_sector": self._scan_sector if self._camera_control == "scan" else None,
+            "blocked_distractor": self._blocked_distractor,
+            "geometry_variant": self._geometry_variant,
         }
 
     def _observation_spaces(self, radius: float) -> dict[str, spaces.Space[Any]]:
@@ -407,7 +477,8 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
             self._observation_renderer = mujoco.Renderer(
                 self.model, height=self.config.rgb_height, width=self.config.rgb_width
             )
-        self._observation_renderer.update_scene(self.data, camera=f"agent_cam_{self._camera_variant}")
+        camera = f"agent_cam_scan_{self._scan_sector}" if self._camera_control == "scan" else f"agent_cam_{self._camera_variant}"
+        self._observation_renderer.update_scene(self.data, camera=camera)
         return self._observation_renderer.render().copy()
 
     def _apply_disturbance_if_due(self, state: WorldState) -> str | None:
@@ -428,6 +499,7 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
         self._set_food_xy(candidate)
         self._disturbance_occurred = True
         self._recovery_pending = True
+        self._post_disturbance_pending = True
         return "food_relocated"
 
     @staticmethod
@@ -467,6 +539,13 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
         self.data.qpos[self._toy_qpos] = self._bounded_xy(xy)
         mujoco.mj_forward(self.model, self.data)
 
+    def _distractor_xy(self) -> np.ndarray:
+        return self.data.qpos[self._distractor_qpos].astype(np.float32)
+
+    def _set_distractor_xy(self, xy: np.ndarray) -> None:
+        self.data.qpos[self._distractor_qpos] = self._bounded_xy(xy)
+        mujoco.mj_forward(self.model, self.data)
+
     def _distance_to_toy(self) -> float:
         return float(np.linalg.norm(self._agent_xy() - self._toy_xy()))
 
@@ -474,7 +553,7 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
         return self._active_task.name in {"play_when_bored", "competing_drives"}
 
     def _environment_version(self) -> str:
-        return "0.4.0" if self._is_m4_task() else "0.3.0"
+        return "0.5.0" if self._camera_control == "scan" else ("0.4.0" if self._is_m4_task() else "0.3.0")
 
     def _configure_variants(self, *, food_variant: str, toy_variant: str, dynamics_variant: str) -> None:
         try:
@@ -497,6 +576,22 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
         self._toy_variant = toy_variant
         self._dynamics_variant = dynamics_variant
         self._movement_speed_scale = movement_scale
+
+    def _configure_m8_scene(self) -> None:
+        distractor_geom = self.model.geom("distractor_geom").id
+        geometry_geom = self.model.geom("m8_geometry_geom").id
+        self.model.geom_rgba[distractor_geom, :3] = self.model.geom_rgba[self.model.geom("food_geom").id, :3]
+        self.model.geom_rgba[distractor_geom, 3] = 1.0 if self._blocked_distractor else 0.0
+        self.model.geom_rgba[geometry_geom, 3] = 1.0 if self._geometry_variant == "unseen_block" else 0.0
+
+    def _nearest_pickup_candidate(self, target_xy: np.ndarray) -> str | None:
+        candidates = [("food", self._food_xy())]
+        if self._blocked_distractor:
+            candidates.append(("distractor", self._distractor_xy()))
+        name, candidate_xy = min(candidates, key=lambda item: float(np.linalg.norm(item[1] - target_xy)))
+        if float(np.linalg.norm(candidate_xy - target_xy)) > self.config.pickup_radius:
+            return None
+        return name
 
     def _bounded_xy(self, xy: np.ndarray) -> np.ndarray:
         limit = self.config.world_radius - self.config.body_clearance
