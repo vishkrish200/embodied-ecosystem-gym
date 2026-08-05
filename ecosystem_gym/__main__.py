@@ -10,6 +10,7 @@ from .m3 import collect_rgb_behavior_cloning_data, write_perception_report
 from .m4 import write_drive_report
 from .m6 import run_m6_viewer_demo, write_m6_report
 from .m7 import run_m7_viewer_demo, write_m7_report
+from .m8 import run_m8_viewer_demo, write_m8_report
 from .policies import evaluate_scripted_policy
 from .trajectory import replay_and_validate
 from .video import write_find_and_eat_regression_video
@@ -53,6 +54,11 @@ def main() -> None:
     m7_demo.add_argument("--trace", type=Path, required=True)
     m7_demo.add_argument("--task", choices=("play_when_bored", "competing_drives"), default="competing_drives")
     m7_demo.add_argument("--training-episodes", type=int, default=400)
+    m8_benchmark = subparsers.add_parser("m8-benchmark", help="run the frozen sequential RGB recovery protocol")
+    m8_benchmark.add_argument("--output", type=Path, required=True)
+    m8_demo = subparsers.add_parser("m8-demo", help="record and replay one M8 RGB recovery trace")
+    m8_demo.add_argument("--trace", type=Path, required=True)
+    m8_demo.add_argument("--seed", type=int, default=7)
     viewer = subparsers.add_parser("viewer", help="start the thin local live Gym viewer")
     viewer.add_argument("--trace", type=Path)
     viewer.add_argument("--port", type=int, default=8765)
@@ -88,6 +94,11 @@ def main() -> None:
         print(json.dumps(report["gate"]))
     elif args.command == "m7-demo":
         print(run_m7_viewer_demo(args.trace, task_id=args.task, training_episodes=args.training_episodes))
+    elif args.command == "m8-benchmark":
+        report = write_m8_report(args.output)
+        print(json.dumps({condition: result["fixed_rgb_scan_recovery_baseline"] for condition, result in report["results"].items()}))
+    elif args.command == "m8-demo":
+        print(run_m8_viewer_demo(args.trace, seed=args.seed))
     elif args.command == "viewer":
         with ViewerSession(trace_path=args.trace) as session:
             server = LocalViewerServer(session, port=args.port)
