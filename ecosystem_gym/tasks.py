@@ -79,6 +79,12 @@ LAYOUTS: dict[str, LayoutSpec] = {
     # M8.6 is a development-only factorial diagnosis. It deliberately avoids
     # M8.5's held-out coordinates while testing a new northeast relation.
     "m86_northeast": LayoutSpec("m86_northeast", (-0.46, -0.34), (0.18, 0.14), (0.54, 0.50)),
+    # M8.7 has separate development and validation layouts after M8.6 showed
+    # that blue-food grounding, not grippy dynamics, is the weak component.
+    "m87_train_northeast": LayoutSpec("m87_train_northeast", (-0.42, -0.30), (0.12, 0.10), (0.50, 0.48)),
+    "m87_train_northwest": LayoutSpec("m87_train_northwest", (0.42, -0.30), (-0.50, 0.10), (-0.12, 0.48)),
+    "m87_validation_northwest": LayoutSpec("m87_validation_northwest", (0.50, -0.40), (-0.70, 0.18), (-0.32, 0.56)),
+    "m87_validation_southeast": LayoutSpec("m87_validation_southeast", (-0.50, 0.40), (0.32, -0.70), (0.70, -0.32)),
 }
 
 TASKS: dict[str, TaskSpec] = {
