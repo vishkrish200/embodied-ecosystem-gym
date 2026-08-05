@@ -16,6 +16,7 @@ from ecosystem_gym.m82 import (
     M82_PAIRED_WIN_MARGIN,
     M82_TEST_SEEDS,
     m82_benchmark,
+    m82_observability_audit,
     run_m82_viewer_demo,
     write_m82_report,
 )
@@ -49,9 +50,9 @@ def test_m82_report_locks_weights_and_reports_the_stop_rule(tmp_path) -> None:
     assert verdict["predeclared_net_advantage_margin"] == M82_PAIRED_WIN_MARGIN
     low, high = verdict["paired_net_advantage_bootstrap_95"]
     assert -1.0 <= low <= high <= 1.0
-    assert verdict["transfer_win"] == (
-        verdict["paired_net_advantage"] >= M82_PAIRED_WIN_MARGIN and low > 0.0
-    )
+    assert verdict["transfer_win"] is None
+    assert report["observability_audit"]["valid"] is False
+    assert all(not result["passes"] for result in report["observability_audit"]["by_condition"].values())
     for condition in report["results"].values():
         assert set(condition) == {
             "m8_fixed_rgb_baseline",
@@ -72,6 +73,12 @@ def test_m82_rejects_non_protocol_test_seeds() -> None:
         assert "frozen" in str(error)
     else:
         raise AssertionError("custom M8.2 test seeds must be rejected")
+
+
+def test_m82_observability_audit_marks_the_legacy_suite_invalid() -> None:
+    audit = m82_observability_audit()
+    assert all(result["food_visible_in_any_scan_episodes"] == 0 for result in audit.values())
+    assert all(result["food_visible_scan_frames"] == 0 for result in audit.values())
 
 
 def test_m82_rejects_an_edited_m81_test_protocol(monkeypatch) -> None:

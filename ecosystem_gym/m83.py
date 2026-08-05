@@ -12,6 +12,7 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
+import mujoco
 import numpy as np
 
 from .actions import ActionKind
@@ -30,9 +31,10 @@ from .m81 import (
     m81_protocol_fingerprint,
 )
 from .m82 import M81_FROZEN_POLICY_FINGERPRINT, M81_FROZEN_PROTOCOL_FINGERPRINT
+from .policies import skill_action
 
 
-M83_PROTOCOL_VERSION = "m83-one-factor-diagnostics-v1"
+M83_PROTOCOL_VERSION = "m83-one-factor-diagnostics-v1-observability-audit"
 M83_DIAGNOSTIC_SEEDS = tuple(range(300, 320))
 
 # Every condition changes exactly one factor relative to the M8.1 reference
@@ -50,6 +52,43 @@ M83_CONDITIONS: dict[str, dict[str, Any]] = {
 
 def _options(controls: dict[str, Any]) -> dict[str, Any]:
     return {"task_id": M8_TASK_ID, **controls}
+
+
+def m83_observability_audit(*, seeds: tuple[int, ...] = M83_DIAGNOSTIC_SEEDS) -> dict[str, dict[str, object]]:
+    """Offline audit of four-view target visibility for the legacy diagnostic."""
+
+    if seeds != M83_DIAGNOSTIC_SEEDS:
+        raise ValueError("M8.3 diagnostic seeds are frozen; use M83_DIAGNOSTIC_SEEDS")
+    audit: dict[str, dict[str, object]] = {}
+    for condition, controls in M83_CONDITIONS.items():
+        visible_episodes = visible_frames = 0
+        for seed in seeds:
+            env = EcosystemEnv(m81_config())
+            renderer = mujoco.Renderer(env.model, height=env.config.rgb_height, width=env.config.rgb_width)
+            try:
+                env.reset(seed=seed, options=_options(controls))
+                food_id = env.model.geom("food_geom").id
+                visible = False
+                for _ in range(4):
+                    renderer.update_scene(env.data, camera=f"agent_cam_scan_{env._scan_sector}")
+                    renderer.enable_segmentation_rendering()
+                    segmentation = renderer.render()
+                    renderer.disable_segmentation_rendering()
+                    frame_visible = bool(np.any(segmentation[..., 0] == food_id))
+                    visible_frames += int(frame_visible)
+                    visible |= frame_visible
+                    env.step(skill_action(ActionKind.SCAN, np.zeros(2, dtype=np.float32), 0.1))
+                visible_episodes += int(visible)
+            finally:
+                renderer.close()
+                env.close()
+        audit[condition] = {
+            "episodes": len(seeds),
+            "food_visible_in_any_scan_episodes": visible_episodes,
+            "food_visible_scan_frames": visible_frames,
+            "passes": visible_episodes == len(seeds),
+        }
+    return audit
 
 
 def _initial_diagnostic(
@@ -94,6 +133,7 @@ def _initial_summary(
 def m83_diagnostics(*, seeds: tuple[int, ...] = M83_DIAGNOSTIC_SEEDS) -> dict[str, object]:
     if seeds != M83_DIAGNOSTIC_SEEDS:
         raise ValueError("M8.3 diagnostic seeds are frozen; use M83_DIAGNOSTIC_SEEDS")
+    observability = m83_observability_audit(seeds=seeds)
     feed_forward, recurrent = fit_m81_policies()
     protocol_fingerprint = m81_protocol_fingerprint()
     policy_fingerprint = m81_policy_fingerprint(feed_forward, recurrent)
@@ -134,11 +174,17 @@ def m83_diagnostics(*, seeds: tuple[int, ...] = M83_DIAGNOSTIC_SEEDS) -> dict[st
             "m83_training_episodes": 0,
         },
         "results": results,
+        "observability_audit": {
+            "method": "offline MuJoCo segmentation across the same four public scan views; unavailable to every policy",
+            "valid": all(result["passes"] for result in observability.values()),
+            "by_condition": observability,
+        },
         "initial_frame_diagnostics": initial_frames,
         "limits": [
             "M8.3 is a diagnosis of frozen M8.1 behavior, not a new learned-policy result.",
             "Initial component visibility is a measurement from M8's fixed adapter; it does not claim that a future raw-RGB learner needs that adapter.",
             "M8.2 remains sealed and is not present in this diagnostic matrix.",
+            "Rows with incomplete scan coverage cannot isolate policy grounding from target invisibility.",
         ],
     }
 

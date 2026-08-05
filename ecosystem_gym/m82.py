@@ -13,6 +13,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+import mujoco
 import numpy as np
 
 from .actions import ActionKind, ActionOutcome
@@ -36,7 +37,7 @@ from .trajectory import ReplayResult
 from .viewer import ViewerSession
 
 
-M82_PROTOCOL_VERSION = "m82-external-validity-v1"
+M82_PROTOCOL_VERSION = "m82-external-validity-v1-observability-audit"
 M82_TEST_SEEDS = tuple(range(200, 220))
 M82_PAIRED_WIN_MARGIN = 0.10
 M82_BOOTSTRAP_DRAWS = 10_000
@@ -45,6 +46,10 @@ M82_BOOTSTRAP_SEED = 20_260_805
 # ridge value, and the two fitted weight matrices before M8.2 was defined.
 M81_FROZEN_POLICY_FINGERPRINT = "bab1d79a31c850391479e37901e99231df0e3cf88eb695dda0747416999f9314"
 M81_FROZEN_PROTOCOL_FINGERPRINT = "27795532c4327227d9c5a44bc03be5dc479336af87a6f4c5d68d8f9716f88d54"
+M82_LEGACY_INVALID_REASON = (
+    "The legacy scan camera leaves the food outside every public scan frame on this suite, "
+    "so the recorded policy scores cannot support an external-validity conclusion."
+)
 
 # This suite was added after the M8.1 result.  It is disjoint from M8.1's
 # layout, seed, and result conditions, and no M8.2 episode is used in fitting.
@@ -98,6 +103,44 @@ class M82Episode:
 
 def _options(controls: dict[str, Any]) -> dict[str, Any]:
     return {"task_id": M8_TASK_ID, **controls}
+
+
+def m82_observability_audit(*, test_seeds: tuple[int, ...] = M82_TEST_SEEDS) -> dict[str, dict[str, object]]:
+    """Offline audit of whether legacy public scans ever expose the food target."""
+
+    if test_seeds != M82_TEST_SEEDS:
+        raise ValueError("M8.2 test seeds are frozen; use M82_TEST_SEEDS")
+    audit: dict[str, dict[str, object]] = {}
+    for condition, controls in M82_CONDITIONS.items():
+        visible_episodes = 0
+        visible_frames = 0
+        for seed in test_seeds:
+            env = EcosystemEnv(m81_config())
+            renderer = mujoco.Renderer(env.model, height=env.config.rgb_height, width=env.config.rgb_width)
+            try:
+                env.reset(seed=seed, options=_options(controls))
+                food_id = env.model.geom("food_geom").id
+                visible = False
+                for _ in range(4):
+                    renderer.update_scene(env.data, camera=f"agent_cam_scan_{env._scan_sector}")
+                    renderer.enable_segmentation_rendering()
+                    segmentation = renderer.render()
+                    renderer.disable_segmentation_rendering()
+                    frame_visible = bool(np.any(segmentation[..., 0] == food_id))
+                    visible_frames += int(frame_visible)
+                    visible |= frame_visible
+                    env.step(skill_action(ActionKind.SCAN, np.zeros(2, dtype=np.float32), 0.1))
+                visible_episodes += int(visible)
+            finally:
+                renderer.close()
+                env.close()
+        audit[condition] = {
+            "episodes": len(test_seeds),
+            "food_visible_in_any_scan_episodes": visible_episodes,
+            "food_visible_scan_frames": visible_frames,
+            "passes": visible_episodes == len(test_seeds),
+        }
+    return audit
 
 
 def _episode_result(
@@ -264,6 +307,7 @@ def m82_benchmark(*, test_seeds: tuple[int, ...] = M82_TEST_SEEDS) -> dict[str, 
         raise ValueError("M8.2 test seeds are frozen; use M82_TEST_SEEDS")
     if set(test_seeds) & (set(M81_TRAIN_SEEDS) | set(M81_TEST_SEEDS)):
         raise AssertionError("M8.2 seeds must remain disjoint from all M8.1 seeds")
+    observability = m82_observability_audit(test_seeds=test_seeds)
     feed_forward, recurrent = fit_m81_policies()
     policy_fingerprint = m81_policy_fingerprint(feed_forward, recurrent)
     protocol_fingerprint = m81_protocol_fingerprint()
@@ -294,7 +338,7 @@ def m82_benchmark(*, test_seeds: tuple[int, ...] = M82_TEST_SEEDS) -> dict[str, 
     paired_episodes = len(paired_ff)
     net_advantage = (recurrent_only - feed_forward_only) / paired_episodes
     ci_low, ci_high = _paired_bootstrap_interval(paired_rnn, paired_ff)
-    transfer_win = net_advantage >= M82_PAIRED_WIN_MARGIN and ci_low > 0.0
+    observable = all(result["passes"] for result in observability.values())
     return {
         "schema_version": "0.82",
         "protocol_version": M82_PROTOCOL_VERSION,
@@ -311,6 +355,12 @@ def m82_benchmark(*, test_seeds: tuple[int, ...] = M82_TEST_SEEDS) -> dict[str, 
         },
         "test_seeds": list(test_seeds),
         "conditions": M82_CONDITIONS,
+        "observability_audit": {
+            "method": "offline MuJoCo segmentation across the same four public scan views; unavailable to every policy",
+            "valid": observable,
+            "reason": None if observable else M82_LEGACY_INVALID_REASON,
+            "by_condition": observability,
+        },
         "policy_boundary": {
             "m8_fixed_rgb_baseline": ["rgb", "drives", "holding_food", "prior_outcome", "policy_owned_memory"],
             "feed_forward_rgb_bc": ["rgb"],
@@ -326,15 +376,16 @@ def m82_benchmark(*, test_seeds: tuple[int, ...] = M82_TEST_SEEDS) -> dict[str, 
             "feed_forward_only_successes": feed_forward_only,
             "paired_net_advantage": net_advantage,
             "paired_net_advantage_bootstrap_95": [ci_low, ci_high],
-            "transfer_win": transfer_win,
-            "predeclared_stop_rule": "Advance to M9 only when the M8.2 paired advantage is at least 0.10 and its 95% bootstrap lower bound is above zero; otherwise retain this as a negative external-validity result and do not tune or retrain on M8.2.",
-            "next_milestone": "M9 learned target grounding" if transfer_win else "stop: document negative external-validity result",
+            "transfer_win": None if not observable else net_advantage >= M82_PAIRED_WIN_MARGIN and ci_low > 0.0,
+            "predeclared_stop_rule": "Interpret the paired transfer comparison only when every episode exposes the food in at least one public scan frame; otherwise retain the scores as an invalid legacy artifact and repair the camera protocol without training on M8.2.",
+            "next_milestone": "repair camera coverage and define a new sealed suite" if not observable else "M9 learned target grounding",
         },
         "limits": [
             "M8.2 reuses the fixed M8 RGB component adapter to ground local targets, so it does not establish end-to-end learned perception or geometry reasoning.",
             "The state-oracle result is a privileged ceiling, not an equal-input baseline.",
             "The blocked distractor remains a kinematic interaction guard rather than contact-physics or obstacle-planning evidence.",
             "M8.2 is post-result held-out only if this fixed suite remains sealed: its seeds, conditions, and outcomes must not be used to retrain or select M8.1 weights.",
+            M82_LEGACY_INVALID_REASON,
         ],
     }
 

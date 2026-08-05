@@ -63,6 +63,13 @@ LAYOUTS: dict[str, LayoutSpec] = {
     # attributed to one spatial change at a time rather than a compound row.
     "m83_agent_northwest": LayoutSpec("m83_agent_northwest", (0.38, -0.42), (0.25, 0.50), (0.50, 0.70)),
     "m83_food_northwest": LayoutSpec("m83_food_northwest", (0.0, 0.0), (-0.82, 0.25), (-0.40, 0.72)),
+    # M8.4 uses its own spatial development and validation distributions; it
+    # never reuses M8.2 audit layouts or M8.3 diagnosis rows for selection.
+    "m84_train_west": LayoutSpec("m84_train_west", (0.18, -0.20), (-0.72, -0.08), (-0.32, 0.36)),
+    "m84_train_southeast": LayoutSpec("m84_train_southeast", (-0.18, 0.16), (0.18, -0.72), (0.64, -0.30)),
+    "m84_train_southwest": LayoutSpec("m84_train_southwest", (0.24, 0.26), (-0.74, -0.76), (-0.34, -0.36)),
+    "m84_validation_northwest": LayoutSpec("m84_validation_northwest", (0.30, -0.26), (-0.78, 0.18), (-0.48, 0.58)),
+    "m84_validation_southeast": LayoutSpec("m84_validation_southeast", (-0.28, 0.30), (0.38, -0.78), (0.76, -0.42)),
 }
 
 TASKS: dict[str, TaskSpec] = {

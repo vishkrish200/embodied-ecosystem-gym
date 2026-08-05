@@ -65,6 +65,10 @@ _MODEL_XML = """
       <camera name="agent_cam_scan_east" pos="0.52 0 1.15" fovy="48" xyaxes="1 0 0 0 1 0"/>
       <camera name="agent_cam_scan_south" pos="0 -0.52 1.15" fovy="48" xyaxes="1 0 0 0 1 0"/>
       <camera name="agent_cam_scan_west" pos="-0.52 0 1.15" fovy="48" xyaxes="1 0 0 0 1 0"/>
+      <camera name="agent_cam_scan_v2_north" pos="0 0.52 1.15" fovy="90" xyaxes="1 0 0 0 1 0"/>
+      <camera name="agent_cam_scan_v2_east" pos="0.52 0 1.15" fovy="90" xyaxes="1 0 0 0 1 0"/>
+      <camera name="agent_cam_scan_v2_south" pos="0 -0.52 1.15" fovy="90" xyaxes="1 0 0 0 1 0"/>
+      <camera name="agent_cam_scan_v2_west" pos="-0.52 0 1.15" fovy="90" xyaxes="1 0 0 0 1 0"/>
     </body>
     <body name="food" pos="0 0 0.06">
       <joint name="food_x" type="slide" axis="1 0 0" range="-0.9 0.9"/>
@@ -191,8 +195,8 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
         self._recovery_pending = False
         self._post_disturbance_pending = False
         self._camera_control = str(reset_options.get("camera_control", "fixed"))
-        if self._camera_control not in {"fixed", "scan"}:
-            raise ValueError("camera_control must be fixed or scan")
+        if self._camera_control not in {"fixed", "scan", "scan_v2"}:
+            raise ValueError("camera_control must be fixed, scan, or scan_v2")
         self._scan_sector = str(reset_options.get("initial_scan_sector", "north"))
         if self._scan_sector not in self._SCAN_SECTORS:
             raise ValueError(f"initial_scan_sector must be one of {self._SCAN_SECTORS}")
@@ -239,7 +243,7 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
             "dynamics_variant": self._dynamics_variant,
             "lighting_variant": self._lighting_variant,
             "camera_control": self._camera_control,
-            "camera_sector": self._scan_sector if self._camera_control == "scan" else None,
+            "camera_sector": self._scan_sector if self._camera_control in {"scan", "scan_v2"} else None,
             "blocked_distractor": self._blocked_distractor,
             "geometry_variant": self._geometry_variant,
         }
@@ -303,7 +307,7 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
             self._walk_toward(self._agent_xy() + action.target_xy, action.duration_seconds)
             return ActionOutcome.SUCCESS, False
         if action.kind is ActionKind.SCAN:
-            if self._camera_control == "scan":
+            if self._camera_control in {"scan", "scan_v2"}:
                 current = self._SCAN_SECTORS.index(self._scan_sector)
                 self._scan_sector = self._SCAN_SECTORS[(current + 1) % len(self._SCAN_SECTORS)]
             self._advance_physics(action.duration_seconds)
@@ -457,7 +461,7 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
             "boundary_contacts": state.boundary_contacts,
             "survived": state.drives.satiety > 0.0 and state.drives.energy > 0.0,
             "camera_control": self._camera_control,
-            "camera_sector": self._scan_sector if self._camera_control == "scan" else None,
+            "camera_sector": self._scan_sector if self._camera_control in {"scan", "scan_v2"} else None,
             "blocked_distractor": self._blocked_distractor,
             "geometry_variant": self._geometry_variant,
         }
@@ -487,7 +491,13 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
             self._observation_renderer = mujoco.Renderer(
                 self.model, height=self.config.rgb_height, width=self.config.rgb_width
             )
-        camera = f"agent_cam_scan_{self._scan_sector}" if self._camera_control == "scan" else f"agent_cam_{self._camera_variant}"
+        camera = (
+            f"agent_cam_scan_v2_{self._scan_sector}"
+            if self._camera_control == "scan_v2"
+            else f"agent_cam_scan_{self._scan_sector}"
+            if self._camera_control == "scan"
+            else f"agent_cam_{self._camera_variant}"
+        )
         self._observation_renderer.update_scene(self.data, camera=camera)
         return self._observation_renderer.render().copy()
 
@@ -563,6 +573,8 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
         return self._active_task.name in {"play_when_bored", "competing_drives"}
 
     def _environment_version(self) -> str:
+        if self._camera_control == "scan_v2":
+            return "0.6.0"
         return "0.5.0" if self._camera_control == "scan" else ("0.4.0" if self._is_m4_task() else "0.3.0")
 
     def _configure_variants(
