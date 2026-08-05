@@ -9,8 +9,9 @@ The initial build uses Gymnasium and MuJoCo. It starts with parameterized skills
 ## Canonical decisions
 
 - Use `satiety` rather than an ambiguously decreasing hunger number: `1.0` means full.
-- Keep the v1 action set small: `walk_to`, `pick_up`, `consume`, `place`, `run_around`, and `idle`.
+- Keep the v1 action set small: `walk_to`, `walk_relative`, `pick_up`, `pick_up_relative`, `consume`, `place`, `run_around`, `idle`, and `scan`.
 - Make all action outcomes explicit; invalid actions never silently mutate state.
 - Support `state_oracle`, `hybrid`, and egocentric `rgb` observations, and report their results separately.
 - Write one replayable, versioned record per step. Do not mix privileged simulator state into RGB-only training data.
 - Establish a scripted oracle and state-based RL baseline before investing in VLM/VLA integration or a polished frontend.
+- Keep M8 sequential-RGB results as benchmark-validity evidence: the fixed colour adapter is a baseline, confidence intervals and a privileged ceiling are mandatory, and visual-geometry failure remains reportable rather than being hidden behind a gate.

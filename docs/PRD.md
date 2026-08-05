@@ -48,7 +48,7 @@ Observation modes:
 
 - `state_oracle`: privileged state for debugging and fast baseline RL only.
 - `hybrid`: RGB plus non-privileged detected-object data, to isolate perception failures.
-- `rgb`: egocentric camera, normalized drives, and prior action outcome only.
+- `rgb`: egocentric camera, normalized drives, and prior action outcome only. Camera-control state stays out of the observation; a policy can retain only its own action history.
 
 V1 actions and results:
 
@@ -60,6 +60,8 @@ V1 actions and results:
 | `place` | target XY | Put a held object down. |
 | `run_around` | duration, radius | Explore/play while consuming energy. |
 | `idle` | duration | Advance time without acting. |
+| `scan` | duration | Advance the agent-mounted RGB camera to its next public camera sector. |
+| `pick_up_relative` | local RGB-relative target | Attempt pickup of the visible candidate at a local offset; a blocked distractor returns `blocked`. |
 
 Each action returns `success`, `blocked`, `target_not_visible`, `not_holding_object`, `not_edible`, or `timeout`. The environment must never repair a failure invisibly.
 
@@ -100,6 +102,7 @@ Release criteria:
 - A state-oracle policy materially beats random on Find and eat.
 - Oracle, hybrid, and RGB-only results are distinct reports.
 - Every logged trajectory validates and replays without missing assets.
+- Sequential RGB recovery uses a frozen 20-seed protocol with named adverse conditions, binomial confidence intervals, and a separately labeled state-oracle ceiling.
 
 ## Technical approach
 
