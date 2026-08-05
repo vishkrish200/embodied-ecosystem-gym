@@ -9,6 +9,7 @@ step info.  M8.2 is excluded from this module's training and validation.
 
 from __future__ import annotations
 
+import hashlib
 import json
 from collections import Counter
 from dataclasses import dataclass
@@ -371,6 +372,36 @@ def _fit_grounder_after_coverage_check() -> LearnedRgbHeatmapGrounder:
 def fit_m84_grounder() -> LearnedRgbHeatmapGrounder:
     _require_full_scan_coverage(M84_TRAIN_CONDITIONS, seeds=M84_TRAIN_SEEDS, label="M8.4 training protocol")
     return _fit_grounder_after_coverage_check()
+
+
+def m84_policy_fingerprint(grounder: LearnedRgbHeatmapGrounder) -> str:
+    """Stable digest of the deterministic learned parameters used by M8.5."""
+
+    digest = hashlib.sha256()
+    for values in (grounder.hidden, grounder.hidden_bias, grounder.output, grounder.output_bias, grounder.pixel_map):
+        array = np.asarray(values, dtype=np.float64)
+        digest.update(np.asarray(array.shape, dtype=np.int64).tobytes())
+        digest.update(array.tobytes())
+    return digest.hexdigest()
+
+
+def m84_protocol_fingerprint() -> str:
+    """Digest every training choice that must remain fixed for M8.5."""
+
+    payload = {
+        "protocol_version": M84_PROTOCOL_VERSION,
+        "train_seeds": M84_TRAIN_SEEDS,
+        "train_conditions": M84_TRAIN_CONDITIONS,
+        "patch_radius": M84_PATCH_RADIUS,
+        "hidden_units": M84_HIDDEN_UNITS,
+        "train_steps": M84_TRAIN_STEPS,
+        "batch_size": M84_BATCH_SIZE,
+        "learning_rate": M84_LEARNING_RATE,
+        "confidence_threshold": M84_CONFIDENCE_THRESHOLD,
+        "minimum_component_pixels": M84_MIN_COMPONENT_PIXELS,
+    }
+    encoded = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
 
 
 @dataclass(frozen=True, slots=True)

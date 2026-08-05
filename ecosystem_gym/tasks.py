@@ -70,6 +70,12 @@ LAYOUTS: dict[str, LayoutSpec] = {
     "m84_train_southwest": LayoutSpec("m84_train_southwest", (0.24, 0.26), (-0.74, -0.76), (-0.34, -0.36)),
     "m84_validation_northwest": LayoutSpec("m84_validation_northwest", (0.30, -0.26), (-0.78, 0.18), (-0.48, 0.58)),
     "m84_validation_southeast": LayoutSpec("m84_validation_southeast", (-0.28, 0.30), (0.38, -0.78), (0.76, -0.42)),
+    # M8.5 is a post-result audit of the frozen M8.4 grounder.  These layouts
+    # are disjoint from M8.4 development/validation and every legacy M8 suite.
+    "m85_northeast": LayoutSpec("m85_northeast", (-0.56, -0.46), (0.30, 0.28), (0.70, 0.68)),
+    "m85_southwest": LayoutSpec("m85_southwest", (0.58, 0.46), (-0.72, -0.72), (-0.32, -0.32)),
+    "m85_northwest": LayoutSpec("m85_northwest", (0.56, -0.48), (-0.76, 0.26), (-0.36, 0.66)),
+    "m85_southeast": LayoutSpec("m85_southeast", (-0.58, 0.48), (0.32, -0.72), (0.72, -0.32)),
 }
 
 TASKS: dict[str, TaskSpec] = {
