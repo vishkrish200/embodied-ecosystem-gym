@@ -478,10 +478,15 @@ def _aggregate(episodes: list[M84Episode]) -> dict[str, object]:
     }
 
 
-def _grounding_metrics(grounder: LearnedRgbHeatmapGrounder, controls: dict[str, Any]) -> dict[str, object]:
+def _grounding_metrics(
+    grounder: LearnedRgbHeatmapGrounder,
+    controls: dict[str, Any],
+    *,
+    seeds: tuple[int, ...] = M84_VALIDATION_SEEDS,
+) -> dict[str, object]:
     true_positive = false_positive = false_negative = 0
     errors: list[float] = []
-    for seed in M84_VALIDATION_SEEDS:
+    for seed in seeds:
         env = EcosystemEnv(m84_config())
         renderer = mujoco.Renderer(env.model, height=env.config.rgb_height, width=env.config.rgb_width)
         try:
@@ -511,7 +516,7 @@ def _grounding_metrics(grounder: LearnedRgbHeatmapGrounder, controls: dict[str, 
     precision = true_positive / max(true_positive + false_positive, 1)
     recall = true_positive / max(true_positive + false_negative, 1)
     return {
-        "frames": 4 * len(M84_VALIDATION_SEEDS),
+        "frames": 4 * len(seeds),
         "component_match_radius": M84_COMPONENT_MATCH_RADIUS,
         "matched_target_components": true_positive,
         "false_positive_components": false_positive,

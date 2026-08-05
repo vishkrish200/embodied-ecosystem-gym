@@ -16,6 +16,7 @@ from .m82 import run_m82_viewer_demo, write_m82_report
 from .m83 import write_m83_report
 from .m84 import run_m84_viewer_demo, write_m84_report
 from .m85 import run_m85_viewer_demo, write_m85_report
+from .m86 import run_m86_viewer_demo, write_m86_report
 from .policies import evaluate_scripted_policy
 from .trajectory import replay_and_validate
 from .video import write_find_and_eat_regression_video
@@ -82,6 +83,10 @@ def main() -> None:
     m85_benchmark.add_argument("--output", type=Path, required=True)
     m85_demo = subparsers.add_parser("m85-demo", help="record and replay one frozen M8.5 heatmap rollout")
     m85_demo.add_argument("--trace", type=Path, required=True)
+    m86_diagnostics = subparsers.add_parser("m86-diagnostics", help="run development-only M8.6 factor diagnostics")
+    m86_diagnostics.add_argument("--output", type=Path, required=True)
+    m86_demo = subparsers.add_parser("m86-demo", help="record and replay one M8.6 blue-grounding diagnostic")
+    m86_demo.add_argument("--trace", type=Path, required=True)
     viewer = subparsers.add_parser("viewer", help="start the thin local live Gym viewer")
     viewer.add_argument("--trace", type=Path)
     viewer.add_argument("--port", type=int, default=8765)
@@ -145,6 +150,11 @@ def main() -> None:
         print(json.dumps(report["external_validity_gate"]))
     elif args.command == "m85-demo":
         print(run_m85_viewer_demo(args.trace))
+    elif args.command == "m86-diagnostics":
+        report = write_m86_report(args.output)
+        print(json.dumps({condition: result["frozen_m84_rgb_heatmap"] for condition, result in report["results"].items()}))
+    elif args.command == "m86-demo":
+        print(run_m86_viewer_demo(args.trace))
     elif args.command == "viewer":
         with ViewerSession(trace_path=args.trace) as session:
             server = LocalViewerServer(session, port=args.port)

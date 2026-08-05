@@ -76,6 +76,9 @@ LAYOUTS: dict[str, LayoutSpec] = {
     "m85_southwest": LayoutSpec("m85_southwest", (0.58, 0.46), (-0.72, -0.72), (-0.32, -0.32)),
     "m85_northwest": LayoutSpec("m85_northwest", (0.56, -0.48), (-0.76, 0.26), (-0.36, 0.66)),
     "m85_southeast": LayoutSpec("m85_southeast", (-0.58, 0.48), (0.32, -0.72), (0.72, -0.32)),
+    # M8.6 is a development-only factorial diagnosis. It deliberately avoids
+    # M8.5's held-out coordinates while testing a new northeast relation.
+    "m86_northeast": LayoutSpec("m86_northeast", (-0.46, -0.34), (0.18, 0.14), (0.54, 0.50)),
 }
 
 TASKS: dict[str, TaskSpec] = {
