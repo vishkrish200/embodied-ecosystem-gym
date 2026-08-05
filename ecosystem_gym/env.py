@@ -27,6 +27,16 @@ _TOY_VARIANTS = {
     "cube": "toy_cube_geom",
     "capsule": "toy_capsule_geom",
 }
+_AGENT_SHAPE_VARIANTS = {
+    "sphere": "agent_geom",
+    "capsule": "agent_capsule_geom",
+    "box": "agent_box_geom",
+}
+_FOOD_SHAPE_VARIANTS = {
+    "sphere": "food_geom",
+    "capsule": "food_capsule_geom",
+    "box": "food_box_geom",
+}
 _DYNAMICS_VARIANTS = {
     "nominal": (1.0, 0.9),
     "grippy": (0.90, 1.2),
@@ -58,6 +68,8 @@ _MODEL_XML = """
       <joint name="agent_x" type="slide" axis="1 0 0" range="-0.9 0.9"/>
       <joint name="agent_y" type="slide" axis="0 1 0" range="-0.9 0.9"/>
       <geom name="agent_geom" type="sphere" size="0.12" rgba="0.18 0.55 0.95 1"/>
+      <geom name="agent_capsule_geom" type="capsule" size="0.065 0.070" euler="0 90 0" contype="0" conaffinity="0" rgba="0.18 0.55 0.95 0"/>
+      <geom name="agent_box_geom" type="box" size="0.115 0.075 0.100" contype="0" conaffinity="0" rgba="0.18 0.55 0.95 0"/>
       <camera name="agent_cam_center" pos="0 0 1.5" fovy="75"/>
       <camera name="agent_cam_left" pos="-0.08 0.04 1.5" fovy="75"/>
       <camera name="agent_cam_right" pos="0.08 -0.04 1.5" fovy="75"/>
@@ -74,6 +86,8 @@ _MODEL_XML = """
       <joint name="food_x" type="slide" axis="1 0 0" range="-0.9 0.9"/>
       <joint name="food_y" type="slide" axis="0 1 0" range="-0.9 0.9"/>
       <geom name="food_geom" type="sphere" size="0.06" contype="0" conaffinity="0" rgba="0.92 0.20 0.16 1"/>
+      <geom name="food_capsule_geom" type="capsule" size="0.040 0.045" euler="0 90 0" contype="0" conaffinity="0" rgba="0.92 0.20 0.16 0"/>
+      <geom name="food_box_geom" type="box" size="0.065 0.040 0.040" contype="0" conaffinity="0" rgba="0.92 0.20 0.16 0"/>
     </body>
     <body name="toy" pos="0 0 0.08">
       <joint name="toy_x" type="slide" axis="1 0 0" range="-0.9 0.9"/>
@@ -170,6 +184,8 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
         self._scan_sector = "north"
         self._blocked_distractor = False
         self._geometry_variant = "default"
+        self._agent_shape_variant = "sphere"
+        self._food_shape_variant = "sphere"
 
     def reset(
         self,
@@ -210,6 +226,8 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
             toy_variant=str(reset_options.get("toy_variant", "ball")),
             dynamics_variant=str(reset_options.get("dynamics_variant", "nominal")),
             lighting_variant=str(reset_options.get("lighting_variant", "nominal")),
+            agent_shape_variant=str(reset_options.get("agent_shape_variant", "sphere")),
+            food_shape_variant=str(reset_options.get("food_shape_variant", "sphere")),
         )
         self._set_agent_xy(np.asarray(self._active_layout.agent_xy, dtype=np.float32))
         self._set_food_xy(self._active_layout.sample_food_xy(self.np_random))
@@ -578,7 +596,14 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
         return "0.5.0" if self._camera_control == "scan" else ("0.4.0" if self._is_m4_task() else "0.3.0")
 
     def _configure_variants(
-        self, *, food_variant: str, toy_variant: str, dynamics_variant: str, lighting_variant: str
+        self,
+        *,
+        food_variant: str,
+        toy_variant: str,
+        dynamics_variant: str,
+        lighting_variant: str,
+        agent_shape_variant: str,
+        food_shape_variant: str,
     ) -> None:
         try:
             food_rgba = FOOD_VARIANTS[food_variant]
@@ -596,7 +621,21 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
             ambient, diffuse = _LIGHTING_VARIANTS[lighting_variant]
         except KeyError as exc:
             raise ValueError(f"unknown lighting_variant '{lighting_variant}'; expected one of {sorted(_LIGHTING_VARIANTS)}") from exc
-        self.model.geom_rgba[self.model.geom("food_geom").id] = food_rgba
+        try:
+            active_agent_geom = _AGENT_SHAPE_VARIANTS[agent_shape_variant]
+        except KeyError as exc:
+            raise ValueError(f"unknown agent_shape_variant '{agent_shape_variant}'; expected one of {sorted(_AGENT_SHAPE_VARIANTS)}") from exc
+        try:
+            active_food_geom = _FOOD_SHAPE_VARIANTS[food_shape_variant]
+        except KeyError as exc:
+            raise ValueError(f"unknown food_shape_variant '{food_shape_variant}'; expected one of {sorted(_FOOD_SHAPE_VARIANTS)}") from exc
+        for geom_name in _AGENT_SHAPE_VARIANTS.values():
+            geom = self.model.geom(geom_name).id
+            self.model.geom_rgba[geom, 3] = 1.0 if geom_name == active_agent_geom else 0.0
+        for geom_name in _FOOD_SHAPE_VARIANTS.values():
+            geom = self.model.geom(geom_name).id
+            self.model.geom_rgba[geom] = food_rgba
+            self.model.geom_rgba[geom, 3] = 1.0 if geom_name == active_food_geom else 0.0
         for variant, geom_name in _TOY_VARIANTS.items():
             self.model.geom_rgba[self.model.geom(geom_name).id, 3] = 1.0 if geom_name == active_toy_geom else 0.0
         self.model.geom_friction[self.model.geom("floor").id, 0] = floor_friction
@@ -606,7 +645,15 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
         self._toy_variant = toy_variant
         self._dynamics_variant = dynamics_variant
         self._lighting_variant = lighting_variant
+        self._agent_shape_variant = agent_shape_variant
+        self._food_shape_variant = food_shape_variant
         self._movement_speed_scale = movement_scale
+
+    def _active_agent_geom_names(self) -> tuple[str, ...]:
+        return (_AGENT_SHAPE_VARIANTS[self._agent_shape_variant],)
+
+    def _active_food_geom_names(self) -> tuple[str, ...]:
+        return (_FOOD_SHAPE_VARIANTS[self._food_shape_variant],)
 
     def _configure_m8_scene(self) -> None:
         distractor_geom = self.model.geom("distractor_geom").id

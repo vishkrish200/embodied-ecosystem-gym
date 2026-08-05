@@ -119,17 +119,21 @@ def _segmentation_frame(env: EcosystemEnv, renderer: mujoco.Renderer) -> Trainin
     segmentation = renderer.render().copy()
     renderer.disable_segmentation_rendering()
     ids = segmentation[..., 0]
-    agent_id = env.model.geom("agent_geom").id
-    target_ids = (env.model.geom("food_geom").id, env.model.geom("distractor_geom").id)
+    agent_ids = tuple(env.model.geom(name).id for name in env._active_agent_geom_names())
+    food_ids = tuple(env.model.geom(name).id for name in env._active_food_geom_names())
+    target_ids = (*food_ids, env.model.geom("distractor_geom").id)
     labels = np.full(ids.shape, _BACKGROUND, dtype=np.int8)
-    labels[ids == agent_id] = _AGENT
+    labels[np.isin(ids, agent_ids)] = _AGENT
     labels[np.isin(ids, target_ids)] = _TARGET
-    agent_pixels = np.argwhere(ids == agent_id)
+    agent_pixels = np.argwhere(np.isin(ids, agent_ids))
     if not len(agent_pixels):
         return TrainingFrame(env._rgb_observation(), labels, ())
     agent_centre = np.asarray((float(np.mean(agent_pixels[:, 1])), -float(np.mean(agent_pixels[:, 0]))), dtype=np.float64)
     pairs: list[tuple[np.ndarray, np.ndarray]] = []
-    for geom_name, target_xy in (("food_geom", env._food_xy()), ("distractor_geom", env._distractor_xy())):
+    for geom_name, target_xy in (
+        *((name, env._food_xy()) for name in env._active_food_geom_names()),
+        ("distractor_geom", env._distractor_xy()),
+    ):
         pixels = np.argwhere(ids == env.model.geom(geom_name).id)
         if len(pixels):
             centre = np.asarray((float(np.mean(pixels[:, 1])), -float(np.mean(pixels[:, 0]))), dtype=np.float64)
@@ -140,13 +144,13 @@ def _segmentation_frame(env: EcosystemEnv, renderer: mujoco.Renderer) -> Trainin
 def _scan_visibility(env: EcosystemEnv, renderer: mujoco.Renderer) -> bool:
     """Offline benchmark audit: whether a four-view scan contains the food."""
 
-    food_id = env.model.geom("food_geom").id
+    food_ids = tuple(env.model.geom(name).id for name in env._active_food_geom_names())
     for _ in range(4):
         renderer.update_scene(env.data, camera=_camera_name(env))
         renderer.enable_segmentation_rendering()
         segmentation = renderer.render()
         renderer.disable_segmentation_rendering()
-        if np.any(segmentation[..., 0] == food_id):
+        if np.any(np.isin(segmentation[..., 0], food_ids)):
             return True
         env.step(skill_action(ActionKind.SCAN, np.zeros(2, dtype=np.float32), 0.1))
     return False

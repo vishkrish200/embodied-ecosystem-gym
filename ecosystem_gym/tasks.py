@@ -90,6 +90,12 @@ LAYOUTS: dict[str, LayoutSpec] = {
     "m88_southwest": LayoutSpec("m88_southwest", (0.62, 0.50), (-0.70, -0.70), (-0.28, -0.28)),
     "m88_northwest": LayoutSpec("m88_northwest", (0.56, -0.44), (-0.66, 0.24), (-0.30, 0.62)),
     "m88_southeast": LayoutSpec("m88_southeast", (-0.62, 0.50), (0.30, -0.74), (0.72, -0.32)),
+    # M8.9 is a fresh visual-morphology audit for the frozen M8.7 grounder.
+    # It does not reuse M8.5, M8.7, or M8.8 layouts.
+    "m89_northeast": LayoutSpec("m89_northeast", (-0.68, -0.56), (0.18, 0.34), (0.56, 0.72)),
+    "m89_southwest": LayoutSpec("m89_southwest", (0.68, 0.56), (-0.76, -0.68), (-0.38, -0.30)),
+    "m89_northwest": LayoutSpec("m89_northwest", (0.62, -0.54), (-0.74, 0.20), (-0.38, 0.58)),
+    "m89_southeast": LayoutSpec("m89_southeast", (-0.68, 0.56), (0.30, -0.68), (0.62, -0.34)),
 }
 
 TASKS: dict[str, TaskSpec] = {
