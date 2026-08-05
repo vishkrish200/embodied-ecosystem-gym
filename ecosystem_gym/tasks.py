@@ -52,6 +52,9 @@ LAYOUTS: dict[str, LayoutSpec] = {
     "m4_train_competing": LayoutSpec("m4_train_competing", (0.0, 0.0), (0.35, -0.30), (0.65, 0.30), (-0.46, 0.0)),
     "m4_heldout_play": LayoutSpec("m4_heldout_play", (0.38, -0.42), (-0.82, 0.25), (-0.30, 0.80), (-0.42, 0.42)),
     "m4_heldout_competing": LayoutSpec("m4_heldout_competing", (-0.38, 0.42), (0.30, -0.80), (0.82, -0.25), (0.42, -0.42)),
+    # M8 uses this fixed-distribution protocol layout so the relocation event
+    # always happens before a food pickup can succeed.
+    "m8_protocol": LayoutSpec("m8_protocol", (0.0, 0.0), (0.25, 0.50), (0.50, 0.70)),
 }
 
 TASKS: dict[str, TaskSpec] = {

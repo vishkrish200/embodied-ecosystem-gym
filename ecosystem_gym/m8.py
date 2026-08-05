@@ -25,7 +25,7 @@ from .viewer import ViewerSession
 M8_PROTOCOL_VERSION = "m8-rgb-recovery-v1"
 M8_EVALUATION_SEEDS = tuple(range(20))
 M8_TASK_ID = "find_and_eat_perception"
-M8_LAYOUT_ID = "m3_train_center"
+M8_LAYOUT_ID = "m8_protocol"
 M8_SCAN_SECTORS = ("north", "east", "south", "west")
 M8_CAMERA_HALF_EXTENT = 0.52
 
@@ -324,7 +324,9 @@ def run_m8_viewer_demo(trace_path: str | Path, *, seed: int = 7) -> ReplayResult
     """Record/replay one relocation rollout through the unchanged thin viewer."""
 
     policy = FixedRgbScanRecoveryPolicy()
-    options = _m8_options("relocation")
+    # The replay artifact combines initial camera-sector occlusion with the
+    # fixed relocation, so it shows both scan and recovery transitions.
+    options = {**_m8_options("relocation"), "initial_scan_sector": "east"}
     with ViewerSession(EcosystemEnv(m8_config(), render_mode="rgb_array"), trace_path=trace_path, episode_id="m8-rgb-recovery") as session:
         observation, _ = session.reset(seed=seed, options=options)
         memory = policy.reset()
