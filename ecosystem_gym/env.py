@@ -506,6 +506,7 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
                 "agent_xy": self._agent_xy().copy(),
                 "food_xy": self._food_xy().copy(),
                 "toy_xy": self._toy_xy().copy(),
+                "rest_xy": self._rest_xy().copy(),
                 **common,
             }
         rgb = self._rgb_observation()
@@ -566,6 +567,7 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
                 "agent_xy": spaces.Box(low=-radius, high=radius, shape=(2,), dtype=np.float32),
                 "food_xy": spaces.Box(low=-radius, high=radius, shape=(2,), dtype=np.float32),
                 "toy_xy": spaces.Box(low=-radius, high=radius, shape=(2,), dtype=np.float32),
+                "rest_xy": spaces.Box(low=-radius, high=radius, shape=(2,), dtype=np.float32),
                 **common,
             }
         image = spaces.Box(

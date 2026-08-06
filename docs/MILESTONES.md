@@ -142,11 +142,11 @@ Exit when every validation condition reaches at least 15/20 horizon survivals, e
 
 Return to the original observation ladder. Train a reinforcement-learning policy on M10's persistent-maintenance task using the permitted `state_oracle` observation only: public object/resource state, drives, holding state, prior outcome, and policy-owned memory. It must learn high-level skill selection over the existing typed action interface; it must not receive task IDs, reset options, `info`, or private environment access.
 
-Before training, version the reward, observation encoding, macro/action set, training budget, random seeds, train layouts, validation layouts, and one untouched audit suite. Use new development and validation splits because M10's 1700–1819 seeds have already supported M12 fitting or iterative validation. The untouched M10 1900–1919 audit range may be used only as the one-shot final audit if its layouts remain suitable; otherwise reserve an equivalent new audit range before fitting.
+Before training, version the reward, observation encoding, macro/action set, training budget, random seeds, train layouts, validation layouts, and one untouched audit suite. Use new M13-only splits because M10's 1700–1919 seeds either supported M12 fitting/diagnosis or are historical mechanics evidence. M13's protocol fixes development 2000–2039, validation 2100–2119, and audit 2200–2219.
 
 Exit when the RL policy materially exceeds random, no-drive, and no-memory ablations on each predeclared condition; completes the persistent cycle gate and forced-recovery chain at predeclared per-condition rates; and replays adverse trajectories exactly. A separately named scripted/state-oracle ceiling must still complete every condition. This milestone is the learning baseline for long-horizon maintenance, not an RGB result.
 
-**Status: planned. Protocol before implementation.**
+**Status: in progress (2026-08-06).** `docs/M13_PROTOCOL.md` freezes the state boundary, reward, eight-macro action surface, training schedule, new layouts/seeds, ablations, and gates. The initial implementation adds public `rest_xy`, the new layouts, a reward-led tabular Q-learning policy, matching no-drive/no-memory/random baselines, a fresh-split mechanics ceiling, and targeted boundary tests. No frozen M13 validation or audit result has been run or claimed.
 
 ## M14 — Hybrid persistent-maintenance RL
 

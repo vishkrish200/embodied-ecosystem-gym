@@ -25,6 +25,7 @@ from .m91 import run_m91_viewer_demo, write_m91_report
 from .m10 import run_m10_viewer_demo, write_m10_report
 from .m11 import write_m11_report
 from .m12 import run_m12_viewer_demo, write_m12_report
+from .m13 import write_m13_report
 from .policies import evaluate_scripted_policy
 from .trajectory import replay_and_validate
 from .video import write_find_and_eat_regression_video
@@ -126,6 +127,8 @@ def main() -> None:
     m12_validation.add_argument("--output", type=Path, required=True)
     m12_demo = subparsers.add_parser("m12-demo", help="record and replay one learned M12 maintenance trace")
     m12_demo.add_argument("--trace", type=Path, required=True)
+    m13_validation = subparsers.add_parser("m13-validation", help="train and evaluate the frozen M13 state-oracle RL baseline")
+    m13_validation.add_argument("--output", type=Path, required=True)
     viewer = subparsers.add_parser("viewer", help="start the thin local live Gym viewer")
     viewer.add_argument("--trace", type=Path)
     viewer.add_argument("--port", type=int, default=8765)
@@ -232,6 +235,9 @@ def main() -> None:
         print(json.dumps(report["gate"]))
     elif args.command == "m12-demo":
         print(run_m12_viewer_demo(args.trace))
+    elif args.command == "m13-validation":
+        report = write_m13_report(args.output)
+        print(json.dumps(report["gate"]))
     elif args.command == "viewer":
         with ViewerSession(trace_path=args.trace) as session:
             server = LocalViewerServer(session, port=args.port)

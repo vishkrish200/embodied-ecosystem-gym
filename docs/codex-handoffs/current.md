@@ -1,8 +1,8 @@
 # Codex Handoff: M13 persistent-maintenance RL reset
 
 Updated: 2026-08-06
-Repo/path: `/Users/vishnukrishnan/.codex/worktrees/ee80/embodied-ecosystem-gym`
-Branch/worktree: `codex/m11-frozen-policy-baseline` at `f819d28`, with uncommitted M12 exploratory work.
+Repo/path: `/Users/vishnukrishnan/Developer/embodied-ecosystem-gym`
+Branch/worktree: `main` with committed M8–M12 history and M13 in progress.
 
 ## Current Goal
 
@@ -23,7 +23,7 @@ task. Do not start another behavior-cloning or RGB policy variant first.
   visual audits. They do not establish end-to-end visual control.
 - M10 validates the persistent environment and oracle ceiling in all four
   conditions. M11 freezes M9 to expose its maintenance gap.
-- M12 is an uncommitted exploratory structured-RGB behavior-cloning result:
+- M12 is a committed exploratory structured-RGB behavior-cloning diagnostic:
   it reaches 80/80 survival and full forced recovery, but only 3/20 compound
   maintenance completions. Its validation rows were inspected during
   diagnosis, so they are not a clean model-selection suite.
@@ -37,24 +37,22 @@ task. Do not start another behavior-cloning or RGB policy variant first.
   `info`, or private environment access.
 - Keep M12 as an honest diagnostic. Do not merge it as the main project claim,
   retune it against the old validation rows, or open a sealed M12 audit.
-- Freeze M13's reward, observation encoding, action set, training budget,
-  train/validation/audit layouts, and per-condition gates before training.
+- `docs/M13_PROTOCOL.md` freezes M13's reward, state adapter, action set,
+  training budget, fresh 2000–2039 / 2100–2119 / 2200–2219 splits, and
+  per-condition gates. The initial implementation adds `rest_xy` to the public
+  state-oracle observation and a
+  reward-led tabular macro learner. Its frozen validation has not been run.
 
 ## Next Steps
 
-1. Write `docs/M13_PROTOCOL.md` before training code. Define the state-oracle
-   input boundary, macro/action representation, reward, persistent-cycle and
-   recovery metrics, random/no-drive/no-memory ablations, and replay evidence.
-2. Create new M13 development and validation layouts/seeds: M10's 1700–1819
-   ranges have supported M12 fitting or iterative diagnosis. Keep 1900–1919
-   untouched for the final audit only if the frozen audit layouts remain valid.
-3. Implement an RL policy over the existing M10 typed skill interface. Start
-   from the M2/M6 Q-learning patterns, but keep training genuinely reward-led
-   rather than teacher-macro imitation.
-4. Run the frozen validation once after development choices are fixed. Report
-   every condition, confidence intervals, completion cycles, safe-drive time,
-   recovery chains, ablations, and exact replay. Score the audit once only
-   after validation passes.
+1. Finish M13 persistence artifacts: write/replay every frozen evaluation
+   trace and serialize the learned policy plus its encoder/compiler hashes.
+2. Run development-only performance checks without opening validation or audit;
+   fix implementation defects only, not gates or protocol constants.
+3. Freeze the code and run M13 validation once. Report every condition,
+   confidence intervals, completion cycles, safe-drive time, recovery chains,
+   and ablations.
+4. Score the M13 audit once only after validation passes.
 5. Only then plan M14 hybrid RL and M15 RGB persistent maintenance with the
    same task and policy objective.
 

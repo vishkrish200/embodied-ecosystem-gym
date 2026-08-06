@@ -128,6 +128,20 @@ LAYOUTS: dict[str, LayoutSpec] = {
     "m10_audit_southwest": LayoutSpec("m10_audit_southwest", (0.58, 0.48), (-0.72, -0.68), (-0.34, -0.30), (-0.64, 0.52), (0.68, -0.48)),
     "m10_audit_northwest": LayoutSpec("m10_audit_northwest", (0.60, -0.48), (-0.74, 0.20), (-0.38, 0.60), (0.64, 0.50), (-0.64, -0.50)),
     "m10_audit_southeast": LayoutSpec("m10_audit_southeast", (-0.60, 0.48), (0.26, -0.74), (0.66, -0.36), (-0.60, -0.52), (0.64, 0.50)),
+    # M13 deliberately retires M10's 1700–1919 splits.  These independent
+    # layouts support the state-oracle persistent-maintenance RL protocol.
+    "m13_dev_northeast": LayoutSpec("m13_dev_northeast", (-0.26, -0.22), (0.24, 0.26), (0.52, 0.58), (0.62, -0.44), (-0.60, 0.44)),
+    "m13_dev_southwest": LayoutSpec("m13_dev_southwest", (0.26, 0.22), (-0.60, -0.62), (-0.26, -0.28), (-0.60, 0.44), (0.60, -0.44)),
+    "m13_dev_northwest": LayoutSpec("m13_dev_northwest", (0.30, -0.24), (-0.64, 0.24), (-0.30, 0.58), (0.58, 0.48), (-0.58, -0.46)),
+    "m13_dev_southeast": LayoutSpec("m13_dev_southeast", (-0.30, 0.24), (0.26, -0.64), (0.60, -0.30), (-0.58, -0.48), (0.58, 0.46)),
+    "m13_validation_northeast": LayoutSpec("m13_validation_northeast", (-0.50, -0.40), (0.24, 0.32), (0.60, 0.68), (0.66, -0.50), (-0.66, 0.50)),
+    "m13_validation_southwest": LayoutSpec("m13_validation_southwest", (0.50, 0.40), (-0.70, -0.68), (-0.34, -0.32), (-0.66, 0.50), (0.66, -0.50)),
+    "m13_validation_northwest": LayoutSpec("m13_validation_northwest", (0.52, -0.40), (-0.72, 0.24), (-0.36, 0.64), (0.62, 0.52), (-0.62, -0.50)),
+    "m13_validation_southeast": LayoutSpec("m13_validation_southeast", (-0.52, 0.40), (0.28, -0.72), (0.64, -0.36), (-0.62, -0.52), (0.62, 0.50)),
+    "m13_audit_northeast": LayoutSpec("m13_audit_northeast", (-0.64, -0.52), (0.22, 0.34), (0.58, 0.72), (0.72, -0.48), (-0.70, 0.54)),
+    "m13_audit_southwest": LayoutSpec("m13_audit_southwest", (0.64, 0.52), (-0.74, -0.72), (-0.38, -0.34), (-0.70, 0.54), (0.70, -0.54)),
+    "m13_audit_northwest": LayoutSpec("m13_audit_northwest", (0.66, -0.52), (-0.76, 0.22), (-0.40, 0.62), (0.68, 0.54), (-0.68, -0.54)),
+    "m13_audit_southeast": LayoutSpec("m13_audit_southeast", (-0.66, 0.52), (0.30, -0.76), (0.66, -0.40), (-0.68, -0.54), (0.68, 0.54)),
 }
 
 TASKS: dict[str, TaskSpec] = {
