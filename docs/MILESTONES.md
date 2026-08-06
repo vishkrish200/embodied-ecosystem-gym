@@ -136,20 +136,38 @@ Fit one structured policy from development trajectories so high-level need selec
 
 Exit when every validation condition reaches at least 15/20 horizon survivals, every successful episode completes all required feed/play/rest cycles, at least 80% of simulated time remains inside frozen safe-drive bands, and at least 15/20 forced disturbances complete the failure-rescan-recovery chain. The successor must improve paired survival over frozen M9 by at least 20 percentage points with a deterministic bootstrap lower bound above zero, and must beat no-memory and no-drive ablations without private inputs.
 
-**Status: planned.**
+**Status: exploratory result, not an accepted successor (2026-08-06).** The structured RGB behavior-cloning policy reached 80/80 horizon survivals, completed all forced relocation-recovery chains, and exceeded its no-memory and no-drive ablations. It failed the compound maintenance gate: only 3/20 compound episodes completed the required cycle counts, with most safe episodes ending at the horizon after two food cycles, two play cycles, and one rest cycle. This demonstrates that the learned grounder and reactive recovery shell are useful, but it does not establish long-horizon maintenance planning. The same validation suite was inspected across development variants, so it is not a sealed basis for further model selection. Preserve the report as a diagnostic; do not open a sealed M12 audit or keep tuning this policy against those seeds.
 
-## M13 — Sealed persistent-maintenance audit
+## M13 — State-oracle persistent-maintenance RL baseline
 
-Freeze M12's training data, protocol, hyperparameters, and policy fingerprint, then score it once on new seeds and layouts combining appearance changes, camera poses, resource timing, blocked distractors, and event-triggered relocation. Do not introduce contact-physics claims unless task mechanics actually change.
+Return to the original observation ladder. Train a reinforcement-learning policy on M10's persistent-maintenance task using the permitted `state_oracle` observation only: public object/resource state, drives, holding state, prior outcome, and policy-owned memory. It must learn high-level skill selection over the existing typed action interface; it must not receive task IDs, reset options, `info`, or private environment access.
 
-Exit only if public coverage and the 80/80 privileged-oracle ceiling pass before scoring and the unchanged M12 aggregate, per-condition, safe-band, and recovery gates all pass. Any failed condition is published unchanged; audit episodes are never used for tuning or a retry milestone.
+Before training, version the reward, observation encoding, macro/action set, training budget, random seeds, train layouts, validation layouts, and one untouched audit suite. Use new development and validation splits because M10's 1700–1819 seeds have already supported M12 fitting or iterative validation. The untouched M10 1900–1919 audit range may be used only as the one-shot final audit if its layouts remain suitable; otherwise reserve an equivalent new audit range before fitting.
 
-**Status: planned.**
+Exit when the RL policy materially exceeds random, no-drive, and no-memory ablations on each predeclared condition; completes the persistent cycle gate and forced-recovery chain at predeclared per-condition rates; and replays adverse trajectories exactly. A separately named scripted/state-oracle ceiling must still complete every condition. This milestone is the learning baseline for long-horizon maintenance, not an RGB result.
 
-## M14 — Persistent virtual toy and v1 release closure
+**Status: planned. Protocol before implementation.**
 
-Expose the audited persistent environment through the thin viewer so a person can watch continuous need cycles, inspect drives and outcomes, intervene through allowed actions, save a checkpoint, resume later, and replay the same history. The frontend continues to call the Gym's reset, step, checkpoint, and trajectory interfaces and owns no simulation state.
+## M14 — Hybrid persistent-maintenance RL
 
-Exit when checkpoint-and-resume matches uninterrupted execution across 20 seeded traces, headless and viewer-driven action schedules produce identical outcomes, long-running sessions expose resource cooldowns and policy decisions, and all six original task families have tests and at least 20 fixed evaluation seeds. Release wording must describe structured learned maintenance over typed kinematic skills rather than end-to-end embodied intelligence.
+Hold M13's task, action interface, reward, and long-horizon evaluation fixed while replacing privileged object coordinates with the existing hybrid observation boundary. Train a policy that receives RGB, drives, holding state, prior outcome, and non-privileged visual detections only. Its purpose is to isolate whether the maintenance RL policy fails because of planning or because of perception.
+
+Exit when the hybrid policy is compared fairly with M13 using the same frozen conditions and training budget, reports perception misses separately from planning failures, and preserves the policy-input boundary. Any performance gap is diagnostic evidence, not a reason to change M13's RL result.
+
+**Status: planned. Depends on M13.**
+
+## M15 — RGB persistent-maintenance policy
+
+Train and evaluate an RGB-only successor only after M13 and M14 establish that the task and reward can support learned long-horizon maintenance. The policy may use recurrent policy-owned memory for scan/action history and a learned visual grounder, but it receives only RGB, drives, holding state, prior outcome, and its own memory. No segmentation, coordinates, task IDs, reset controls, or `info` may cross the inference boundary.
+
+Freeze a fresh protocol before fitting: public-visibility coverage, train/validation/audit splits, per-condition cycle/survival/recovery gates, ablations, a privileged ceiling, replay, and failure attribution. Compare the RGB policy against the M13 state-RL and M14 hybrid-RL baselines rather than a behavior-cloning-only successor.
+
+**Status: planned. Depends on M13 and M14.**
+
+## M16 — Sealed audit and persistent virtual-toy release closure
+
+Freeze the selected RGB policy and score it once on an untouched persistent-maintenance audit with declared visual, layout, camera, resource-timing, distractor, and relocation variation. Publish every failed row unchanged. Only after the audit should the thin viewer add checkpoint/resume and continuous-session inspection over the same Gym API; it must continue to own no simulation state.
+
+Exit when the audited policy, all baselines, and replay evidence are published together; checkpoint-and-resume matches uninterrupted execution across 20 seeded traces; and all six original task families retain fixed-seed tests. Release wording must remain bounded to learned maintenance over typed kinematic skills, not end-to-end real-world embodiment.
 
 **Status: planned.**

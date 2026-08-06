@@ -1,70 +1,68 @@
-# Codex Handoff: M9 integrated RGB agent
+# Codex Handoff: M13 persistent-maintenance RL reset
 
 Updated: 2026-08-06
-Repo/path: /Users/vishnukrishnan/.codex/worktrees/fe6c/embodied-ecosystem-gym
-Branch/worktree: `codex/m89-visual-morphology-audit` at `e5f3003` (pushed to origin). `origin/main` is at M8.8, so continue from this branch until M8.9 is merged.
+Repo/path: `/Users/vishnukrishnan/.codex/worktrees/ee80/embodied-ecosystem-gym`
+Branch/worktree: `codex/m11-frozen-policy-baseline` at `f819d28`, with uncommitted M12 exploratory work.
 
 ## Current Goal
 
-- Re-center the project on the v1 PRD claim: demonstrate one policy, using only public RGB observations plus drives, that can maintain needs and complete simple grounded tasks through a longer episode with food, toy, scanning, relocation, and a blocked distractor.
-- Do not start another isolated M8 food-grounding audit. The next work should be an integration milestone, provisionally M9.
+Re-center the project on the v1 observation ladder: scripted controller,
+state-oracle RL baseline, hybrid policy, then RGB policy. The immediate next
+milestone is M13, a state-oracle RL baseline for M10's persistent-maintenance
+task. Do not start another behavior-cloning or RGB policy variant first.
 
 ## Current State
 
-- The project has a deterministic MuJoCo Gym, typed skill actions/outcomes, `state_oracle`, `hybrid`, and RGB observation modes, deterministic JSONL replay, and a thin viewer sharing the exact environment loop.
-- M6 demonstrates state-oracle drive arbitration. M7 demonstrates RGB-driven macro selection with a fixed colour adapter and teacher-labelled behaviour cloning. M8.7 learns only local RGB target grounding; scanning, pickup, retry, and coordinate calibration remain authored.
-- M8.9 is a sealed external visual-morphology audit of frozen M8.7: 75/80 learned successes and 80/80 privileged-oracle successes. Rows are 20/20 blue capsule food, 20/20 red box food plus relocation, 19/20 blue box-agent plus blocked distractor, and 16/20 purple capsule-agent plus landmark.
+- M0–M5 provide the deterministic MuJoCo Gym, typed skills and outcomes,
+  state-oracle/hybrid/RGB observations, replayable JSONL traces, and a thin
+  viewer using the same environment loop.
+- M2 and M6 already demonstrate tabular state-oracle Q-learning, but only on
+  short Find-and-eat or food-versus-play tasks; neither is a long-horizon
+  persistent-maintenance RL result.
+- M8–M8.9 provide coverage-gated RGB grounding/recovery evidence and sealed
+  visual audits. They do not establish end-to-end visual control.
+- M10 validates the persistent environment and oracle ceiling in all four
+  conditions. M11 freezes M9 to expose its maintenance gap.
+- M12 is an uncommitted exploratory structured-RGB behavior-cloning result:
+  it reaches 80/80 survival and full forced recovery, but only 3/20 compound
+  maintenance completions. Its validation rows were inspected during
+  diagnosis, so they are not a clean model-selection suite.
 
-## Completed
+## Constraints
 
-- M0–M5: reproducible environment/replay/viewer foundation.
-- M6–M7: bounded drive-arbitration evidence with explicit limits.
-- M8–M8.9: observability repair, sealed evaluation protocols, a genuine M8.5 transfer failure, M8.6 diagnosis, frozen M8.7 successor, and two held-out audits.
-- M8.2 remains an invalid legacy artifact: the target was invisible in all public scan sequences. Do not reuse it as either a negative result or training data.
-
-## Files Touched Or Investigated
-
-- `docs/PRD.md`: original product claim and release criteria.
-- `docs/PROJECT_CONTEXT.md`: source-of-truth Gym/viewer boundary and policy-input constraints.
-- `docs/MILESTONES.md`: current evidence and limits through M8.9.
-- `ecosystem_gym/env.py`: MuJoCo environment and public observation contract.
-- `ecosystem_gym/m7.py`: RGB macro arbitration with fixed colour grounding.
-- `ecosystem_gym/m84.py`, `ecosystem_gym/m87.py`, `ecosystem_gym/m89.py`: learned local RGB grounder and sealed audits.
-- `ecosystem_gym/viewer.py`, `ecosystem_gym/trajectory.py`: thin viewer and replay boundary.
-
-## Commands And Checks
-
-- `uv run pytest`: passed after M8.9.
-- `uv run python -m ecosystem_gym m89-benchmark --output artifacts/reports/m89-sealed-visual-morphology-audit.json`: 75/80 learned, 80/80 oracle, all coverage gates pass.
-- `uv run python -m ecosystem_gym m89-demo --trace artifacts/trajectories/m89-sealed-visual-morphology-audit-demo.jsonl`: successful five-step replayable rollout.
-
-## Known Failures Or Blockers
-
-- The current system is not an end-to-end learned embodied agent. It has isolated learned pieces joined by authored control.
-- The environment is not contact-rich or collision-aware: M4 reports a kinematic controller, and M8 geometry/morphology changes are primarily rendered visual shifts.
-- The toy room is a correct thin viewer, not a developed user-facing virtual-pet product.
-- The PRD says all six task families should have at least 20 fixed evaluation seeds. M7's visual-held-out matrix uses 10 seeds per row, so the release criterion is not cleanly closed as written.
-
-## Decisions And Constraints
-
-- Preserve deterministic replay and the thin viewer boundary.
-- Policies must not receive task IDs, reset options, `info`, oracle coordinates, segmentation, or other private state. Offline teacher labels are permitted only when explicitly isolated from inference.
-- Freeze an M9 protocol before fitting/selecting its policy. Require coverage auditing before any RGB score, per-condition results with confidence intervals, a privileged oracle ceiling, and a fresh held-out audit.
-- Do not broaden into frontend work or claim real-world robotics, semantic object understanding, contact-rich physics, or end-to-end learning unless implemented and tested.
-
-## Do Not Repeat
-
-- Do not create another score-only M8.x audit of the frozen M8.7 food grounder; it would not materially test the PRD claim.
-- Do not treat aggregate success as valid when target visibility has not been audited. M8.2's 0/80 was an impossible-observation protocol, not policy evidence.
-- Do not call M7 or M8 end-to-end learned perception: M7 uses a fixed colour adapter and M8.7 uses offline segmentation labels during training plus authored control at deployment.
+- Preserve the authoritative Gym, deterministic replay, bounded typed skills,
+  and thin viewer boundary.
+- A state-oracle RL policy may use only the documented state-oracle observation
+  plus policy-owned memory. It must not receive task IDs, reset options,
+  `info`, or private environment access.
+- Keep M12 as an honest diagnostic. Do not merge it as the main project claim,
+  retune it against the old validation rows, or open a sealed M12 audit.
+- Freeze M13's reward, observation encoding, action set, training budget,
+  train/validation/audit layouts, and per-condition gates before training.
 
 ## Next Steps
 
-1. Read the PRD, project context, milestones, and this handoff; inspect current `env.py`, M7, M8.7, viewer, and trajectory code. Summarize the current state and identify the smallest integrated M9 claim that would close the real v1 gap.
-2. Write and review an M9 protocol before coding: a longer-lived RGB-only food/play environment with explicit initial-drive scenarios, public scanning, relocation, blocked distractor, held-out layout/appearance/dynamics rows, 20 seeds, coverage checks, confidence intervals, and an oracle ceiling. Specify whether one learned policy must own macro choice, target grounding, and search/recovery.
-3. Implement only after that protocol is fixed. Preserve existing M8 results and use fresh development/validation/audit splits; publish a negative result rather than tuning against the final audit.
+1. Write `docs/M13_PROTOCOL.md` before training code. Define the state-oracle
+   input boundary, macro/action representation, reward, persistent-cycle and
+   recovery metrics, random/no-drive/no-memory ablations, and replay evidence.
+2. Create new M13 development and validation layouts/seeds: M10's 1700–1819
+   ranges have supported M12 fitting or iterative diagnosis. Keep 1900–1919
+   untouched for the final audit only if the frozen audit layouts remain valid.
+3. Implement an RL policy over the existing M10 typed skill interface. Start
+   from the M2/M6 Q-learning patterns, but keep training genuinely reward-led
+   rather than teacher-macro imitation.
+4. Run the frozen validation once after development choices are fixed. Report
+   every condition, confidence intervals, completion cycles, safe-drive time,
+   recovery chains, ablations, and exact replay. Score the audit once only
+   after validation passes.
+5. Only then plan M14 hybrid RL and M15 RGB persistent maintenance with the
+   same task and policy objective.
 
-## Reactivation Prompt
+## Do Not Repeat
 
-We are continuing from this handoff: `/Users/vishnukrishnan/.codex/worktrees/fe6c/embodied-ecosystem-gym/docs/codex-handoffs/current.md`.
-Read it first, inspect the current repo state, verify what still applies, summarize the state in 5 bullets, then continue from the Next Steps without relying on the old chat context.
+- Do not use a behavior-cloning score as evidence that RL has solved
+  long-horizon maintenance.
+- Do not use aggregate survival to hide a cycle-completion failure.
+- Do not tune against a frozen validation or sealed-audit suite.
+- Do not add frontend state, contact-physics claims, or VLM/VLA integration
+  before the persistent-maintenance RL baseline is established.

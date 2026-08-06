@@ -136,13 +136,15 @@ def m10_scan_coverage(
     """Offline segmentation audit; no policy method can access these labels."""
 
     report: dict[str, dict[str, object]] = {}
-    for name, controls in conditions.items():
-        initial_food = replenished_food = toy = rest = relocated_food = distractor = 0
-        relocation_episodes = distractor_episodes = 0
-        for seed in seeds:
-            env = EcosystemEnv(m10_config())
-            renderer = mujoco.Renderer(env.model, height=env.config.rgb_height, width=env.config.rgb_width)
-            try:
+    # Reset applies all condition variants to the same model.  Reusing its
+    # renderer avoids creating one macOS GPU context per fixed-seed audit.
+    env = EcosystemEnv(m10_config())
+    renderer = mujoco.Renderer(env.model, height=env.config.rgb_height, width=env.config.rgb_width)
+    try:
+        for name, controls in conditions.items():
+            initial_food = replenished_food = toy = rest = relocated_food = distractor = 0
+            relocation_episodes = distractor_episodes = 0
+            for seed in seeds:
                 env.reset(seed=seed, options=_options(controls))
                 food_ids = tuple(env.model.geom(item).id for item in env._active_food_geom_names())
                 toy_id = env.model.geom({"ball": "toy_ball_geom", "cube": "toy_cube_geom", "capsule": "toy_capsule_geom"}[env._toy_variant]).id
@@ -177,30 +179,30 @@ def m10_scan_coverage(
                     distractor_episodes += 1
                     env.reset(seed=seed, options=_options(controls))
                     distractor += int(_visible_in_public_scan(env, renderer, (env.model.geom("distractor_geom").id,)))
-            finally:
-                renderer.close()
-                env.close()
-        count = len(seeds)
-        passes = (
-            initial_food == count
-            and replenished_food == count
-            and toy == count
-            and rest == count
-            and (not relocation_episodes or relocated_food == relocation_episodes)
-            and (not distractor_episodes or distractor == distractor_episodes)
-        )
-        report[name] = {
-            "episodes": count,
-            "initial_food_visible": initial_food,
-            "replenished_food_visible": replenished_food,
-            "toy_visible": toy,
-            "rest_visible": rest,
-            "relocation_episodes": relocation_episodes,
-            "relocated_food_visible": relocated_food,
-            "distractor_episodes": distractor_episodes,
-            "distractor_visible": distractor,
-            "passes": passes,
-        }
+            count = len(seeds)
+            passes = (
+                initial_food == count
+                and replenished_food == count
+                and toy == count
+                and rest == count
+                and (not relocation_episodes or relocated_food == relocation_episodes)
+                and (not distractor_episodes or distractor == distractor_episodes)
+            )
+            report[name] = {
+                "episodes": count,
+                "initial_food_visible": initial_food,
+                "replenished_food_visible": replenished_food,
+                "toy_visible": toy,
+                "rest_visible": rest,
+                "relocation_episodes": relocation_episodes,
+                "relocated_food_visible": relocated_food,
+                "distractor_episodes": distractor_episodes,
+                "distractor_visible": distractor,
+                "passes": passes,
+            }
+    finally:
+        renderer.close()
+        env.close()
     return report
 
 

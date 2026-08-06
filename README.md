@@ -28,6 +28,10 @@ M9.1 separates that ambiguous gate without changing the policy. The policy compl
 
 M10 replaces M9's one-shot maintenance checklist with a 160-step persistent environment contract. Food replenishes at seeded new locations, boredom can produce repeated play cycles, and a guarded visible rest target restores energy. Its four-row × 20-seed mechanics gate has complete public scan coverage and an 80/80 privileged-oracle ceiling, including 40/40 event-triggered stale pickup failures followed by recovery. M10 deliberately scores no RGB policy; the frozen M9 baseline and failure atlas belong to M11.
 
+M12 then explored a structured RGB behavior-cloning successor. Its best frozen run survived all 80 M10 validation episodes and completed every forced relocation-recovery chain, but only 3/20 compound episodes completed the required repeated feed/play/rest cycles. That is a long-horizon scheduling failure, not a renderer or target-visibility failure. M12 is therefore retained as an exploratory diagnostic, not promoted to the project result; its validation rows were inspected during diagnosis and are not a clean suite for further tuning.
+
+The next roadmap returns to the intended learning ladder: M13 is a state-oracle RL baseline for persistent maintenance, M14 holds the task fixed while moving to hybrid observations, M15 evaluates an RGB-only persistent-maintenance policy, and M16 reserves a sealed audit plus thin-viewer release closure. The Gym, typed skills, replay, and fixed-seed evaluation remain the shared foundation for every stage.
+
 ```bash
 uv sync --group dev
 uv run pytest

@@ -108,11 +108,13 @@ def _first_failure(
 
 
 def run_m11_episode(
-    policy: IntegratedRgbDrivePolicy, *, seed: int, condition: str, controls: dict[str, Any]
+    policy: IntegratedRgbDrivePolicy, *, seed: int, condition: str, controls: dict[str, Any], env: EcosystemEnv | None = None
 ) -> M11Episode:
     """Run M9 unchanged and retain enough public evidence to diagnose each failure."""
 
-    env = EcosystemEnv(m10_config())
+    owns_env = env is None
+    if env is None:
+        env = EcosystemEnv(m10_config())
     try:
         observation, _ = env.reset(seed=seed, options=m10_options(controls))
         memory = policy.reset()
@@ -201,7 +203,8 @@ def run_m11_episode(
                 )
         raise AssertionError("M11 episode did not terminate")
     finally:
-        env.close()
+        if owns_env:
+            env.close()
 
 
 def _episode_record(episode: M11Episode) -> dict[str, object]:
@@ -274,20 +277,28 @@ def m11_protocol_fingerprint() -> str:
     return hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
 
 
-def m11_baseline(*, seeds: tuple[int, ...] = M10_VALIDATION_SEEDS) -> dict[str, object]:
+def m11_baseline(
+    *, seeds: tuple[int, ...] = M10_VALIDATION_SEEDS, mechanics: dict[str, object] | None = None
+) -> dict[str, object]:
     if seeds != M10_VALIDATION_SEEDS:
         raise ValueError("M11 baseline seeds are frozen; use M10_VALIDATION_SEEDS")
-    mechanics = m10_validation()
+    mechanics = m10_validation() if mechanics is None else mechanics
     if not bool(mechanics["gate"]["passes"]):
         raise RuntimeError("M10 mechanics gate failed; M11 policy interpretation is invalid")
     policy = fit_m9_policy()
     before = m9_policy_fingerprint(policy)
     if before != M11_FROZEN_M9_POLICY_FINGERPRINT:
         raise RuntimeError("the M9 fit changed; update neither policy nor M11 baseline without a new protocol")
-    results = {
-        name: _aggregate([run_m11_episode(policy, seed=seed, condition=name, controls=controls) for seed in seeds])
-        for name, controls in M10_VALIDATION_CONDITIONS.items()
-    }
+    env = EcosystemEnv(m10_config())
+    try:
+        results = {
+            name: _aggregate(
+                [run_m11_episode(policy, seed=seed, condition=name, controls=controls, env=env) for seed in seeds]
+            )
+            for name, controls in M10_VALIDATION_CONDITIONS.items()
+        }
+    finally:
+        env.close()
     after = m9_policy_fingerprint(policy)
     return {
         "schema_version": "0.11",
