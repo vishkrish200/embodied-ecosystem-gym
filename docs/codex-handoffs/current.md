@@ -44,21 +44,24 @@ task. Do not start another behavior-cloning or RGB policy variant first.
   passed/replayed, but full policy maintenance was 0/20 in every condition;
   its `2500–2519` audit is sealed. The guarded reward helped development but
   did not generalize. Do not rerun M13.1 validation or open its audit.
-- `docs/M13_2_PROTOCOL.md` freezes M13.2: retain M13.1 reward, public-state
-  boundary, macro compiler, memory and gates, but replace only tabular Q with
-  a 30-feature 64x64 Double-DQN. Its new development / validation / audit
-  splits are 2600–2639 / 2700–2719 / 2800–2819.
+- M13.2 development is complete but failed before validation. Its compact
+  Double-DQN completed no development maintenance episode in any condition;
+  a diagnostic rollout selected `PICK_UP` for all 160 decisions and received
+  160 cheap `blocked` outcomes. This exposes that the M13.1 reward/action
+  semantics do not disincentivize blocked short actions under approximation.
+  Its 2700–2819 validation/audit splits remain unopened. Do not introduce an
+  action mask or blocked-action penalty without a newly frozen protocol.
 
 ## Next Steps
 
-1. Implement M13.2 only from `docs/M13_2_PROTOCOL.md`; retain the M13.1
-   reward/config, public boundary, macro compiler, gates, and zero-default
-   legacy reward behavior.
-2. Add the fresh `m132_*` layouts and a deterministic 30-feature NumPy
-   Double-DQN with strict model/feature/trace replay tests.
-3. Run the fixed development-only M13.2 budget; freeze code before opening its
-   new validation suite, then leave its audit sealed unless validation passes.
-4. Only then plan M14 hybrid RL and M15 RGB persistent maintenance with the
+1. Do not open M13.2 validation or audit. Preserve its development artifacts
+   as a negative diagnostic.
+2. Before any M13.3 implementation, decide whether to change the macro/reward
+   contract: e.g. explicitly penalize blocked actions or restrict interaction
+   macros by public geometric preconditions. Either is a new causal experiment
+   and needs a fresh protocol, split family, ablation contract, and audit.
+3. Only after a state-RL baseline passes should M14 hybrid RL and M15 RGB
+   persistent maintenance proceed with the
    same task and policy objective.
 
 ## Do Not Repeat
