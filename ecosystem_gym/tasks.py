@@ -16,6 +16,7 @@ class LayoutSpec:
     food_low: tuple[float, float]
     food_high: tuple[float, float]
     toy_xy: tuple[float, float] = (0.45, 0.0)
+    rest_xy: tuple[float, float] = (-0.45, 0.0)
 
     def sample_food_xy(self, rng: np.random.Generator) -> np.ndarray:
         return rng.uniform(self.food_low, self.food_high, size=2).astype(np.float32)
@@ -96,6 +97,37 @@ LAYOUTS: dict[str, LayoutSpec] = {
     "m89_southwest": LayoutSpec("m89_southwest", (0.68, 0.56), (-0.76, -0.68), (-0.38, -0.30)),
     "m89_northwest": LayoutSpec("m89_northwest", (0.62, -0.54), (-0.74, 0.20), (-0.38, 0.58)),
     "m89_southeast": LayoutSpec("m89_southeast", (-0.68, 0.56), (0.30, -0.68), (0.62, -0.34)),
+    # M9 integrates food, toy, scanning, and recovery in one longer-lived
+    # episode.  These layouts are disjoint from all M8 development, validation,
+    # and sealed-audit coordinates.
+    "m9_train_northeast": LayoutSpec("m9_train_northeast", (-0.34, -0.28), (0.16, 0.22), (0.46, 0.56), (0.60, -0.42)),
+    "m9_train_southwest": LayoutSpec("m9_train_southwest", (0.34, 0.28), (-0.58, -0.60), (-0.24, -0.26), (-0.56, 0.42)),
+    "m9_train_northwest": LayoutSpec("m9_train_northwest", (0.36, -0.30), (-0.62, 0.20), (-0.28, 0.54), (0.52, 0.46)),
+    "m9_train_southeast": LayoutSpec("m9_train_southeast", (-0.36, 0.30), (0.22, -0.62), (0.56, -0.28), (-0.50, -0.46)),
+    "m9_validation_northeast": LayoutSpec("m9_validation_northeast", (-0.48, -0.38), (0.20, 0.30), (0.58, 0.66), (0.60, -0.50)),
+    "m9_validation_southwest": LayoutSpec("m9_validation_southwest", (0.48, 0.38), (-0.68, -0.66), (-0.30, -0.30), (-0.62, 0.46)),
+    "m9_validation_northwest": LayoutSpec("m9_validation_northwest", (0.50, -0.38), (-0.70, 0.22), (-0.32, 0.62), (0.56, 0.50)),
+    "m9_validation_southeast": LayoutSpec("m9_validation_southeast", (-0.50, 0.38), (0.24, -0.70), (0.64, -0.32), (-0.54, -0.50)),
+    "m9_audit_northeast": LayoutSpec("m9_audit_northeast", (-0.60, -0.50), (0.18, 0.32), (0.54, 0.70), (0.70, -0.46)),
+    "m9_audit_southwest": LayoutSpec("m9_audit_southwest", (0.60, 0.50), (-0.74, -0.70), (-0.36, -0.32), (-0.66, 0.52)),
+    "m9_audit_northwest": LayoutSpec("m9_audit_northwest", (0.62, -0.50), (-0.76, 0.20), (-0.36, 0.60), (0.62, 0.52)),
+    "m9_audit_southeast": LayoutSpec("m9_audit_southeast", (-0.62, 0.50), (0.26, -0.76), (0.66, -0.36), (-0.58, -0.54)),
+    # M9.1 is a fresh development-only protocol repair. It does not touch M9's
+    # unscored audit layouts and isolates distractor choice from forced recovery.
+    "m91_choice_northwest": LayoutSpec("m91_choice_northwest", (0.54, -0.46), (-0.74, 0.22), (-0.38, 0.60), (0.60, 0.46)),
+    "m91_recovery_southeast": LayoutSpec("m91_recovery_southeast", (-0.54, 0.46), (0.24, -0.74), (0.62, -0.38), (-0.58, -0.50)),
+    # M10 freezes separate development, validation, and audit layouts for
+    # persistent food, play, and rest cycles. These do not reuse M9.1.
+    "m10_train_northeast": LayoutSpec("m10_train_northeast", (-0.32, -0.26), (0.18, 0.20), (0.48, 0.54), (0.58, -0.42), (-0.54, 0.40)),
+    "m10_train_southwest": LayoutSpec("m10_train_southwest", (0.32, 0.26), (-0.56, -0.58), (-0.22, -0.24), (-0.54, 0.40), (0.56, -0.42)),
+    "m10_validation_northeast": LayoutSpec("m10_validation_northeast", (-0.46, -0.36), (0.22, 0.28), (0.58, 0.64), (0.62, -0.48), (-0.62, 0.46)),
+    "m10_validation_southwest": LayoutSpec("m10_validation_southwest", (0.46, 0.36), (-0.66, -0.64), (-0.30, -0.28), (-0.62, 0.48), (0.62, -0.46)),
+    "m10_validation_northwest": LayoutSpec("m10_validation_northwest", (0.48, -0.36), (-0.68, 0.22), (-0.34, 0.60), (0.58, 0.50), (-0.58, -0.48)),
+    "m10_validation_southeast": LayoutSpec("m10_validation_southeast", (-0.48, 0.36), (0.24, -0.68), (0.62, -0.32), (-0.56, -0.50), (0.58, 0.48)),
+    "m10_audit_northeast": LayoutSpec("m10_audit_northeast", (-0.58, -0.48), (0.20, 0.34), (0.56, 0.70), (0.68, -0.44), (-0.66, 0.50)),
+    "m10_audit_southwest": LayoutSpec("m10_audit_southwest", (0.58, 0.48), (-0.72, -0.68), (-0.34, -0.30), (-0.64, 0.52), (0.68, -0.48)),
+    "m10_audit_northwest": LayoutSpec("m10_audit_northwest", (0.60, -0.48), (-0.74, 0.20), (-0.38, 0.60), (0.64, 0.50), (-0.64, -0.50)),
+    "m10_audit_southeast": LayoutSpec("m10_audit_southeast", (-0.60, 0.48), (0.26, -0.74), (0.66, -0.36), (-0.60, -0.52), (0.64, 0.50)),
 }
 
 TASKS: dict[str, TaskSpec] = {
@@ -128,6 +160,25 @@ TASKS: dict[str, TaskSpec] = {
         initial_satiety=0.20,
         initial_boredom=0.85,
         success_condition="consume_food",
+    ),
+    "maintain_needs": TaskSpec(
+        name="maintain_needs",
+        description="Feed and play in one episode while maintaining satiety and relieving boredom.",
+        train_layout_ids=("m9_train_northeast", "m9_train_southwest"),
+        heldout_layout_ids=("m9_validation_northeast", "m9_validation_southwest"),
+        initial_satiety=0.25,
+        initial_boredom=0.85,
+        success_condition="maintain_needs",
+    ),
+    "persistent_maintenance": TaskSpec(
+        name="persistent_maintenance",
+        description="Maintain satiety, energy, and boredom across repeated feed, play, and rest cycles.",
+        train_layout_ids=("m10_train_northeast", "m10_train_southwest"),
+        heldout_layout_ids=("m10_validation_northeast", "m10_validation_southwest"),
+        initial_satiety=0.45,
+        initial_energy=0.65,
+        initial_boredom=0.65,
+        success_condition="persistent_maintenance",
     ),
 }
 

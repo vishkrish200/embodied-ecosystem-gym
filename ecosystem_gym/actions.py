@@ -16,6 +16,7 @@ class ActionKind(IntEnum):
     WALK_RELATIVE = 6
     SCAN = 7
     PICK_UP_RELATIVE = 8
+    REST = 9
 
 
 class ActionOutcome(StrEnum):

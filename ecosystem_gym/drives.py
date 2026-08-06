@@ -30,5 +30,13 @@ class Drives:
             boredom=float(np.clip(self.boredom - amount, 0.0, 1.0)),
         )
 
+    def restore_energy(self, amount: float) -> "Drives":
+        """Apply a bounded rest effect without changing satiety or boredom."""
+        return Drives(
+            satiety=self.satiety,
+            energy=float(np.clip(self.energy + amount, 0.0, 1.0)),
+            boredom=self.boredom,
+        )
+
     def as_array(self) -> np.ndarray:
         return np.asarray([self.satiety, self.energy, self.boredom], dtype=np.float32)

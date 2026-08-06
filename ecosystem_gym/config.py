@@ -21,6 +21,13 @@ class EcosystemConfig:
     play_boredom_reduction: float = 0.60
     play_success_boredom_threshold: float = 0.35
     eat_satiety_gain: float = 0.45
+    food_respawn_seconds: float = 5.0
+    rest_interaction_radius: float = 0.22
+    rest_cycle_energy_threshold: float = 0.45
+    rest_energy_gain: float = 0.65
+    persistent_min_feed_cycles: int = 3
+    persistent_min_play_cycles: int = 3
+    persistent_min_rest_cycles: int = 2
     task_success_reward: float = 1.0
     step_penalty_per_second: float = 0.01
     invalid_action_penalty: float = 0.1

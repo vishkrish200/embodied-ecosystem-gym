@@ -20,6 +20,12 @@ M8.1 asks the project’s actual research question: on disjoint training seeds, 
 
 M8.2 is retained as an invalid legacy external-validity artifact, not a negative transfer result. Its frozen 20-seed suite used a scan camera that never exposed the food in any of its four public frames, so 0/80 cannot distinguish a weak policy from an impossible observation problem. M8.4 introduces a versioned `scan_v2` camera with a pre-run segmentation-only coverage audit, then trains a small RGB heatmap grounder on separate development layouts and validates it on 80 frozen episodes with a separate state-oracle ceiling. M8.5 freezes that M8.4 trainer and its fitted weights for a fresh, coverage-valid external audit; it fails one blue/grippy northeast condition at 3/20, so the project records a real transfer limit rather than tuning to the new suite. M8.6 then isolates that failure on new development-only seeds: grippy dynamics has no observed effect, while blue-food component recall falls from 95% for red to 46.7% on a new relative position. M8.7 responds with larger RGB patches and balanced blue hard negatives, passing a new 76/80 validation suite while retaining an explicit false-positive-component limitation. M8.8 freezes that successor and passes a fresh 79/80 external audit with complete public scan coverage and an 80/80 oracle ceiling. M8.9 then freezes the same M8.7 grounder for new food and agent visual morphologies while preserving collision physics, reaching 75/80 with complete public coverage and an 80/80 oracle ceiling; capsule-agent scenes are the weakest new row at 16/20.
 
+M9 is the integration protocol: a single longer-lived episode now requires both feeding and play, and one RGB-and-drive policy owns scan selection, food/toy pursuit, pickup recovery, and play through policy-owned memory. Its frozen 80-episode development validation reaches 75/80 with complete coverage and an 80/80 oracle ceiling, but it fails the required blocked-distractor recovery gate: one blocked row avoids the distractor entirely and the compound row recovers only 7/20 times. The sealed M9 audit is intentionally left unscored rather than retuning against it.
+
+M9.1 separates that ambiguous gate without changing the policy. The policy completes a fresh blocked-distractor choice row at 20/20 with zero invalid pickups, but reaches only 13/20 on a fresh forced-relocation recovery row despite rescanning in every episode. The real next technical problem is therefore sequential recovery after a confirmed failed pickup, not distractor choice.
+
+M10 replaces M9's one-shot maintenance checklist with a 160-step persistent environment contract. Food replenishes at seeded new locations, boredom can produce repeated play cycles, and a guarded visible rest target restores energy. Its four-row × 20-seed mechanics gate has complete public scan coverage and an 80/80 privileged-oracle ceiling, including 40/40 event-triggered stale pickup failures followed by recovery. M10 deliberately scores no RGB policy; the frozen M9 baseline and failure atlas belong to M11.
+
 ```bash
 uv sync --group dev
 uv run pytest
@@ -90,6 +96,18 @@ uv run python -m ecosystem_gym m88-demo --trace artifacts/trajectories/m88-seale
 # Run the sealed visual-morphology audit of the same frozen M8.7 grounder.
 uv run python -m ecosystem_gym m89-benchmark --output artifacts/reports/m89-sealed-visual-morphology-audit.json
 uv run python -m ecosystem_gym m89-demo --trace artifacts/trajectories/m89-sealed-visual-morphology-audit-demo.jsonl
+
+# Run M9 development validation. `--audit` is intentionally a one-shot sealed score and is not used for tuning.
+uv run python -m ecosystem_gym m9-benchmark --output artifacts/reports/m9-integrated-rgb-maintenance.json
+uv run python -m ecosystem_gym m9-demo --trace artifacts/trajectories/m9-integrated-rgb-maintenance-demo.jsonl
+
+# Diagnose distractor choice and forced recovery with the M9 policy frozen.
+uv run python -m ecosystem_gym m91-diagnosis --output artifacts/reports/m91-diagnosis.json
+uv run python -m ecosystem_gym m91-demo --trace artifacts/trajectories/m91-forced-recovery-demo.jsonl
+
+# Validate persistent feed/play/rest mechanics and replay one privileged trace.
+uv run python -m ecosystem_gym m10-validation --output artifacts/reports/m10-persistent-maintenance.json
+uv run python -m ecosystem_gym m10-demo --trace artifacts/trajectories/m10-persistent-maintenance-demo.jsonl
 
 # Open the same environment loop in a local browser, with optional replayable logging.
 uv run python -m ecosystem_gym viewer --trace artifacts/trajectories/viewer.jsonl

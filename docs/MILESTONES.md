@@ -105,3 +105,51 @@ Freeze the M8.7 training protocol and fitted grounder hashes, then evaluate once
 Freeze the M8.7 training protocol and fitted grounder hashes again, then evaluate once on new layouts, seeds, and `scan_v2` conditions that change food morphology (sphere to capsule or box) and agent appearance (sphere to capsule or box). Keep the original sphere collision geoms active and make alternative geoms non-colliding, so this changes rendered evidence rather than task physics. Require complete public target coverage, an 80/80 privileged oracle ceiling, and 75% aggregate plus per-condition success. Do not train, tune, or select M8.7 using any M8.9 episode.
 
 **Status: complete (2026-08-05).** `m89-benchmark` uses fresh seeds 1200–1219 and fresh layouts, coverage-checking all 80 initial target sequences plus all 20 relocated target sequences before scoring. The state oracle reaches 80/80. The frozen M8.7 grounder reaches 75/80: 20/20 on blue capsule food and red box food after relocation, 19/20 on blue box-agent with a blocked distractor, and 16/20 on purple capsule-agent with a landmark. Every row clears the 75% gate, but the capsule-agent row has a wide 95% Wilson interval of 58.4%–91.9% because it has only 20 episodes. This demonstrates bounded transfer to the declared visual morphologies, not semantic object understanding, real-world perception, altered contact physics, or end-to-end learned control; M8.9 is sealed and must not be used to tune M8.7.
+
+## M9 — Integrated RGB drive maintenance
+
+**Status: development validation failed (2026-08-06).** M9 adds one longer-lived `maintain_needs` task that requires both food consumption and toy play before termination, keeping the RGB observation restricted to the frame, drives, holding state, and prior outcome. Its one `IntegratedRgbDrivePolicy` inference object combines the frozen learned M8.7 food candidate model, an M9 learned toy/agent grounding model, and a learned macro-selection table over policy-owned scan/action memory. The frozen 4×20 validation protocol checks public scan coverage for food, toy, blocked distractor, and relocated food before scoring, reports Wilson intervals, and includes an 80/80 state-oracle ceiling. The deterministic result is 75/80 (93.75%, 95% Wilson 86.2%–97.3%) and every completion row clears its rate threshold, but required blocked-distractor recovery fails: `bored_then_feed_blocked` avoids the distractor entirely (0/20 recovery), while `balanced_drive_compound` recovers only 7/20 after a blocked outcome. The sealed M9 audit remains unscored; this is a negative development result, not a reason to lower the gate or tune against a fresh audit. M9 remains structured RGB behaviour cloning over typed kinematic skills, not end-to-end embodied learning.
+
+## M9.1 — Distractor choice versus forced recovery
+
+**Status: diagnosis complete, policy remains frozen (2026-08-06).** M9.1 repairs M9's ambiguous blocked-distractor metric on fresh layouts and seeds 1600–1619. `distractor_choice` measures safe completion in the presence of a visible blocked food-like item, while `forced_recovery` moves food immediately after the initial approach and requires a failed stale pickup, a new full public scan, and completion. The frozen M9 policy passes distractor choice at 20/20 with zero invalid pickups, so safe avoidance is not a recovery failure. It fails forced recovery at 13/20 completion and 11/20 full failure-rescan-completion chains, despite rescanning after relocation in 20/20 episodes; the oracle reaches 40/40. This isolates a genuine sequential-recovery limit rather than a distractor-choice failure. No retraining or M9 sealed audit follows this development-only diagnosis.
+
+## M10 — Persistent-maintenance environment and frozen protocol
+
+Replace M9's one-feed/one-play terminal checklist with non-terminal maintenance cycles. Food replenishes, boredom can return, and energy receives an explicit restoration mechanism through a public typed action and visible rest target. Freeze development, validation, and audit layouts before fitting a policy; retain event-triggered relocation as a required recovery event rather than a fixed-step disturbance.
+
+Exit when the privileged oracle survives the full horizon and completes at least three feed cycles, three play cycles, and two rest cycles on 20 frozen protocol seeds; every initial, replenished, and relocated target passes public RGB coverage; and action traces replay identically from a clean reset. M10 validates environment mechanics and protocol observability only, not an RGB-policy success claim.
+
+**Status: complete (2026-08-06).** `persistent_maintenance` now runs for a fixed 160-step horizon instead of terminating after one feed/play pair. Food disappears after consumption and deterministically replenishes at a new seeded location, boredom can produce repeated play cycles, and the appended guarded `rest` action restores energy only near a visible rest target and below the frozen threshold. The four-row × 20-seed validation audit sees initial food, replenished food, toy, and rest in every public scan sequence; both relocation rows see relocated food 20/20 and the compound row sees its blocked distractor 20/20. The privileged oracle survives and satisfies the cycle gate in 80/80 episodes, including 40/40 event-triggered stale-pickup failures followed by recovery. The weakest observed episode still completes 15 feed, 16 play, and 8 rest cycles, above the frozen 3/3/2 minimum. One persistent event-relocation trace replays exactly. No RGB policy is scored in M10.
+
+## M11 — Frozen-policy baseline and failure atlas
+
+Run the frozen M9 policy unchanged on M10 validation episodes and publish the resulting capability gap. Record every drive transition, target observation, candidate rank, local offset, pickup outcome, rescan, replenishment, and terminal cause so each failure can be assigned to the first causal stage from recorded evidence.
+
+Exit when four conditions × 20 seeds report survival curves, completed maintenance cycles, time inside predeclared safe drive bands, forced-recovery chains, interventions, and terminal causes. Every failed episode must have an inspectable first-failure classification. M11 is diagnostic and has no policy pass threshold.
+
+**Status: planned.**
+
+## M12 — Learned persistent-maintenance successor
+
+Fit one structured policy from development trajectories so high-level need selection, cycle memory, candidate retirement, rescanning, and recovery are learned rather than generated from an exhaustive authored decision table. Inference remains restricted to RGB, drives, holding state, prior outcome, and policy-owned memory, with typed kinematic skills beneath it.
+
+Exit when every validation condition reaches at least 15/20 horizon survivals, every successful episode completes all required feed/play/rest cycles, at least 80% of simulated time remains inside frozen safe-drive bands, and at least 15/20 forced disturbances complete the failure-rescan-recovery chain. The successor must improve paired survival over frozen M9 by at least 20 percentage points with a deterministic bootstrap lower bound above zero, and must beat no-memory and no-drive ablations without private inputs.
+
+**Status: planned.**
+
+## M13 — Sealed persistent-maintenance audit
+
+Freeze M12's training data, protocol, hyperparameters, and policy fingerprint, then score it once on new seeds and layouts combining appearance changes, camera poses, resource timing, blocked distractors, and event-triggered relocation. Do not introduce contact-physics claims unless task mechanics actually change.
+
+Exit only if public coverage and the 80/80 privileged-oracle ceiling pass before scoring and the unchanged M12 aggregate, per-condition, safe-band, and recovery gates all pass. Any failed condition is published unchanged; audit episodes are never used for tuning or a retry milestone.
+
+**Status: planned.**
+
+## M14 — Persistent virtual toy and v1 release closure
+
+Expose the audited persistent environment through the thin viewer so a person can watch continuous need cycles, inspect drives and outcomes, intervene through allowed actions, save a checkpoint, resume later, and replay the same history. The frontend continues to call the Gym's reset, step, checkpoint, and trajectory interfaces and owns no simulation state.
+
+Exit when checkpoint-and-resume matches uninterrupted execution across 20 seeded traces, headless and viewer-driven action schedules produce identical outcomes, long-running sessions expose resource cooldowns and policy decisions, and all six original task families have tests and at least 20 fixed evaluation seeds. Release wording must describe structured learned maintenance over typed kinematic skills rather than end-to-end embodied intelligence.
+
+**Status: planned.**

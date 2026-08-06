@@ -20,6 +20,9 @@ from .m86 import run_m86_viewer_demo, write_m86_report
 from .m87 import run_m87_viewer_demo, write_m87_report
 from .m88 import run_m88_viewer_demo, write_m88_report
 from .m89 import run_m89_viewer_demo, write_m89_report
+from .m9 import run_m9_viewer_demo, write_m9_report
+from .m91 import run_m91_viewer_demo, write_m91_report
+from .m10 import run_m10_viewer_demo, write_m10_report
 from .policies import evaluate_scripted_policy
 from .trajectory import replay_and_validate
 from .video import write_find_and_eat_regression_video
@@ -102,6 +105,19 @@ def main() -> None:
     m89_benchmark.add_argument("--output", type=Path, required=True)
     m89_demo = subparsers.add_parser("m89-demo", help="record and replay one frozen M8.9 rollout")
     m89_demo.add_argument("--trace", type=Path, required=True)
+    m9_benchmark = subparsers.add_parser("m9-benchmark", help="run the frozen M9 integrated RGB maintenance protocol")
+    m9_benchmark.add_argument("--output", type=Path, required=True)
+    m9_benchmark.add_argument("--audit", action="store_true", help="score the one-shot sealed M9 audit rather than validation")
+    m9_demo = subparsers.add_parser("m9-demo", help="record and replay one M9 integrated RGB rollout")
+    m9_demo.add_argument("--trace", type=Path, required=True)
+    m91_diagnosis = subparsers.add_parser("m91-diagnosis", help="separate M9 distractor choice from forced recovery without retraining")
+    m91_diagnosis.add_argument("--output", type=Path, required=True)
+    m91_demo = subparsers.add_parser("m91-demo", help="record and replay one M9.1 forced-recovery rollout")
+    m91_demo.add_argument("--trace", type=Path, required=True)
+    m10_benchmark = subparsers.add_parser("m10-validation", help="validate frozen persistent-maintenance mechanics and observability")
+    m10_benchmark.add_argument("--output", type=Path, required=True)
+    m10_demo = subparsers.add_parser("m10-demo", help="record and replay one privileged M10 maintenance trace")
+    m10_demo.add_argument("--trace", type=Path, required=True)
     viewer = subparsers.add_parser("viewer", help="start the thin local live Gym viewer")
     viewer.add_argument("--trace", type=Path)
     viewer.add_argument("--port", type=int, default=8765)
@@ -185,6 +201,21 @@ def main() -> None:
         print(json.dumps(report["external_validity_gate"]))
     elif args.command == "m89-demo":
         print(run_m89_viewer_demo(args.trace))
+    elif args.command == "m9-benchmark":
+        report = write_m9_report(args.output, audit=args.audit)
+        print(json.dumps(report["gate"]))
+    elif args.command == "m9-demo":
+        print(run_m9_viewer_demo(args.trace))
+    elif args.command == "m91-diagnosis":
+        report = write_m91_report(args.output)
+        print(json.dumps(report["verdict"]))
+    elif args.command == "m91-demo":
+        print(run_m91_viewer_demo(args.trace))
+    elif args.command == "m10-validation":
+        report = write_m10_report(args.output)
+        print(json.dumps(report["gate"]))
+    elif args.command == "m10-demo":
+        print(run_m10_viewer_demo(args.trace))
     elif args.command == "viewer":
         with ViewerSession(trace_path=args.trace) as session:
             server = LocalViewerServer(session, port=args.port)

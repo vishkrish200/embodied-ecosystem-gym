@@ -91,6 +91,11 @@ class TrajectoryWriter:
             "environment_version": info["environment_version"],
             "disturbance": info.get("disturbance"),
             "post_disturbance_completion": bool(info.get("post_disturbance_completion", False)),
+            "resource_event": info.get("resource_event"),
+            "feed_cycles": int(info.get("feed_cycles", 0)),
+            "play_cycles": int(info.get("play_cycles", 0)),
+            "rest_cycles": int(info.get("rest_cycles", 0)),
+            "food_available": bool(info.get("food_available", True)),
             "camera_sector": info.get("camera_sector"),
         }
         self._file.write(json.dumps(record, sort_keys=True, separators=(",", ":")) + "\n")
@@ -151,7 +156,16 @@ def replay_and_validate(path: str | Path) -> ReplayResult:
                 raise ValueError(f"reward mismatch at step {expected['step']}")
             if bool(terminated) != expected["terminated"] or bool(truncated) != expected["truncated"]:
                 raise ValueError(f"terminal state mismatch at step {expected['step']}")
-            for key in ("disturbance", "post_disturbance_completion", "camera_sector"):
+            for key in (
+                "disturbance",
+                "post_disturbance_completion",
+                "resource_event",
+                "feed_cycles",
+                "play_cycles",
+                "rest_cycles",
+                "food_available",
+                "camera_sector",
+            ):
                 if key in expected and info.get(key) != expected[key]:
                     raise ValueError(f"{key} mismatch at step {expected['step']}")
             actual_observation = _json_value(observation)

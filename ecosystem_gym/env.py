@@ -96,6 +96,11 @@ _MODEL_XML = """
       <geom name="toy_cube_geom" type="box" size="0.075 0.075 0.075" contype="0" conaffinity="0" rgba="0.95 0.78 0.10 0"/>
       <geom name="toy_capsule_geom" type="capsule" size="0.055 0.10" contype="0" conaffinity="0" rgba="0.95 0.78 0.10 0"/>
     </body>
+    <body name="rest" pos="0 0 0.04">
+      <joint name="rest_x" type="slide" axis="1 0 0" range="-0.9 0.9"/>
+      <joint name="rest_y" type="slide" axis="0 1 0" range="-0.9 0.9"/>
+      <geom name="rest_geom" type="box" size="0.13 0.10 0.04" contype="0" conaffinity="0" rgba="0.28 0.82 0.48 1"/>
+    </body>
     <body name="distractor" pos="0 0 0.06">
       <joint name="distractor_x" type="slide" axis="1 0 0" range="-0.9 0.9"/>
       <joint name="distractor_y" type="slide" axis="0 1 0" range="-0.9 0.9"/>
@@ -119,6 +124,11 @@ class WorldState:
     task_id: str = "find_and_eat"
     toy_played: bool = False
     boundary_contacts: int = 0
+    feed_cycles: int = 0
+    play_cycles: int = 0
+    rest_cycles: int = 0
+    food_available: bool = True
+    food_respawn_remaining: float = 0.0
 
 
 class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
@@ -163,6 +173,7 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
         self._agent_qpos = self._qpos_indices("agent_x", "agent_y")
         self._food_qpos = self._qpos_indices("food_x", "food_y")
         self._toy_qpos = self._qpos_indices("toy_x", "toy_y")
+        self._rest_qpos = self._qpos_indices("rest_x", "rest_y")
         self._distractor_qpos = self._qpos_indices("distractor_x", "distractor_y")
         self._state: WorldState | None = None
         self._prior_outcome = ActionOutcome.SUCCESS
@@ -186,6 +197,7 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
         self._geometry_variant = "default"
         self._agent_shape_variant = "sphere"
         self._food_shape_variant = "sphere"
+        self._event_relocation_on_first_pickup = False
 
     def reset(
         self,
@@ -217,6 +229,7 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
         if self._scan_sector not in self._SCAN_SECTORS:
             raise ValueError(f"initial_scan_sector must be one of {self._SCAN_SECTORS}")
         self._blocked_distractor = bool(reset_options.get("blocked_distractor", False))
+        self._event_relocation_on_first_pickup = bool(reset_options.get("event_relocation_on_first_pickup", False))
         self._geometry_variant = str(reset_options.get("geometry_variant", "default"))
         if self._geometry_variant not in {"default", "unseen_block", "m81_landmark", "m82_landmark"}:
             raise ValueError("geometry_variant must be default, unseen_block, m81_landmark, or m82_landmark")
@@ -232,19 +245,29 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
         self._set_agent_xy(np.asarray(self._active_layout.agent_xy, dtype=np.float32))
         self._set_food_xy(self._active_layout.sample_food_xy(self.np_random))
         self._set_toy_xy(np.asarray(self._active_layout.toy_xy, dtype=np.float32))
+        self._set_rest_xy(np.asarray(self._active_layout.rest_xy, dtype=np.float32))
         distractor_xy = np.asarray(reset_options.get("distractor_xy", (-0.55, 0.0)), dtype=np.float32)
         if distractor_xy.shape != (2,):
             raise ValueError("distractor_xy must have shape (2,)")
         self._set_distractor_xy(distractor_xy)
         self._configure_m8_scene()
-        self._state = WorldState(
-            holding_food=False,
-            food_consumed=False,
-            drives=Drives(
+        self._set_rest_visible(self._is_persistent_task())
+        initial_drives = reset_options.get("initial_drives")
+        if initial_drives is None:
+            drives = Drives(
                 satiety=self._active_task.initial_satiety,
                 energy=self._active_task.initial_energy,
                 boredom=self._active_task.initial_boredom,
-            ),
+            )
+        else:
+            values = np.asarray(initial_drives, dtype=np.float32)
+            if values.shape != (3,) or np.any(values < 0.0) or np.any(values > 1.0):
+                raise ValueError("initial_drives must contain three values in [0, 1]")
+            drives = Drives(satiety=float(values[0]), energy=float(values[1]), boredom=float(values[2]))
+        self._state = WorldState(
+            holding_food=False,
+            food_consumed=False,
+            drives=drives,
             step_count=0,
             task_id=self._active_task.name,
         )
@@ -263,6 +286,7 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
             "camera_control": self._camera_control,
             "camera_sector": self._scan_sector if self._camera_control in {"scan", "scan_v2"} else None,
             "blocked_distractor": self._blocked_distractor,
+            "event_relocation_on_first_pickup": self._event_relocation_on_first_pickup,
             "geometry_variant": self._geometry_variant,
         }
 
@@ -272,18 +296,30 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
         state = self._require_state()
         skill = SkillAction.from_gym(action)
         state.drives = state.drives.evolve(self.config, skill.duration_seconds)
+        resource_event = self._advance_persistent_resources(skill.duration_seconds)
+        event_disturbance = self._apply_event_disturbance_if_due(state, skill)
         outcome, task_success = self._execute(state, skill)
         state.step_count += 1
-        recovery_action = self._recovery_pending and skill.kind is ActionKind.WALK_TO and outcome is ActionOutcome.SUCCESS
+        recovery_action = self._recovery_pending and skill.kind in {ActionKind.WALK_TO, ActionKind.WALK_RELATIVE} and outcome is ActionOutcome.SUCCESS
         if recovery_action:
             self._recovery_pending = False
-        post_disturbance_completion = self._post_disturbance_pending and task_success
+        post_disturbance_completion = self._post_disturbance_pending and (
+            task_success
+            or (
+                self._is_persistent_task()
+                and skill.kind is ActionKind.CONSUME
+                and outcome is ActionOutcome.SUCCESS
+            )
+        )
         if post_disturbance_completion:
             self._post_disturbance_pending = False
-        disturbance = self._apply_disturbance_if_due(state)
+        disturbance = event_disturbance or self._apply_disturbance_if_due(state)
         self._prior_outcome = outcome
-        terminated = task_success or state.drives.satiety <= 0.0 or state.drives.energy <= 0.0
+        survived = state.drives.satiety > 0.0 and state.drives.energy > 0.0
+        terminated = (task_success and not self._is_persistent_task()) or not survived
         truncated = state.step_count >= self.config.max_episode_steps and not terminated
+        if self._is_persistent_task():
+            task_success = truncated and survived and self._persistent_requirements_met(state)
         reward = -self.config.step_penalty_per_second * skill.duration_seconds
         if outcome not in {ActionOutcome.SUCCESS, ActionOutcome.BLOCKED}:
             reward -= self.config.invalid_action_penalty
@@ -299,6 +335,7 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
             disturbance=disturbance,
             recovery_action=recovery_action,
             post_disturbance_completion=post_disturbance_completion,
+            resource_event=resource_event,
         )
 
     def render(self) -> np.ndarray | None:
@@ -331,7 +368,7 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
             self._advance_physics(action.duration_seconds)
             return ActionOutcome.SUCCESS, False
         if action.kind is ActionKind.PICK_UP:
-            if state.food_consumed or self._distance_to_food() > self.config.pickup_radius:
+            if not state.food_available or state.food_consumed or self._distance_to_food() > self.config.pickup_radius:
                 self._advance_physics(action.duration_seconds)
                 return ActionOutcome.BLOCKED, False
             state.holding_food = True
@@ -358,9 +395,17 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
                 energy=state.drives.energy,
                 boredom=state.drives.boredom,
             )
+            if self._is_persistent_task():
+                state.feed_cycles += 1
+                state.food_available = False
+                state.food_respawn_remaining = self.config.food_respawn_seconds
+                self._set_food_visible(False)
+                return ActionOutcome.SUCCESS, False
             task_success = self._active_task.success_condition == "consume_food"
             if self._active_task.name == "competing_drives" and state.toy_played:
                 task_success = False
+            if self._active_task.success_condition == "maintain_needs":
+                task_success = state.toy_played
             return ActionOutcome.SUCCESS, task_success
         if action.kind is ActionKind.PLACE:
             self._advance_physics(action.duration_seconds)
@@ -370,18 +415,37 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
             state.holding_food = False
             return ActionOutcome.SUCCESS, False
         if action.kind is ActionKind.RUN_AROUND:
-            if self._is_m4_task() and self._distance_to_toy() > self.config.toy_interaction_radius:
+            if self._supports_play() and self._distance_to_toy() > self.config.toy_interaction_radius:
                 self._advance_physics(action.duration_seconds)
                 return ActionOutcome.BLOCKED, False
+            play_cycle_ready = state.drives.boredom >= self.config.play_success_boredom_threshold
             self._run_around(action.duration_seconds)
-            if self._is_m4_task():
+            if self._supports_play():
                 state.toy_played = True
                 state.drives = state.drives.relieve_boredom(self.config.play_boredom_reduction)
+                if self._is_persistent_task() and play_cycle_ready:
+                    state.play_cycles += 1
+                    return ActionOutcome.SUCCESS, False
                 return (
                     ActionOutcome.SUCCESS,
-                    self._active_task.success_condition == "relieve_boredom"
-                    and state.drives.boredom <= self.config.play_success_boredom_threshold,
+                    (
+                        self._active_task.success_condition == "relieve_boredom"
+                        and state.drives.boredom <= self.config.play_success_boredom_threshold
+                    )
+                    or (
+                        self._active_task.success_condition == "maintain_needs" and state.food_consumed
+                    ),
                 )
+            return ActionOutcome.SUCCESS, False
+        if action.kind is ActionKind.REST:
+            if not self._is_persistent_task() or self._distance_to_rest() > self.config.rest_interaction_radius:
+                self._advance_physics(action.duration_seconds)
+                return ActionOutcome.BLOCKED, False
+            self._advance_physics(action.duration_seconds)
+            if state.drives.energy > self.config.rest_cycle_energy_threshold:
+                return ActionOutcome.BLOCKED, False
+            state.drives = state.drives.restore_energy(self.config.rest_energy_gain)
+            state.rest_cycles += 1
             return ActionOutcome.SUCCESS, False
         if action.kind is ActionKind.IDLE:
             self._advance_physics(action.duration_seconds)
@@ -457,6 +521,7 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
         disturbance: str | None,
         recovery_action: bool,
         post_disturbance_completion: bool,
+        resource_event: str | None,
     ) -> dict[str, Any]:
         state = self._require_state()
         return {
@@ -470,12 +535,18 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
             "disturbance": disturbance,
             "recovery_action": recovery_action,
             "post_disturbance_completion": post_disturbance_completion,
+            "resource_event": resource_event,
             "failure_reason": self._failure_reason(outcome),
             "task_id": self._active_task.name,
             "food_variant": self._food_variant,
             "toy_variant": self._toy_variant,
             "dynamics_variant": self._dynamics_variant,
             "toy_played": state.toy_played,
+            "feed_cycles": state.feed_cycles,
+            "play_cycles": state.play_cycles,
+            "rest_cycles": state.rest_cycles,
+            "food_available": state.food_available,
+            "maintenance_complete": self._persistent_requirements_met(state) if self._is_persistent_task() else False,
             "boundary_contacts": state.boundary_contacts,
             "survived": state.drives.satiety > 0.0 and state.drives.energy > 0.0,
             "camera_control": self._camera_control,
@@ -577,6 +648,16 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
         self.data.qpos[self._toy_qpos] = self._bounded_xy(xy)
         mujoco.mj_forward(self.model, self.data)
 
+    def _rest_xy(self) -> np.ndarray:
+        return self.data.qpos[self._rest_qpos].astype(np.float32)
+
+    def _set_rest_xy(self, xy: np.ndarray) -> None:
+        self.data.qpos[self._rest_qpos] = self._bounded_xy(xy)
+        mujoco.mj_forward(self.model, self.data)
+
+    def _set_rest_visible(self, visible: bool) -> None:
+        self.model.geom_rgba[self.model.geom("rest_geom").id, 3] = 1.0 if visible else 0.0
+
     def _distractor_xy(self) -> np.ndarray:
         return self.data.qpos[self._distractor_qpos].astype(np.float32)
 
@@ -587,10 +668,30 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
     def _distance_to_toy(self) -> float:
         return float(np.linalg.norm(self._agent_xy() - self._toy_xy()))
 
+    def _distance_to_rest(self) -> float:
+        return float(np.linalg.norm(self._agent_xy() - self._rest_xy()))
+
     def _is_m4_task(self) -> bool:
         return self._active_task.name in {"play_when_bored", "competing_drives"}
 
+    def _supports_play(self) -> bool:
+        return self._is_m4_task() or self._active_task.success_condition in {"maintain_needs", "persistent_maintenance"}
+
+    def _is_persistent_task(self) -> bool:
+        return self._active_task.success_condition == "persistent_maintenance"
+
+    def _persistent_requirements_met(self, state: WorldState) -> bool:
+        return (
+            state.feed_cycles >= self.config.persistent_min_feed_cycles
+            and state.play_cycles >= self.config.persistent_min_play_cycles
+            and state.rest_cycles >= self.config.persistent_min_rest_cycles
+        )
+
     def _environment_version(self) -> str:
+        if self._is_persistent_task():
+            return "0.8.0"
+        if self._active_task.success_condition == "maintain_needs":
+            return "0.7.0"
         if self._camera_control == "scan_v2":
             return "0.6.0"
         return "0.5.0" if self._camera_control == "scan" else ("0.4.0" if self._is_m4_task() else "0.3.0")
@@ -655,6 +756,11 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
     def _active_food_geom_names(self) -> tuple[str, ...]:
         return (_FOOD_SHAPE_VARIANTS[self._food_shape_variant],)
 
+    def _set_food_visible(self, visible: bool) -> None:
+        active = _FOOD_SHAPE_VARIANTS[self._food_shape_variant]
+        for geom_name in _FOOD_SHAPE_VARIANTS.values():
+            self.model.geom_rgba[self.model.geom(geom_name).id, 3] = 1.0 if visible and geom_name == active else 0.0
+
     def _configure_m8_scene(self) -> None:
         distractor_geom = self.model.geom("distractor_geom").id
         geometry_geom = self.model.geom("m8_geometry_geom").id
@@ -667,9 +773,13 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
         self.model.geom_rgba[m82_landmark_geom, 3] = 1.0 if self._geometry_variant == "m82_landmark" else 0.0
 
     def _nearest_pickup_candidate(self, target_xy: np.ndarray) -> str | None:
-        candidates = [("food", self._food_xy())]
+        candidates: list[tuple[str, np.ndarray]] = []
+        if self._require_state().food_available:
+            candidates.append(("food", self._food_xy()))
         if self._blocked_distractor:
             candidates.append(("distractor", self._distractor_xy()))
+        if not candidates:
+            return None
         name, candidate_xy = min(candidates, key=lambda item: float(np.linalg.norm(item[1] - target_xy)))
         if float(np.linalg.norm(candidate_xy - target_xy)) > self.config.pickup_radius:
             return None
@@ -681,6 +791,58 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
 
     def _distance_to_food(self) -> float:
         return float(np.linalg.norm(self._agent_xy() - self._food_xy()))
+
+    def _advance_persistent_resources(self, elapsed_seconds: float) -> str | None:
+        if not self._is_persistent_task():
+            return None
+        state = self._require_state()
+        if state.food_available:
+            return None
+        state.food_respawn_remaining = max(0.0, state.food_respawn_remaining - elapsed_seconds)
+        if state.food_respawn_remaining > 0.0:
+            return None
+        previous = self._food_xy()
+        candidate = self._active_layout.sample_food_xy(self.np_random)
+        for _ in range(8):
+            if float(np.linalg.norm(candidate - previous)) > 0.25 and float(np.linalg.norm(candidate - self._agent_xy())) > 0.25:
+                break
+            candidate = self._active_layout.sample_food_xy(self.np_random)
+        self._set_food_xy(candidate)
+        self._set_food_visible(True)
+        state.food_available = True
+        state.food_consumed = False
+        return "food_replenished"
+
+    def _apply_event_disturbance_if_due(self, state: WorldState, action: SkillAction) -> str | None:
+        if (
+            not self._event_relocation_on_first_pickup
+            or self._disturbance_occurred
+            or not state.food_available
+            or state.holding_food
+            or action.kind not in {ActionKind.PICK_UP, ActionKind.PICK_UP_RELATIVE}
+        ):
+            return None
+        previous = self._food_xy()
+        candidate = self._active_layout.sample_food_xy(self.np_random)
+        for _ in range(8):
+            if float(np.linalg.norm(candidate - previous)) > 0.25 and float(np.linalg.norm(candidate - self._agent_xy())) > self.config.pickup_radius:
+                break
+            candidate = self._active_layout.sample_food_xy(self.np_random)
+        if float(np.linalg.norm(candidate - previous)) <= 0.25 or float(np.linalg.norm(candidate - self._agent_xy())) <= self.config.pickup_radius:
+            low = np.asarray(self._active_layout.food_low, dtype=np.float32)
+            high = np.asarray(self._active_layout.food_high, dtype=np.float32)
+            corners = (
+                low,
+                high,
+                np.asarray((low[0], high[1]), dtype=np.float32),
+                np.asarray((high[0], low[1]), dtype=np.float32),
+            )
+            candidate = max(corners, key=lambda item: float(np.linalg.norm(item - previous)))
+        self._set_food_xy(candidate)
+        self._disturbance_occurred = True
+        self._recovery_pending = True
+        self._post_disturbance_pending = True
+        return "food_relocated"
 
     def _qpos_indices(self, *joint_names: str) -> np.ndarray:
         return np.asarray([self.model.jnt_qposadr[self.model.joint(name).id] for name in joint_names])
