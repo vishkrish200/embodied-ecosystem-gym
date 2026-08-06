@@ -85,7 +85,7 @@ The base PCG64 stream is `20260807`, with `+1`, `+2`, and `+3` for no-drive,
 no-memory, and random. Epsilon-greedy exploration is 1.00 linearly to 0.05
 over the first 9,000 episodes then 0.05. The replay buffer has capacity
 100,000 FIFO transitions; updates begin after 1,000 transitions, sample 128
-uniformly without replacement, occur once every 16 environment decisions,
+uniformly without replacement, occur once every 256 environment decisions,
 and use Double-DQN targets with `gamma=0.99`. Online parameters use Adam
 (`lr=3e-4`, `beta1=.9`, `beta2=.999`, `epsilon=1e-8`) and mean Huber loss
 (`delta=1.0`); target parameters copy the online network every 1,000 updates.

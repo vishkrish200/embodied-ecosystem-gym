@@ -156,6 +156,20 @@ LAYOUTS: dict[str, LayoutSpec] = {
     "m131_audit_southwest": LayoutSpec("m131_audit_southwest", (0.66, 0.54), (-0.76, -0.74), (-0.40, -0.36), (-0.72, 0.56), (0.72, -0.50)),
     "m131_audit_northwest": LayoutSpec("m131_audit_northwest", (0.68, -0.54), (-0.78, 0.20), (-0.42, 0.64), (0.70, 0.56), (-0.70, -0.54)),
     "m131_audit_southeast": LayoutSpec("m131_audit_southeast", (-0.68, 0.54), (0.32, -0.78), (0.68, -0.42), (-0.70, -0.56), (0.70, 0.54)),
+    # M13.2 keeps the M13.1 task/reward but has a new function-approximation
+    # split family, disjoint from every M13/M13.1 layout.
+    "m132_dev_northeast": LayoutSpec("m132_dev_northeast", (-0.22, -0.18), (0.20, 0.32), (0.48, 0.64), (0.58, -0.38), (-0.56, 0.40)),
+    "m132_dev_southwest": LayoutSpec("m132_dev_southwest", (0.22, 0.18), (-0.64, -0.66), (-0.30, -0.32), (-0.56, 0.40), (0.56, -0.38)),
+    "m132_dev_northwest": LayoutSpec("m132_dev_northwest", (0.26, -0.20), (-0.68, 0.18), (-0.34, 0.62), (0.54, 0.44), (-0.54, -0.42)),
+    "m132_dev_southeast": LayoutSpec("m132_dev_southeast", (-0.26, 0.20), (0.22, -0.68), (0.64, -0.34), (-0.54, -0.44), (0.54, 0.42)),
+    "m132_validation_northeast": LayoutSpec("m132_validation_northeast", (-0.46, -0.36), (0.28, 0.36), (0.64, 0.72), (0.70, -0.46), (-0.70, 0.54)),
+    "m132_validation_southwest": LayoutSpec("m132_validation_southwest", (0.46, 0.36), (-0.74, -0.72), (-0.38, -0.36), (-0.70, 0.54), (0.70, -0.46)),
+    "m132_validation_northwest": LayoutSpec("m132_validation_northwest", (0.56, -0.44), (-0.76, 0.20), (-0.40, 0.68), (0.66, 0.56), (-0.66, -0.54)),
+    "m132_validation_southeast": LayoutSpec("m132_validation_southeast", (-0.56, 0.44), (0.32, -0.76), (0.68, -0.40), (-0.66, -0.56), (0.66, 0.54)),
+    "m132_audit_northeast": LayoutSpec("m132_audit_northeast", (-0.68, -0.56), (0.26, 0.38), (0.62, 0.76), (0.76, -0.52), (-0.74, 0.58)),
+    "m132_audit_southwest": LayoutSpec("m132_audit_southwest", (0.68, 0.56), (-0.78, -0.76), (-0.42, -0.38), (-0.74, 0.58), (0.74, -0.52)),
+    "m132_audit_northwest": LayoutSpec("m132_audit_northwest", (0.70, -0.56), (-0.80, 0.18), (-0.44, 0.66), (0.72, 0.58), (-0.72, -0.56)),
+    "m132_audit_southeast": LayoutSpec("m132_audit_southeast", (-0.70, 0.56), (0.34, -0.80), (0.70, -0.44), (-0.72, -0.58), (0.72, 0.56)),
 }
 
 TASKS: dict[str, TaskSpec] = {
