@@ -298,6 +298,7 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
         state.drives = state.drives.evolve(self.config, skill.duration_seconds)
         resource_event = self._advance_persistent_resources(skill.duration_seconds)
         event_disturbance = self._apply_event_disturbance_if_due(state, skill)
+        cycle_counts_before = (state.feed_cycles, state.play_cycles, state.rest_cycles)
         outcome, task_success = self._execute(state, skill)
         state.step_count += 1
         recovery_action = self._recovery_pending and skill.kind in {ActionKind.WALK_TO, ActionKind.WALK_RELATIVE} and outcome is ActionOutcome.SUCCESS
@@ -327,6 +328,14 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
             reward += self.config.play_success_reward if self._active_task.success_condition == "relieve_boredom" else self.config.task_success_reward
         if recovery_action or post_disturbance_completion:
             reward += self.config.disturbance_recovery_reward
+        if self._is_persistent_task():
+            feed_before, play_before, rest_before = cycle_counts_before
+            if state.feed_cycles > feed_before:
+                reward += self.config.persistent_feed_cycle_reward
+            if state.play_cycles > play_before:
+                reward += self.config.persistent_play_cycle_reward
+            if state.rest_cycles > rest_before:
+                reward += self.config.persistent_rest_cycle_reward
         if state.drives.satiety <= 0.0 or state.drives.energy <= 0.0:
             reward -= self.config.task_success_reward
         return self._observation(), float(reward), terminated, truncated, self._info(

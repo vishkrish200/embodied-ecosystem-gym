@@ -26,6 +26,7 @@ from .m10 import run_m10_viewer_demo, write_m10_report
 from .m11 import write_m11_report
 from .m12 import run_m12_viewer_demo, write_m12_report
 from .m13 import write_m13_audit_report, write_m13_report, write_m13_training_report
+from .m131 import write_m131_report, write_m131_training_report
 from .policies import evaluate_scripted_policy
 from .trajectory import replay_and_validate
 from .video import write_find_and_eat_regression_video
@@ -134,6 +135,10 @@ def main() -> None:
     m13_audit = subparsers.add_parser("m13-audit", help="run the one-shot sealed M13 audit after a passing validation")
     m13_audit.add_argument("--validation-report", type=Path, required=True)
     m13_audit.add_argument("--output", type=Path, required=True)
+    m131_validation = subparsers.add_parser("m131-validation", help="run the one-shot M13.1 cycle-reward validation")
+    m131_validation.add_argument("--output", type=Path, required=True)
+    m131_train = subparsers.add_parser("m131-train", help="write M13.1 development-only policy artifacts")
+    m131_train.add_argument("--output", type=Path, required=True)
     viewer = subparsers.add_parser("viewer", help="start the thin local live Gym viewer")
     viewer.add_argument("--trace", type=Path)
     viewer.add_argument("--port", type=int, default=8765)
@@ -249,6 +254,12 @@ def main() -> None:
     elif args.command == "m13-audit":
         report = write_m13_audit_report(args.output, validation_report_path=args.validation_report)
         print(json.dumps(report["gate"]))
+    elif args.command == "m131-validation":
+        report = write_m131_report(args.output)
+        print(json.dumps(report["gate"]))
+    elif args.command == "m131-train":
+        report = write_m131_training_report(args.output)
+        print(json.dumps(report["policy_artifacts"]))
     elif args.command == "viewer":
         with ViewerSession(trace_path=args.trace) as session:
             server = LocalViewerServer(session, port=args.port)

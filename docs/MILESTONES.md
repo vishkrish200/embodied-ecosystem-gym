@@ -146,7 +146,7 @@ Before training, version the reward, observation encoding, macro/action set, tra
 
 Exit when the RL policy materially exceeds random, no-drive, and no-memory ablations on each predeclared condition; completes the persistent cycle gate and forced-recovery chain at predeclared per-condition rates; and replays adverse trajectories exactly. A separately named scripted/state-oracle ceiling must still complete every condition. This milestone is the learning baseline for long-horizon maintenance, not an RGB result.
 
-**Status: in progress (2026-08-06).** `docs/M13_PROTOCOL.md` freezes the state boundary, reward, eight-macro action surface, training schedule, new layouts/seeds, ablations, and gates. The initial implementation adds public `rest_xy`, the new layouts, a reward-led tabular Q-learning policy, matching no-drive/no-memory/random baselines, a fresh-split mechanics ceiling, and targeted boundary tests. No frozen M13 validation or audit result has been run or claimed.
+**Status: original baseline failed validation; M13.1 in progress (2026-08-06).** `docs/M13_PROTOCOL.md` froze the state boundary, reward, eight-macro action surface, training schedule, new layouts/seeds, ablations, and gates. The original reward-only-at-completion tabular policy survived all validation episodes but completed zero maintenance episodes, so it failed every per-condition maintenance gate; its sealed audit remains unopened. `docs/M13_1_PROTOCOL.md` now freezes the reward-only cycle-transition revision on new 2300–2519 splits. It retains the same policy boundary, encoder, macro compiler, mechanics, training budget, and gates; M13.2 representation work is conditional on a clean M13.1 validation failure.
 
 ## M14 — Hybrid persistent-maintenance RL
 

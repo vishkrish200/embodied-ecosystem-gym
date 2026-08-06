@@ -33,5 +33,8 @@ class EcosystemConfig:
     invalid_action_penalty: float = 0.1
     disturbance_recovery_reward: float = 0.05
     play_success_reward: float = 1.0
+    persistent_feed_cycle_reward: float = 0.0
+    persistent_play_cycle_reward: float = 0.0
+    persistent_rest_cycle_reward: float = 0.0
     rgb_width: int = 64
     rgb_height: int = 64

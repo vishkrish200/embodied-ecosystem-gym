@@ -2,7 +2,7 @@
 
 Updated: 2026-08-06
 Repo/path: `/Users/vishnukrishnan/Developer/embodied-ecosystem-gym`
-Branch/worktree: `main` with committed M8–M12 history and M13 in progress.
+Branch/worktree: `main` with committed M8–M12 history, original M13 failure evidence, and M13.1 in progress.
 
 ## Current Goal
 
@@ -37,24 +37,30 @@ task. Do not start another behavior-cloning or RGB policy variant first.
   `info`, or private environment access.
 - Keep M12 as an honest diagnostic. Do not merge it as the main project claim,
   retune it against the old validation rows, or open a sealed M12 audit.
-- `docs/M13_PROTOCOL.md` freezes M13's reward, state adapter, action set,
-  training budget, fresh 2000–2039 / 2100–2119 / 2200–2219 splits, and
-  per-condition gates. The initial implementation adds `rest_xy` to the public
-  state-oracle observation and a
-  reward-led tabular macro learner. Its frozen validation has not been run.
+- Original M13 validation is complete and failed: survival passed but no full
+  policy episode completed the required cycles. Its 2200–2219 audit remains
+  unopened. Do not reuse its validation rows as a development signal.
+- `docs/M13_1_PROTOCOL.md` freezes M13.1: the same public-state tabular policy
+  and 12,000-episode schedule, but guarded +0.25 reward only for authoritative
+  feed/play/rest counter increments. Its development / validation / audit
+  splits are new 2300–2339 / 2400–2419 / 2500–2519. M13.2 is conditional on a
+  clean M13.1 validation failure and must use a new protocol/splits.
 
 ## Next Steps
 
-1. Run `python -m ecosystem_gym m13-train --output ...` for the fixed,
+1. Implement and test M13.1's zero-default, guarded cycle-transition reward;
+   preserve all legacy/M13 reward behavior at default configuration.
+2. Run `python -m ecosystem_gym m131-train --output ...` for the fixed,
    development-only 12,000-episode budget and inspect only its artifacts.
-2. Run development-only performance checks without opening validation or audit;
+3. Run development-only performance checks without opening validation or audit;
    fix implementation defects only, not gates or protocol constants.
-3. Freeze the code and run M13 validation once. It writes and replays every
+4. Freeze the code and run M13.1 validation once. It writes and replays every
    policy trace, then reports every condition,
    confidence intervals, completion cycles, safe-drive time, recovery chains,
    and ablations.
-4. Score the M13 audit once only after validation passes.
-5. Only then plan M14 hybrid RL and M15 RGB persistent maintenance with the
+5. Score the M13.1 audit once only after validation passes. If validation
+   fails, leave the audit unopened and write M13.2's distinct protocol.
+6. Only then plan M14 hybrid RL and M15 RGB persistent maintenance with the
    same task and policy objective.
 
 ## Do Not Repeat
