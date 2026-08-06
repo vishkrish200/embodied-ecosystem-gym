@@ -40,27 +40,25 @@ task. Do not start another behavior-cloning or RGB policy variant first.
 - Original M13 validation is complete and failed: survival passed but no full
   policy episode completed the required cycles. Its 2200–2219 audit remains
   unopened. Do not reuse its validation rows as a development signal.
-- `docs/M13_1_PROTOCOL.md` freezes M13.1: the same public-state tabular policy
-  and 12,000-episode schedule, but guarded +0.25 reward only for authoritative
-  feed/play/rest counter increments. Its development / validation / audit
-  splits are new 2300–2339 / 2400–2419 / 2500–2519. M13.2 is conditional on a
-  clean M13.1 validation failure and must use a new protocol/splits.
+- M13.1 validation is complete and failed cleanly. Coverage and 400 traces
+  passed/replayed, but full policy maintenance was 0/20 in every condition;
+  its `2500–2519` audit is sealed. The guarded reward helped development but
+  did not generalize. Do not rerun M13.1 validation or open its audit.
+- `docs/M13_2_PROTOCOL.md` freezes M13.2: retain M13.1 reward, public-state
+  boundary, macro compiler, memory and gates, but replace only tabular Q with
+  a 30-feature 64x64 Double-DQN. Its new development / validation / audit
+  splits are 2600–2639 / 2700–2719 / 2800–2819.
 
 ## Next Steps
 
-1. Implement and test M13.1's zero-default, guarded cycle-transition reward;
-   preserve all legacy/M13 reward behavior at default configuration.
-2. Run `python -m ecosystem_gym m131-train --output ...` for the fixed,
-   development-only 12,000-episode budget and inspect only its artifacts.
-3. Run development-only performance checks without opening validation or audit;
-   fix implementation defects only, not gates or protocol constants.
-4. Freeze the code and run M13.1 validation once. It writes and replays every
-   policy trace, then reports every condition,
-   confidence intervals, completion cycles, safe-drive time, recovery chains,
-   and ablations.
-5. Score the M13.1 audit once only after validation passes. If validation
-   fails, leave the audit unopened and write M13.2's distinct protocol.
-6. Only then plan M14 hybrid RL and M15 RGB persistent maintenance with the
+1. Implement M13.2 only from `docs/M13_2_PROTOCOL.md`; retain the M13.1
+   reward/config, public boundary, macro compiler, gates, and zero-default
+   legacy reward behavior.
+2. Add the fresh `m132_*` layouts and a deterministic 30-feature NumPy
+   Double-DQN with strict model/feature/trace replay tests.
+3. Run the fixed development-only M13.2 budget; freeze code before opening its
+   new validation suite, then leave its audit sealed unless validation passes.
+4. Only then plan M14 hybrid RL and M15 RGB persistent maintenance with the
    same task and policy objective.
 
 ## Do Not Repeat
