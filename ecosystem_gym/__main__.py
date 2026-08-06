@@ -23,6 +23,7 @@ from .m89 import run_m89_viewer_demo, write_m89_report
 from .m9 import run_m9_viewer_demo, write_m9_report
 from .m91 import run_m91_viewer_demo, write_m91_report
 from .m10 import run_m10_viewer_demo, write_m10_report
+from .m11 import write_m11_report
 from .policies import evaluate_scripted_policy
 from .trajectory import replay_and_validate
 from .video import write_find_and_eat_regression_video
@@ -118,6 +119,8 @@ def main() -> None:
     m10_benchmark.add_argument("--output", type=Path, required=True)
     m10_demo = subparsers.add_parser("m10-demo", help="record and replay one privileged M10 maintenance trace")
     m10_demo.add_argument("--trace", type=Path, required=True)
+    m11_baseline = subparsers.add_parser("m11-baseline", help="run the frozen M9 baseline and write its persistent failure atlas")
+    m11_baseline.add_argument("--output", type=Path, required=True)
     viewer = subparsers.add_parser("viewer", help="start the thin local live Gym viewer")
     viewer.add_argument("--trace", type=Path)
     viewer.add_argument("--port", type=int, default=8765)
@@ -216,6 +219,9 @@ def main() -> None:
         print(json.dumps(report["gate"]))
     elif args.command == "m10-demo":
         print(run_m10_viewer_demo(args.trace))
+    elif args.command == "m11-baseline":
+        report = write_m11_report(args.output)
+        print(json.dumps({"diagnostic_complete": report["diagnostic_complete"]}))
     elif args.command == "viewer":
         with ViewerSession(trace_path=args.trace) as session:
             server = LocalViewerServer(session, port=args.port)

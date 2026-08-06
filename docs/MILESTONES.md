@@ -128,7 +128,7 @@ Run the frozen M9 policy unchanged on M10 validation episodes and publish the re
 
 Exit when four conditions × 20 seeds report survival curves, completed maintenance cycles, time inside predeclared safe drive bands, forced-recovery chains, interventions, and terminal causes. Every failed episode must have an inspectable first-failure classification. M11 is diagnostic and has no policy pass threshold.
 
-**Status: planned.**
+**Status: complete (2026-08-06, diagnostic baseline).** `m11-baseline` runs the pinned M9 policy unchanged across M10's four validation rows and 80 episodes, while recording every drive transition, RGB candidate observation, selected rank/local offset, action outcome, rescan, replenishment, relocation, and terminal result. It does not complete persistent maintenance in any episode because it has no `rest` macro or rest-target grounder: 5/20 compound, 20/20 event-relocation, 4/20 persistent-reference, and 20/20 renewal/morphology episodes survive the horizon, but every row records zero rest cycles. The atlas preserves the more specific recovery limit too: 13/20 compound recovery chains complete after a forced stale pickup, while 7/20 fail to consume relocated food. The policy fingerprint remains unchanged before and after evaluation, M10's coverage/oracle gate remains recorded, and every non-successful episode has a step-linked first-failure classification. This is a baseline capability gap for M12, not a policy score or a training result.
 
 ## M12 — Learned persistent-maintenance successor
 
