@@ -45,11 +45,12 @@ task. Do not start another behavior-cloning or RGB policy variant first.
 
 ## Next Steps
 
-1. Finish M13 persistence artifacts: write/replay every frozen evaluation
-   trace and serialize the learned policy plus its encoder/compiler hashes.
+1. Run `python -m ecosystem_gym m13-train --output ...` for the fixed,
+   development-only 12,000-episode budget and inspect only its artifacts.
 2. Run development-only performance checks without opening validation or audit;
    fix implementation defects only, not gates or protocol constants.
-3. Freeze the code and run M13 validation once. Report every condition,
+3. Freeze the code and run M13 validation once. It writes and replays every
+   policy trace, then reports every condition,
    confidence intervals, completion cycles, safe-drive time, recovery chains,
    and ablations.
 4. Score the M13 audit once only after validation passes.

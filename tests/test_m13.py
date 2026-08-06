@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 
 from ecosystem_gym.actions import ActionKind, ActionOutcome
 from ecosystem_gym.env import EcosystemEnv
@@ -11,11 +12,17 @@ from ecosystem_gym.m13 import (
     M13Macro,
     M13Memory,
     ScriptedM13Oracle,
+    TabularM13QPolicy,
     advance_memory,
     compile_macro,
     encode_state,
+    load_m13_policy,
+    m13_audit,
     m13_config,
+    m13_policy_fingerprint,
+    replay_m13_trace,
     run_m13_episode,
+    write_m13_policy,
 )
 from ecosystem_gym.policies import skill_action
 
@@ -79,3 +86,29 @@ def test_m13_public_state_scripted_ceiling_completes_one_fresh_development_episo
     assert result.survived
     assert result.maintenance_complete
     assert result.feed_cycles >= 3 and result.play_cycles >= 3 and result.rest_cycles >= 2
+
+
+def test_m13_policy_and_trace_replay_preserve_inference(tmp_path) -> None:
+    policy = TabularM13QPolicy()
+    artifact = write_m13_policy(tmp_path / "policy.json", policy)
+    restored = load_m13_policy(artifact["path"])
+    trace = tmp_path / "episode.jsonl"
+    run_m13_episode(
+        restored,
+        seed=M13_DEVELOPMENT_SEEDS[0],
+        condition="persistent_reference",
+        controls=M13_DEVELOPMENT_CONDITIONS["persistent_reference"],
+        trace_path=trace,
+        policy_fingerprint=m13_policy_fingerprint(restored),
+    )
+    replay = replay_m13_trace(trace, restored)
+    assert replay.steps == 160
+
+
+def test_m13_audit_refuses_a_non_passing_validation_report(tmp_path) -> None:
+    validation = tmp_path / "validation.json"
+    validation.write_text('{"gate":{"passes":false}}\n', encoding="utf-8")
+    audit_dir = tmp_path / "audit-artifacts"
+    with pytest.raises(ValueError, match="validation-passing"):
+        m13_audit(validation_report_path=validation, artifact_dir=audit_dir)
+    assert not audit_dir.exists()

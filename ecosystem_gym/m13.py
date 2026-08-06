@@ -24,6 +24,7 @@ from .env import EcosystemEnv
 from .m10 import m10_config, m10_scan_coverage
 from .m8 import wilson_interval
 from .policies import skill_action
+from .trajectory import ReplayResult, SCHEMA_VERSION, _json_value, replay_and_validate
 
 
 M13_PROTOCOL_VERSION = "m13-state-oracle-persistent-rl-r1"
@@ -243,7 +244,10 @@ class TabularM13QPolicy:
         return self.q_values.setdefault(state, np.zeros(len(M13Macro), dtype=np.float64))
 
     def choose(self, observation: dict[str, Any], memory: M13Memory) -> M13Macro:
-        return M13Macro(int(np.argmax(self._q(self._state(observation, memory)))))
+        values = self.q_values.get(self._state(observation, memory))
+        if values is None:
+            return M13Macro.GO_FOOD
+        return M13Macro(int(np.argmax(values)))
 
     def observe(
         self,
@@ -347,6 +351,43 @@ def m13_policy_fingerprint(policy: TabularM13QPolicy) -> str:
     return digest.hexdigest()
 
 
+def write_m13_policy(path: str | Path, policy: TabularM13QPolicy) -> dict[str, str]:
+    """Serialize the exact learned table used by a frozen evaluation."""
+
+    payload = {
+        "schema_version": "m13-policy-v1",
+        "protocol_fingerprint": m13_protocol_fingerprint(),
+        "include_drives": policy.include_drives,
+        "use_memory": policy.use_memory,
+        "q_values": [
+            {"state": list(state), "values": np.asarray(values, dtype=np.float64).tolist()}
+            for state, values in sorted(policy.q_values.items())
+        ],
+    }
+    output = Path(path)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(json.dumps(payload, sort_keys=True, separators=(",", ":")) + "\n", encoding="utf-8")
+    return {"path": str(output.resolve()), "sha256": _file_sha256(output), "policy_fingerprint": m13_policy_fingerprint(policy)}
+
+
+def load_m13_policy(path: str | Path) -> TabularM13QPolicy:
+    payload = json.loads(Path(path).read_text(encoding="utf-8"))
+    if payload.get("schema_version") != "m13-policy-v1" or payload.get("protocol_fingerprint") != m13_protocol_fingerprint():
+        raise ValueError("M13 policy artifact does not match the frozen protocol")
+    policy = TabularM13QPolicy(include_drives=bool(payload["include_drives"]), use_memory=bool(payload["use_memory"]))
+    for row in payload["q_values"]:
+        state = tuple(int(value) for value in row["state"])
+        values = np.asarray(row["values"], dtype=np.float64)
+        if values.shape != (len(M13Macro),):
+            raise ValueError("M13 policy artifact has an invalid action-value row")
+        policy.q_values[state] = values
+    return policy
+
+
+def _file_sha256(path: str | Path) -> str:
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
 def m13_protocol_fingerprint() -> str:
     payload = {
         "version": M13_PROTOCOL_VERSION,
@@ -385,7 +426,14 @@ class M13Episode:
 
 
 def run_m13_episode(
-    policy: M13Policy, *, seed: int, condition: str, controls: dict[str, Any], env: EcosystemEnv | None = None
+    policy: M13Policy,
+    *,
+    seed: int,
+    condition: str,
+    controls: dict[str, Any],
+    env: EcosystemEnv | None = None,
+    trace_path: str | Path | None = None,
+    policy_fingerprint: str | None = None,
 ) -> M13Episode:
     owns_env = env is None
     if env is None:
@@ -426,10 +474,16 @@ def run_m13_episode(
                 "reward": float(reward),
                 "outcome": info["outcome"],
                 "disturbance": info["disturbance"],
+                "post_disturbance_completion": bool(info["post_disturbance_completion"]),
                 "resource_event": info["resource_event"],
                 "feed_cycles": int(info["feed_cycles"]),
                 "play_cycles": int(info["play_cycles"]),
                 "rest_cycles": int(info["rest_cycles"]),
+                "food_available": bool(info["food_available"]),
+                "camera_sector": info["camera_sector"],
+                "task_success": bool(info["task_success"]),
+                "environment_version": str(info["environment_version"]),
+                "observation_after": _json_value(next_observation),
                 "terminated": bool(terminated),
                 "truncated": bool(truncated),
             })
@@ -437,16 +491,106 @@ def run_m13_episode(
             if terminated or truncated:
                 drives = np.asarray(observation["drives"], dtype=np.float32)
                 terminal_cause = "survived_horizon" if truncated and bool(info["survived"]) else "energy_depleted" if drives[1] <= 0.0 else "satiety_depleted" if drives[0] <= 0.0 else "terminated"
-                return M13Episode(
+                result = M13Episode(
                     seed=seed, condition=condition, survived=bool(info["survived"]), maintenance_complete=bool(info["maintenance_complete"]), terminal_cause=terminal_cause,
                     feed_cycles=int(info["feed_cycles"]), play_cycles=int(info["play_cycles"]), rest_cycles=int(info["rest_cycles"]), safe_drive_fraction=safe_steps / step,
                     forced_recovery={"required": bool(controls.get("event_relocation_on_first_pickup")), "stale_pickup": stale_pickup, "consumed_after_relocation": consumed_after_relocation, "complete": stale_pickup and consumed_after_relocation},
                     interventions=dict(interventions), steps=tuple(records),
                 )
+                if trace_path is not None:
+                    _write_m13_trace(trace_path, result, controls=controls, policy_fingerprint=policy_fingerprint)
+                return result
         raise AssertionError("M13 episode did not terminate")
     finally:
         if owns_env:
             env.close()
+
+
+def _write_m13_trace(
+    path: str | Path, episode: M13Episode, *, controls: dict[str, Any], policy_fingerprint: str | None
+) -> None:
+    """Write a generic-replay JSONL trace plus the M13 policy-decision proof."""
+
+    output = Path(path)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    options = _options(controls)
+    header = {
+        "schema_version": SCHEMA_VERSION,
+        "record_type": "episode_metadata",
+        "episode_id": f"m13-{episode.condition}-seed-{episode.seed}",
+        "seed": episode.seed,
+        "reset_options": _json_value(options),
+        "observation_mode": "state_oracle",
+        "config": asdict(m13_config()),
+        "m13_protocol_fingerprint": m13_protocol_fingerprint(),
+        "m13_policy_fingerprint": policy_fingerprint,
+    }
+    rows = [json.dumps(header, sort_keys=True, separators=(",", ":"))]
+    for record in episode.steps:
+        row = {
+            "schema_version": SCHEMA_VERSION,
+            "episode_id": header["episode_id"],
+            "step": record["step"],
+            "seed": episode.seed,
+            "observation_mode": "state_oracle",
+            "observation": record["observation_after"],
+            "action": record["action"],
+            "outcome": record["outcome"],
+            "reward": record["reward"],
+            "task_success": record["task_success"],
+            "terminated": record["terminated"],
+            "truncated": record["truncated"],
+            "environment_version": record["environment_version"],
+            "disturbance": record["disturbance"],
+            "post_disturbance_completion": record["post_disturbance_completion"],
+            "resource_event": record["resource_event"],
+            "feed_cycles": record["feed_cycles"],
+            "play_cycles": record["play_cycles"],
+            "rest_cycles": record["rest_cycles"],
+            "food_available": record["food_available"],
+            "camera_sector": record["camera_sector"],
+            "m13_policy_observation": record["policy_observation"],
+            "m13_encoded_state": record["encoded_state"],
+            "m13_memory_before": record["memory_before"],
+            "m13_memory_after": record["memory_after"],
+            "m13_macro": record["macro"],
+        }
+        rows.append(json.dumps(row, sort_keys=True, separators=(",", ":")))
+    output.write_text("\n".join(rows) + "\n", encoding="utf-8")
+
+
+def replay_m13_trace(path: str | Path, policy: TabularM13QPolicy) -> ReplayResult:
+    """Replay both environment transitions and policy inference from a frozen trace."""
+
+    generic = replay_and_validate(path)
+    records = [json.loads(line) for line in Path(path).read_text(encoding="utf-8").splitlines() if line]
+    header, steps = records[0], records[1:]
+    if header.get("m13_protocol_fingerprint") != m13_protocol_fingerprint():
+        raise ValueError("M13 trace protocol fingerprint mismatch")
+    if header.get("m13_policy_fingerprint") != m13_policy_fingerprint(policy):
+        raise ValueError("M13 trace policy fingerprint mismatch")
+    env = EcosystemEnv(m13_config())
+    try:
+        observation, _ = env.reset(seed=int(header["seed"]), options=dict(header["reset_options"]))
+        memory = policy.reset()
+        for expected in steps:
+            if _json_value(observation) != expected["m13_policy_observation"]:
+                raise ValueError(f"M13 policy observation mismatch at step {expected['step']}")
+            state = policy._state(observation, memory)
+            if list(state) != expected["m13_encoded_state"] or _memory_snapshot(memory) != expected["m13_memory_before"]:
+                raise ValueError(f"M13 policy state mismatch at step {expected['step']}")
+            macro = policy.choose(observation, memory)
+            action = compile_macro(macro, observation, env.config)
+            if macro.name != expected["m13_macro"] or _json_value(action) != expected["action"]:
+                raise ValueError(f"M13 policy action mismatch at step {expected['step']}")
+            next_observation, _, _, _, _ = env.step(action)
+            policy.observe(memory, observation_before=observation, macro=macro, action=action, observation_after=next_observation)
+            if _memory_snapshot(memory) != expected["m13_memory_after"]:
+                raise ValueError(f"M13 policy memory mismatch at step {expected['step']}")
+            observation = next_observation
+    finally:
+        env.close()
+    return generic
 
 
 def _aggregate(episodes: list[M13Episode]) -> dict[str, object]:
@@ -466,10 +610,37 @@ def _aggregate(episodes: list[M13Episode]) -> dict[str, object]:
     }
 
 
-def _evaluate(policy: M13Policy, conditions: dict[str, dict[str, Any]], seeds: tuple[int, ...]) -> dict[str, dict[str, object]]:
+def _evaluate(
+    policy: M13Policy,
+    conditions: dict[str, dict[str, Any]],
+    seeds: tuple[int, ...],
+    *,
+    trace_dir: Path | None = None,
+    policy_label: str | None = None,
+    policy_fingerprint: str | None = None,
+) -> tuple[dict[str, dict[str, object]], list[dict[str, str]]]:
     env = EcosystemEnv(m13_config())
     try:
-        return {name: _aggregate([run_m13_episode(policy, seed=seed, condition=name, controls=controls, env=env) for seed in seeds]) for name, controls in conditions.items()}
+        results: dict[str, dict[str, object]] = {}
+        manifest: list[dict[str, str]] = []
+        for name, controls in conditions.items():
+            episodes: list[M13Episode] = []
+            for seed in seeds:
+                trace_path = None if trace_dir is None else trace_dir / str(policy_label) / name / f"seed-{seed}.jsonl"
+                episode = run_m13_episode(
+                    policy,
+                    seed=seed,
+                    condition=name,
+                    controls=controls,
+                    env=env,
+                    trace_path=trace_path,
+                    policy_fingerprint=policy_fingerprint,
+                )
+                episodes.append(episode)
+                if trace_path is not None:
+                    manifest.append({"policy": str(policy_label), "condition": name, "seed": str(seed), "path": str(trace_path.resolve()), "sha256": _file_sha256(trace_path)})
+            results[name] = _aggregate(episodes)
+        return results, manifest
     finally:
         env.close()
 
@@ -502,13 +673,66 @@ def _flatten(results: dict[str, dict[str, object]], field: str) -> np.ndarray:
     return np.asarray([float(bool(episode[field])) for condition in M13_VALIDATION_CONDITIONS for episode in results[condition]["episodes_detail"]], dtype=np.float64)  # type: ignore[index]
 
 
-def m13_validation(*, training_episodes: int = M13_TRAINING_EPISODES, seeds: tuple[int, ...] = M13_VALIDATION_SEEDS) -> dict[str, object]:
+def m13_train(*, artifact_dir: str | Path) -> dict[str, object]:
+    """Run the frozen development-only training budget without opening validation."""
+
+    artifacts = Path(artifact_dir)
+    if artifacts.exists():
+        raise FileExistsError("M13 development artifact directory already exists; choose a new run directory")
+    artifacts.mkdir(parents=True)
+    policies = {
+        "full_state_oracle_q": TabularM13QPolicy(),
+        "no_drive_q": TabularM13QPolicy(include_drives=False),
+        "no_memory_q": TabularM13QPolicy(use_memory=False),
+    }
+    for offset, policy in enumerate(policies.values()):
+        policy.train(seed=M13_TRAINING_SEED + offset)
+    policy_artifacts = {
+        name: write_m13_policy(artifacts / "policies" / f"{name}.json", policy)
+        for name, policy in policies.items()
+    }
+    return {
+        "schema_version": "0.13",
+        "protocol_fingerprint": m13_protocol_fingerprint(),
+        "split": "development_only",
+        "training": {"episodes": M13_TRAINING_EPISODES, "seed": M13_TRAINING_SEED},
+        "policy_artifacts": policy_artifacts,
+        "limits": ["This artifact contains no validation or audit score.", "Development results may not select a changed M13 protocol."],
+    }
+
+
+def write_m13_training_report(path: str | Path) -> dict[str, object]:
+    output = Path(path)
+    if output.exists():
+        raise FileExistsError("M13 development report already exists; choose a new run path")
+    output.parent.mkdir(parents=True, exist_ok=True)
+    report = m13_train(artifact_dir=output.parent / f"{output.stem}-artifacts")
+    output.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return report
+
+
+def m13_validation(
+    *,
+    artifact_dir: str | Path,
+    training_episodes: int = M13_TRAINING_EPISODES,
+    seeds: tuple[int, ...] = M13_VALIDATION_SEEDS,
+) -> dict[str, object]:
     if training_episodes != M13_TRAINING_EPISODES or seeds != M13_VALIDATION_SEEDS:
         raise ValueError("M13 validation budget and seeds are frozen")
     coverage = m10_scan_coverage(M13_VALIDATION_CONDITIONS, seeds=seeds)
     if not all(bool(row["passes"]) for row in coverage.values()):
         raise RuntimeError("M13 validation has unobservable public targets")
-    ceiling = _evaluate(ScriptedM13Oracle(), M13_VALIDATION_CONDITIONS, seeds)
+    artifacts = Path(artifact_dir)
+    if artifacts.exists():
+        raise FileExistsError("M13 validation artifact directory already exists; validation cannot be overwritten or rerun")
+    artifacts.mkdir(parents=True)
+    ceiling, ceiling_manifest = _evaluate(
+        ScriptedM13Oracle(),
+        M13_VALIDATION_CONDITIONS,
+        seeds,
+        trace_dir=artifacts / "traces",
+        policy_label="state_oracle_scripted_ceiling",
+    )
     if not _ceiling_passes(ceiling, seeds=seeds):
         raise RuntimeError("M13 persistent-maintenance mechanics ceiling failed")
     full = TabularM13QPolicy()
@@ -517,18 +741,112 @@ def m13_validation(*, training_episodes: int = M13_TRAINING_EPISODES, seeds: tup
     full.train()
     no_drive.train(seed=M13_TRAINING_SEED + 1)
     no_memory.train(seed=M13_TRAINING_SEED + 2)
-    results = {"full_state_oracle_q": _evaluate(full, M13_VALIDATION_CONDITIONS, seeds), "no_drive_q": _evaluate(no_drive, M13_VALIDATION_CONDITIONS, seeds), "no_memory_q": _evaluate(no_memory, M13_VALIDATION_CONDITIONS, seeds), "macro_random": _evaluate(RandomM13Policy(M13_TRAINING_SEED + 3), M13_VALIDATION_CONDITIONS, seeds)}
+    policy_artifacts = {
+        "full_state_oracle_q": write_m13_policy(artifacts / "policies" / "full_state_oracle_q.json", full),
+        "no_drive_q": write_m13_policy(artifacts / "policies" / "no_drive_q.json", no_drive),
+        "no_memory_q": write_m13_policy(artifacts / "policies" / "no_memory_q.json", no_memory),
+    }
+    full_results, full_manifest = _evaluate(full, M13_VALIDATION_CONDITIONS, seeds, trace_dir=artifacts / "traces", policy_label="full_state_oracle_q", policy_fingerprint=m13_policy_fingerprint(full))
+    no_drive_results, no_drive_manifest = _evaluate(no_drive, M13_VALIDATION_CONDITIONS, seeds, trace_dir=artifacts / "traces", policy_label="no_drive_q", policy_fingerprint=m13_policy_fingerprint(no_drive))
+    no_memory_results, no_memory_manifest = _evaluate(no_memory, M13_VALIDATION_CONDITIONS, seeds, trace_dir=artifacts / "traces", policy_label="no_memory_q", policy_fingerprint=m13_policy_fingerprint(no_memory))
+    random_results, random_manifest = _evaluate(RandomM13Policy(M13_TRAINING_SEED + 3), M13_VALIDATION_CONDITIONS, seeds, trace_dir=artifacts / "traces", policy_label="macro_random")
+    results = {"full_state_oracle_q": full_results, "no_drive_q": no_drive_results, "no_memory_q": no_memory_results, "macro_random": random_results}
+    for manifest_item in (*full_manifest, *no_drive_manifest, *no_memory_manifest):
+        policy_path = policy_artifacts[manifest_item["policy"]]["path"]
+        replay_m13_trace(manifest_item["path"], load_m13_policy(policy_path))
+    for manifest_item in (*ceiling_manifest, *random_manifest):
+        replay_and_validate(manifest_item["path"])
     gates = _condition_gates(results["full_state_oracle_q"])
     full_maintenance = _flatten(results["full_state_oracle_q"], "maintenance_complete")
     full_survival = _flatten(results["full_state_oracle_q"], "survived")
     comparisons = {name: {"maintenance_delta": float(np.mean(full_maintenance - _flatten(rows, "maintenance_complete"))), "survival_delta": float(np.mean(full_survival - _flatten(rows, "survived")))} for name, rows in results.items() if name != "full_state_oracle_q"}
     passes = all(all(row.values()) for row in gates.values()) and all(float(comparisons[name]["maintenance_delta"]) >= 0.10 for name in comparisons) and float(comparisons["macro_random"]["survival_delta"]) >= 0.20
-    return {"schema_version": "0.13", "protocol_version": M13_PROTOCOL_VERSION, "protocol_fingerprint": m13_protocol_fingerprint(), "policy_boundary": ["agent_xy", "food_xy", "toy_xy", "rest_xy", "drives", "holding_food", "prior_outcome", "policy_owned_memory"], "training": {"episodes": training_episodes, "seed": M13_TRAINING_SEED, "full_policy_fingerprint": m13_policy_fingerprint(full), "no_drive_fingerprint": m13_policy_fingerprint(no_drive), "no_memory_fingerprint": m13_policy_fingerprint(no_memory)}, "coverage": coverage, "state_oracle_scripted_ceiling": ceiling, "results": results, "condition_gates": gates, "comparisons": comparisons, "gate": {"passes": passes}, "limits": ["M13 is a reward-trained state-oracle macro baseline, not an RGB result.", "The policy never receives task IDs, reset options, info, reward decomposition, private environment state, or M12 labels.", "This command is validation only; a sealed audit requires a separately frozen policy artifact and is intentionally not opened here."]}
+    return {"schema_version": "0.13", "protocol_version": M13_PROTOCOL_VERSION, "protocol_fingerprint": m13_protocol_fingerprint(), "policy_boundary": ["agent_xy", "food_xy", "toy_xy", "rest_xy", "drives", "holding_food", "prior_outcome", "policy_owned_memory"], "training": {"episodes": training_episodes, "seed": M13_TRAINING_SEED, "full_policy_fingerprint": m13_policy_fingerprint(full), "no_drive_fingerprint": m13_policy_fingerprint(no_drive), "no_memory_fingerprint": m13_policy_fingerprint(no_memory)}, "policy_artifacts": policy_artifacts, "trace_manifest": [*ceiling_manifest, *full_manifest, *no_drive_manifest, *no_memory_manifest, *random_manifest], "coverage": coverage, "state_oracle_scripted_ceiling": ceiling, "results": results, "condition_gates": gates, "comparisons": comparisons, "gate": {"passes": passes}, "limits": ["M13 is a reward-trained state-oracle macro baseline, not an RGB result.", "The policy never receives task IDs, reset options, info, reward decomposition, private environment state, or M12 labels.", "This command is validation only; a sealed audit requires a separately frozen policy artifact and is intentionally not opened here."]}
 
 
 def write_m13_report(path: str | Path) -> dict[str, object]:
-    report = m13_validation()
     output = Path(path)
     output.parent.mkdir(parents=True, exist_ok=True)
+    report = m13_validation(artifact_dir=output.parent / f"{output.stem}-artifacts")
+    output.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return report
+
+
+def m13_audit(*, validation_report_path: str | Path, artifact_dir: str | Path) -> dict[str, object]:
+    """Open the M13 audit once, only from a validation-passing frozen policy."""
+
+    validation = json.loads(Path(validation_report_path).read_text(encoding="utf-8"))
+    if validation.get("protocol_fingerprint") != m13_protocol_fingerprint() or not bool(validation.get("gate", {}).get("passes")):
+        raise ValueError("M13 audit requires a validation-passing report for this exact protocol")
+    full_artifact = validation.get("policy_artifacts", {}).get("full_state_oracle_q")
+    if not isinstance(full_artifact, dict) or not isinstance(full_artifact.get("path"), str):
+        raise ValueError("M13 validation report is missing its frozen full-policy artifact")
+    full = load_m13_policy(full_artifact["path"])
+    if full_artifact.get("policy_fingerprint") != m13_policy_fingerprint(full):
+        raise ValueError("M13 full-policy artifact fingerprint mismatch")
+    artifacts = Path(artifact_dir)
+    if artifacts.exists():
+        raise FileExistsError("M13 audit artifact directory already exists; the sealed audit cannot be rerun")
+    artifacts.mkdir(parents=True)
+    marker = artifacts / "audit-opened.json"
+    marker.write_text(
+        json.dumps(
+            {"protocol_fingerprint": m13_protocol_fingerprint(), "validation_report": str(Path(validation_report_path).resolve()), "full_policy_fingerprint": m13_policy_fingerprint(full)},
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    coverage = m10_scan_coverage(M13_AUDIT_CONDITIONS, seeds=M13_AUDIT_SEEDS)
+    if not all(bool(row["passes"]) for row in coverage.values()):
+        raise RuntimeError("M13 audit has unobservable public targets")
+    ceiling, ceiling_manifest = _evaluate(
+        ScriptedM13Oracle(),
+        M13_AUDIT_CONDITIONS,
+        M13_AUDIT_SEEDS,
+        trace_dir=artifacts / "traces",
+        policy_label="state_oracle_scripted_ceiling",
+    )
+    if not _ceiling_passes(ceiling, seeds=M13_AUDIT_SEEDS):
+        raise RuntimeError("M13 audit persistent-maintenance mechanics ceiling failed")
+    results, full_manifest = _evaluate(
+        full,
+        M13_AUDIT_CONDITIONS,
+        M13_AUDIT_SEEDS,
+        trace_dir=artifacts / "traces",
+        policy_label="full_state_oracle_q",
+        policy_fingerprint=m13_policy_fingerprint(full),
+    )
+    for row in full_manifest:
+        replay_m13_trace(row["path"], full)
+    for row in ceiling_manifest:
+        replay_and_validate(row["path"])
+    gates = _condition_gates(results)
+    return {
+        "schema_version": "0.13",
+        "protocol_version": M13_PROTOCOL_VERSION,
+        "protocol_fingerprint": m13_protocol_fingerprint(),
+        "split": "sealed_audit",
+        "validation_report": str(Path(validation_report_path).resolve()),
+        "validation_report_sha256": _file_sha256(validation_report_path),
+        "full_policy_fingerprint": m13_policy_fingerprint(full),
+        "coverage": coverage,
+        "state_oracle_scripted_ceiling": ceiling,
+        "results": results,
+        "condition_gates": gates,
+        "trace_manifest": [*ceiling_manifest, *full_manifest],
+        "gate": {"passes": all(all(row.values()) for row in gates.values())},
+    }
+
+
+def write_m13_audit_report(path: str | Path, *, validation_report_path: str | Path) -> dict[str, object]:
+    output = Path(path)
+    if output.exists():
+        raise FileExistsError("M13 audit report already exists; the sealed audit cannot be overwritten")
+    output.parent.mkdir(parents=True, exist_ok=True)
+    report = m13_audit(
+        validation_report_path=validation_report_path,
+        artifact_dir=output.parent / f"{output.stem}-artifacts",
+    )
     output.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return report
