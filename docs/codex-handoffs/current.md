@@ -78,12 +78,15 @@ task. Do not start another behavior-cloning or RGB policy variant first.
    renewal/morphology safe-drive gate. The all-replicas rule therefore fails.
    Its 3600–3719 validation/audit splits remain unopened. Do not rerun M13.5,
    select a seed, or silently widen the public interface.
-4. M13.6 implementation is frozen in `ecosystem_gym/m136.py`; its fresh
-   development-only eight-pair stability matrix is running unchanged. It keeps
-   M13.5's public interface, reward, mask, discount, update budget, target-copy
-   cadence, and gates fixed, submits all eight dense candidates before sparse
-   nulls, and uses 4100–4319 only. Do not touch M13.6 source or use validation
-   or audit until development gates finish.
+4. M13.6 development is complete and failed before validation. Its fresh
+   eight-pair candidate-first matrix passed coverage/ceiling 160/160, strictly
+   replayed all 4,000 development traces, and every dense candidate beat its
+   sparse/null and random comparators. Only 20260820 and 20260823 passed every
+   per-condition gate; six of eight candidates failed at least one
+   maintenance/survival/recovery/safe-drive row. Dense update is therefore a
+   strong but non-reproducible effect. Its 4200–4319 validation/audit splits
+   remain unopened. Do not rerun M13.6, select a passing seed, or widen the
+   public interface.
 5. Only after a state-RL baseline passes should M14 hybrid RL and M15 RGB
    persistent maintenance proceed with the
    same task and policy objective.
