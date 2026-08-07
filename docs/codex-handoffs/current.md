@@ -63,13 +63,17 @@ task. Do not start another behavior-cloning or RGB policy variant first.
 
 1. Preserve `artifacts/reports/m133-development.json` and its 960 replayed
    development traces as a negative result; do not open M13.3 validation.
-2. M13.4 implementation is frozen in `ecosystem_gym/m134.py`: it constrains
-   only public macro preconditions, including redundant near-target `GO_*`
-   actions, leaves drive scheduling learned, and uses fresh 3200–3419 splits.
-   Its development-only 15-fit paired matrix is running or must be allowed to
-   finish unchanged. Do not reuse M13.3 validation/audit or silently widen the
-   policy input.
-3. Only after a state-RL baseline passes should M14 hybrid RL and M15 RGB
+2. M13.4 development is complete and failed before validation. Its fresh
+   3200–3239 coverage/ceiling checks pass 160/160 and all 3,040 traces replay,
+   with zero public-mask violations; nevertheless none of its three full-policy
+   replicas passes every survival/maintenance/safe-drive/recovery gate. Its
+   3300–3419 validation/audit splits remain unopened. Do not retry M13.4 or
+   silently widen the policy input.
+3. Freeze a new causal diagnosis/protocol before another M13 training run.
+   M13.4 rules out redundant local macro feasibility as a sufficient remedy;
+   the next proposal must address schedule learning or value-learning dynamics
+   without using M13.4 validation/audit.
+4. Only after a state-RL baseline passes should M14 hybrid RL and M15 RGB
    persistent maintenance proceed with the
    same task and policy objective.
 
