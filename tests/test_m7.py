@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 
 from ecosystem_gym.env import EcosystemEnv
-from ecosystem_gym.m7 import (
+from ecosystem_gym.experiments.m7 import (
     TabularRgbDriveBCPolicy,
     _gate_passed,
     _rgb_config,

@@ -1,8 +1,8 @@
 import numpy as np
 
 from ecosystem_gym.env import EcosystemEnv
-from ecosystem_gym.m13 import M13Macro, compile_macro
-from ecosystem_gym.m134 import (
+from ecosystem_gym.experiments.m13 import M13Macro, compile_macro
+from ecosystem_gym.experiments.m134 import (
     M134_AUDIT_SEEDS,
     M134_DEVELOPMENT_CONDITIONS,
     M134_DEVELOPMENT_SEEDS,
@@ -18,7 +18,7 @@ from ecosystem_gym.m134 import (
     run_m134_episode,
     write_m134_policy,
 )
-from ecosystem_gym.m133 import m133_config
+from ecosystem_gym.experiments.m133 import m133_config
 
 
 def _observation(condition: str = "persistent_reference"):

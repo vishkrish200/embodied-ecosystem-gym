@@ -2,6 +2,18 @@
 
 A reproducible embodied-agent benchmark with a first-party virtual-toy experience. The Gym owns MuJoCo state transitions, tasks, evaluation, and trajectory logs; the toy room is a thin human-facing client over the same environment.
 
+## Code layout
+
+`ecosystem_gym/` is the active product and benchmark foundation: the environment,
+task definitions, action contract, drives, replay, rendering, and viewer evolve
+together there. `ecosystem_gym/experiments/` contains frozen milestone harnesses.
+Those modules preserve the exact policies, seed splits, and reporting logic behind
+past results; they are evidence, not competing versions of the simulator.
+
+When adding a capability, change the shared foundation if it changes the task or
+public contract. Add an experiment only when it evaluates a separately frozen
+hypothesis. Do not make new milestone files merely to continue normal development.
+
 Milestone 1 provides one deterministic MuJoCo room, one creature, one food item, normalized satiety/energy/boredom drives, and a complete `walk_to` -> `pick_up` -> `consume` task. The public Gymnasium contract remains state-oracle only for now; hybrid and RGB observations arrive in M3.
 
 Milestone 2 turns that vertical slice into a small benchmark. It evaluates a raw random-action policy against a learned tabular state-oracle Q-learning policy over fixed training and held-out spawn-layout splits, then writes one comparable JSON report.
@@ -37,83 +49,83 @@ uv sync --group dev
 uv run pytest
 
 # Run the fixed 20-seed scripted baseline and retain replayable JSONL logs.
-uv run python -m ecosystem_gym evaluate --trajectory-dir artifacts/trajectories/m1
+uv run python -m ecosystem_gym experiment evaluate --trajectory-dir artifacts/trajectories/m1
 
 # Validate any saved trace against a clean reset of the same seed.
 uv run python -m ecosystem_gym replay artifacts/trajectories/m1/find-eat_seed-0007.jsonl
 
 # Record the MuJoCo regression video through the public skill API.
-uv run python -m ecosystem_gym record-video artifacts/regression/find-and-eat_seed-0007.mp4
+uv run python -m ecosystem_gym experiment record-video artifacts/regression/find-and-eat_seed-0007.mp4
 
 # Train/evaluate both baselines and write the M2 benchmark artifact.
-uv run python -m ecosystem_gym benchmark --output artifacts/reports/m2-find-and-eat.json
+uv run python -m ecosystem_gym experiment benchmark --output artifacts/reports/m2-find-and-eat.json
 
 # Report state-oracle, hybrid, and RGB performance under camera/layout variation and recovery.
-uv run python -m ecosystem_gym perception-benchmark --output artifacts/reports/m3-perception.json
+uv run python -m ecosystem_gym experiment perception-benchmark --output artifacts/reports/m3-perception.json
 
 # Write RGB frames and privileged teacher labels, then run the learned appearance gate.
-uv run python -m ecosystem_gym collect-bc --output artifacts/datasets/m35-rgb-bc.npz
-uv run python -m ecosystem_gym learned-rgb-gate --dataset artifacts/datasets/m35-rgb-bc.npz --output artifacts/reports/m35-learned-rgb.json
+uv run python -m ecosystem_gym experiment collect-bc --output artifacts/datasets/m35-rgb-bc.npz
+uv run python -m ecosystem_gym experiment learned-rgb-gate --dataset artifacts/datasets/m35-rgb-bc.npz --output artifacts/reports/m35-learned-rgb.json
 
 # Evaluate play/competing-drive tasks across held-out conditions.
-uv run python -m ecosystem_gym m4-benchmark --output artifacts/reports/m4-drive-benchmark.json
+uv run python -m ecosystem_gym experiment m4-benchmark --output artifacts/reports/m4-drive-benchmark.json
 
 # Train and evaluate learned food-versus-play arbitration, then record its viewer trace.
-uv run python -m ecosystem_gym m6-benchmark --output artifacts/reports/m6-learned-drives.json
-uv run python -m ecosystem_gym m6-demo --trace artifacts/trajectories/m6-competing-demo.jsonl
+uv run python -m ecosystem_gym experiment m6-benchmark --output artifacts/reports/m6-learned-drives.json
+uv run python -m ecosystem_gym experiment m6-demo --trace artifacts/trajectories/m6-competing-demo.jsonl
 
 # Train/evaluate RGB drive arbitration and record one replayable RGB viewer trace.
-uv run python -m ecosystem_gym m7-benchmark --output artifacts/reports/m7-rgb-drives.json
-uv run python -m ecosystem_gym m7-demo --trace artifacts/trajectories/m7-competing-demo.jsonl
+uv run python -m ecosystem_gym experiment m7-benchmark --output artifacts/reports/m7-rgb-drives.json
+uv run python -m ecosystem_gym experiment m7-demo --trace artifacts/trajectories/m7-competing-demo.jsonl
 
 # Run the frozen sequential RGB-recovery protocol and replay one adverse trace.
-uv run python -m ecosystem_gym m8-benchmark --output artifacts/reports/m8-rgb-recovery.json
-uv run python -m ecosystem_gym m8-demo --trace artifacts/trajectories/m8-rgb-recovery-demo.jsonl
+uv run python -m ecosystem_gym experiment m8-benchmark --output artifacts/reports/m8-rgb-recovery.json
+uv run python -m ecosystem_gym experiment m8-demo --trace artifacts/trajectories/m8-rgb-recovery-demo.jsonl
 
-uv run python -m ecosystem_gym m81-benchmark --output artifacts/reports/m81-rgb-memory.json
-uv run python -m ecosystem_gym m81-demo --trace artifacts/trajectories/m81-recurrent-demo.jsonl
+uv run python -m ecosystem_gym experiment m81-benchmark --output artifacts/reports/m81-rgb-memory.json
+uv run python -m ecosystem_gym experiment m81-demo --trace artifacts/trajectories/m81-recurrent-demo.jsonl
 
-uv run python -m ecosystem_gym m82-benchmark --output artifacts/reports/m82-external-validity.json
-uv run python -m ecosystem_gym m82-demo --trace artifacts/trajectories/m82-frozen-rnn-demo.jsonl
+uv run python -m ecosystem_gym experiment m82-benchmark --output artifacts/reports/m82-external-validity.json
+uv run python -m ecosystem_gym experiment m82-demo --trace artifacts/trajectories/m82-frozen-rnn-demo.jsonl
 
 # Diagnose one factor at a time before training any successor policy.
-uv run python -m ecosystem_gym m83-diagnostics --output artifacts/reports/m83-one-factor-diagnostics.json
+uv run python -m ecosystem_gym experiment m83-diagnostics --output artifacts/reports/m83-one-factor-diagnostics.json
 
 # Validate the learned RGB heatmap grounder only after the camera-coverage gate passes.
-uv run python -m ecosystem_gym m84-validation --output artifacts/reports/m84-learned-rgb-grounding.json
-uv run python -m ecosystem_gym m84-demo --trace artifacts/trajectories/m84-learned-rgb-grounding-demo.jsonl
+uv run python -m ecosystem_gym experiment m84-validation --output artifacts/reports/m84-learned-rgb-grounding.json
+uv run python -m ecosystem_gym experiment m84-demo --trace artifacts/trajectories/m84-learned-rgb-grounding-demo.jsonl
 
 # Run the sealed, no-tuning external audit of the frozen M8.4 grounder.
-uv run python -m ecosystem_gym m85-benchmark --output artifacts/reports/m85-sealed-external-audit.json
-uv run python -m ecosystem_gym m85-demo --trace artifacts/trajectories/m85-sealed-external-audit-demo.jsonl
+uv run python -m ecosystem_gym experiment m85-benchmark --output artifacts/reports/m85-sealed-external-audit.json
+uv run python -m ecosystem_gym experiment m85-demo --trace artifacts/trajectories/m85-sealed-external-audit-demo.jsonl
 
 # Diagnose M8.5 on separate development-only seeds; this does not tune M8.4.
-uv run python -m ecosystem_gym m86-diagnostics --output artifacts/reports/m86-blue-grounding-diagnosis.json
-uv run python -m ecosystem_gym m86-demo --trace artifacts/trajectories/m86-blue-grounding-diagnosis-demo.jsonl
+uv run python -m ecosystem_gym experiment m86-diagnostics --output artifacts/reports/m86-blue-grounding-diagnosis.json
+uv run python -m ecosystem_gym experiment m86-demo --trace artifacts/trajectories/m86-blue-grounding-diagnosis-demo.jsonl
 
 # Validate the blue-balanced successor on a new frozen suite before any audit.
-uv run python -m ecosystem_gym m87-validation --output artifacts/reports/m87-blue-balanced-grounding.json
-uv run python -m ecosystem_gym m87-demo --trace artifacts/trajectories/m87-blue-balanced-grounding-demo.jsonl
+uv run python -m ecosystem_gym experiment m87-validation --output artifacts/reports/m87-blue-balanced-grounding.json
+uv run python -m ecosystem_gym experiment m87-demo --trace artifacts/trajectories/m87-blue-balanced-grounding-demo.jsonl
 
 # Run the sealed external audit of the frozen M8.7 grounder.
-uv run python -m ecosystem_gym m88-benchmark --output artifacts/reports/m88-sealed-external-audit.json
-uv run python -m ecosystem_gym m88-demo --trace artifacts/trajectories/m88-sealed-external-audit-demo.jsonl
+uv run python -m ecosystem_gym experiment m88-benchmark --output artifacts/reports/m88-sealed-external-audit.json
+uv run python -m ecosystem_gym experiment m88-demo --trace artifacts/trajectories/m88-sealed-external-audit-demo.jsonl
 
 # Run the sealed visual-morphology audit of the same frozen M8.7 grounder.
-uv run python -m ecosystem_gym m89-benchmark --output artifacts/reports/m89-sealed-visual-morphology-audit.json
-uv run python -m ecosystem_gym m89-demo --trace artifacts/trajectories/m89-sealed-visual-morphology-audit-demo.jsonl
+uv run python -m ecosystem_gym experiment m89-benchmark --output artifacts/reports/m89-sealed-visual-morphology-audit.json
+uv run python -m ecosystem_gym experiment m89-demo --trace artifacts/trajectories/m89-sealed-visual-morphology-audit-demo.jsonl
 
 # Run M9 development validation. `--audit` is intentionally a one-shot sealed score and is not used for tuning.
-uv run python -m ecosystem_gym m9-benchmark --output artifacts/reports/m9-integrated-rgb-maintenance.json
-uv run python -m ecosystem_gym m9-demo --trace artifacts/trajectories/m9-integrated-rgb-maintenance-demo.jsonl
+uv run python -m ecosystem_gym experiment m9-benchmark --output artifacts/reports/m9-integrated-rgb-maintenance.json
+uv run python -m ecosystem_gym experiment m9-demo --trace artifacts/trajectories/m9-integrated-rgb-maintenance-demo.jsonl
 
 # Diagnose distractor choice and forced recovery with the M9 policy frozen.
-uv run python -m ecosystem_gym m91-diagnosis --output artifacts/reports/m91-diagnosis.json
-uv run python -m ecosystem_gym m91-demo --trace artifacts/trajectories/m91-forced-recovery-demo.jsonl
+uv run python -m ecosystem_gym experiment m91-diagnosis --output artifacts/reports/m91-diagnosis.json
+uv run python -m ecosystem_gym experiment m91-demo --trace artifacts/trajectories/m91-forced-recovery-demo.jsonl
 
 # Validate persistent feed/play/rest mechanics and replay one privileged trace.
-uv run python -m ecosystem_gym m10-validation --output artifacts/reports/m10-persistent-maintenance.json
-uv run python -m ecosystem_gym m10-demo --trace artifacts/trajectories/m10-persistent-maintenance-demo.jsonl
+uv run python -m ecosystem_gym experiment m10-validation --output artifacts/reports/m10-persistent-maintenance.json
+uv run python -m ecosystem_gym experiment m10-demo --trace artifacts/trajectories/m10-persistent-maintenance-demo.jsonl
 
 # Open the same environment loop in a local browser, with optional replayable logging.
 uv run python -m ecosystem_gym viewer --trace artifacts/trajectories/viewer.jsonl

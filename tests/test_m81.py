@@ -3,7 +3,7 @@ from __future__ import annotations
 import inspect
 import json
 
-from ecosystem_gym.m81 import (
+from ecosystem_gym.experiments.m81 import (
     M81_CONDITIONS,
     M81_DIAGNOSTIC_CONDITIONS,
     M81_PAIRED_WIN_MARGIN,

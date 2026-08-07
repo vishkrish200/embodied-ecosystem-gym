@@ -5,7 +5,7 @@ import numpy as np
 from ecosystem_gym.actions import ActionKind
 from ecosystem_gym.config import EcosystemConfig
 from ecosystem_gym.env import EcosystemEnv
-from ecosystem_gym.m9 import (
+from ecosystem_gym.experiments.m9 import (
     M9_AUDIT_CONDITIONS,
     M9_AUDIT_SEEDS,
     M9_TRAIN_CONDITIONS,

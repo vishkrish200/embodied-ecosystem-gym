@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from ecosystem_gym.m9 import M9_AUDIT_SEEDS, M9_TRAIN_SEEDS, M9_VALIDATION_SEEDS, m9_scan_coverage
-from ecosystem_gym.m91 import M91_CONDITIONS, M91_SEEDS, m91_diagnosis
+from ecosystem_gym.experiments.m9 import M9_AUDIT_SEEDS, M9_TRAIN_SEEDS, M9_VALIDATION_SEEDS, m9_scan_coverage
+from ecosystem_gym.experiments.m91 import M91_CONDITIONS, M91_SEEDS, m91_diagnosis
 
 
 def test_m91_uses_fresh_seeds_and_coverage_valid_rows() -> None:

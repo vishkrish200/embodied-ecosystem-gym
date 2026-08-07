@@ -1,8 +1,8 @@
 import numpy as np
 
 from ecosystem_gym.env import EcosystemEnv
-from ecosystem_gym.m13 import M13Macro
-from ecosystem_gym.m136 import (
+from ecosystem_gym.experiments.m13 import M13Macro
+from ecosystem_gym.experiments.m136 import (
     M136_AUDIT_SEEDS,
     M136_CANDIDATE_UPDATE_EVERY,
     M136_DEVELOPMENT_CONDITIONS,
@@ -20,7 +20,7 @@ from ecosystem_gym.m136 import (
     run_m136_episode,
     write_m136_policy,
 )
-from ecosystem_gym.m133 import m133_config
+from ecosystem_gym.experiments.m133 import m133_config
 
 
 def test_m136_freezes_fresh_splits_and_eight_paired_seeds() -> None:

@@ -3,7 +3,7 @@ from __future__ import annotations
 import numpy as np
 
 from ecosystem_gym.actions import ActionKind, ActionOutcome
-from ecosystem_gym.m12 import M12Macro, M12Memory, M12Selector, _advance_memory, _food_target, _macro_action, _mandatory_macro, _reset_no_memory, _select_macro, m12_config
+from ecosystem_gym.experiments.m12 import M12Macro, M12Memory, M12Selector, _advance_memory, _food_target, _macro_action, _mandatory_macro, _reset_no_memory, _select_macro, m12_config
 
 
 def _observation(*, holding_food: bool = False, outcome: ActionOutcome = ActionOutcome.SUCCESS) -> dict[str, object]:

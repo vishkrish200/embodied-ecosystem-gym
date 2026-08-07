@@ -4,7 +4,7 @@ import numpy as np
 
 from ecosystem_gym import EcosystemEnv
 from ecosystem_gym.actions import ActionKind
-from ecosystem_gym.m4 import drive_benchmark, write_drive_report
+from ecosystem_gym.experiments.m4 import drive_benchmark, write_drive_report
 from ecosystem_gym.policies import skill_action
 
 

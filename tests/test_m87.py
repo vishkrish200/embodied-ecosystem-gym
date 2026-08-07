@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import json
 
-from ecosystem_gym.m85 import M85_TEST_SEEDS
-from ecosystem_gym.m87 import (
+from ecosystem_gym.experiments.m85 import M85_TEST_SEEDS
+from ecosystem_gym.experiments.m87 import (
     M87_TRAIN_CONDITIONS,
     M87_TRAIN_SEEDS,
     M87_VALIDATION_CONDITIONS,

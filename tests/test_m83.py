@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import json
 
-from ecosystem_gym.m82 import M81_FROZEN_POLICY_FINGERPRINT, M81_FROZEN_PROTOCOL_FINGERPRINT
-from ecosystem_gym.m83 import M83_CONDITIONS, M83_DIAGNOSTIC_SEEDS, m83_diagnostics, m83_observability_audit, write_m83_report
+from ecosystem_gym.experiments.m82 import M81_FROZEN_POLICY_FINGERPRINT, M81_FROZEN_PROTOCOL_FINGERPRINT
+from ecosystem_gym.experiments.m83 import M83_CONDITIONS, M83_DIAGNOSTIC_SEEDS, m83_diagnostics, m83_observability_audit, write_m83_report
 
 
 def test_m83_is_a_frozen_one_factor_diagnostic_matrix(tmp_path) -> None:

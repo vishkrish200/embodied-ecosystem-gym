@@ -4,8 +4,8 @@ import json
 
 import pytest
 
-from ecosystem_gym.m87 import M87_TRAIN_CONDITIONS, M87_VALIDATION_CONDITIONS
-from ecosystem_gym.m88 import (
+from ecosystem_gym.experiments.m87 import M87_TRAIN_CONDITIONS, M87_VALIDATION_CONDITIONS
+from ecosystem_gym.experiments.m88 import (
     M87_FROZEN_POLICY_FINGERPRINT,
     M87_FROZEN_PROTOCOL_FINGERPRINT,
     M88_CONDITIONS,

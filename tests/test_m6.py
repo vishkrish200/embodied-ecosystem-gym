@@ -6,7 +6,7 @@ import numpy as np
 
 from ecosystem_gym.actions import ActionOutcome
 from ecosystem_gym.config import EcosystemConfig
-from ecosystem_gym.m6 import (
+from ecosystem_gym.experiments.m6 import (
     DriveMacroAction,
     TabularDriveQPolicy,
     _gate_passed,

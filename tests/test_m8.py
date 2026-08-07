@@ -7,7 +7,7 @@ import numpy as np
 from ecosystem_gym.actions import ActionKind
 from ecosystem_gym.config import EcosystemConfig
 from ecosystem_gym.env import EcosystemEnv
-from ecosystem_gym.m8 import (
+from ecosystem_gym.experiments.m8 import (
     M8_CONDITIONS,
     M8_EVALUATION_SEEDS,
     FixedRgbScanRecoveryPolicy,

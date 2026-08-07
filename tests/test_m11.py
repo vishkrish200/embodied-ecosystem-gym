@@ -1,12 +1,12 @@
-from ecosystem_gym.m10 import M10_VALIDATION_CONDITIONS
-from ecosystem_gym.m11 import (
+from ecosystem_gym.experiments.m10 import M10_VALIDATION_CONDITIONS
+from ecosystem_gym.experiments.m11 import (
     M11_FROZEN_M9_POLICY_FINGERPRINT,
     M11_SAFE_DRIVE_BANDS,
     m11_baseline,
     m11_protocol_fingerprint,
     run_m11_episode,
 )
-from ecosystem_gym.m9 import fit_m9_policy, m9_policy_fingerprint
+from ecosystem_gym.experiments.m9 import fit_m9_policy, m9_policy_fingerprint
 
 
 def test_m11_pins_the_m9_policy_and_safe_bands() -> None:

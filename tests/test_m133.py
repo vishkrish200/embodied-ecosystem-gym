@@ -3,9 +3,9 @@ import numpy as np
 from ecosystem_gym.actions import ActionOutcome
 from ecosystem_gym.config import EcosystemConfig
 from ecosystem_gym.env import EcosystemEnv
-from ecosystem_gym.m13 import M13Macro, M13Memory, compile_macro
-from ecosystem_gym.m131 import m131_config
-from ecosystem_gym.m133 import (
+from ecosystem_gym.experiments.m13 import M13Macro, M13Memory, compile_macro
+from ecosystem_gym.experiments.m131 import m131_config
+from ecosystem_gym.experiments.m133 import (
     M133_AUDIT_SEEDS,
     M133_DEVELOPMENT_CONDITIONS,
     M133_DEVELOPMENT_SEEDS,

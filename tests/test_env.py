@@ -7,8 +7,8 @@ from gymnasium.utils.env_checker import check_env
 from ecosystem_gym import EcosystemConfig, EcosystemEnv
 from ecosystem_gym.actions import ActionKind
 from ecosystem_gym.benchmark import benchmark, write_benchmark_report
-from ecosystem_gym.m3 import collect_rgb_behavior_cloning_data, perception_benchmark
-from ecosystem_gym.learned_rgb import learned_rgb_gate
+from ecosystem_gym.experiments.m3 import collect_rgb_behavior_cloning_data, perception_benchmark
+from ecosystem_gym.experiments.learned_rgb import learned_rgb_gate
 from ecosystem_gym.policies import FIXED_EVALUATION_SEEDS, evaluate_scripted_policy, scripted_find_and_eat
 from ecosystem_gym.trajectory import replay_and_validate
 

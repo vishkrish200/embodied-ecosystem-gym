@@ -4,12 +4,12 @@ import json
 
 import pytest
 
-import ecosystem_gym.m81 as m81
+import ecosystem_gym.experiments.m81 as m81
 from ecosystem_gym.config import EcosystemConfig
 from ecosystem_gym.env import EcosystemEnv
-from ecosystem_gym.m8 import _agent_image_centre
-from ecosystem_gym.m81 import M81_TEST_SEEDS, M81_TRAIN_SEEDS
-from ecosystem_gym.m82 import (
+from ecosystem_gym.experiments.m8 import _agent_image_centre
+from ecosystem_gym.experiments.m81 import M81_TEST_SEEDS, M81_TRAIN_SEEDS
+from ecosystem_gym.experiments.m82 import (
     M81_FROZEN_POLICY_FINGERPRINT,
     M81_FROZEN_PROTOCOL_FINGERPRINT,
     M82_CONDITIONS,

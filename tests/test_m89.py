@@ -6,10 +6,10 @@ import numpy as np
 import pytest
 
 from ecosystem_gym.env import EcosystemEnv
-from ecosystem_gym.m84 import m84_config
-from ecosystem_gym.m87 import M87_TRAIN_CONDITIONS, M87_VALIDATION_CONDITIONS
-from ecosystem_gym.m88 import M88_CONDITIONS
-from ecosystem_gym.m89 import (
+from ecosystem_gym.experiments.m84 import m84_config
+from ecosystem_gym.experiments.m87 import M87_TRAIN_CONDITIONS, M87_VALIDATION_CONDITIONS
+from ecosystem_gym.experiments.m88 import M88_CONDITIONS
+from ecosystem_gym.experiments.m89 import (
     M87_FROZEN_POLICY_FINGERPRINT,
     M87_FROZEN_PROTOCOL_FINGERPRINT,
     M89_CONDITIONS,

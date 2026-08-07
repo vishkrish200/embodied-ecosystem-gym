@@ -5,7 +5,7 @@
 M11 measures the capability gap between M9's frozen single-cycle RGB policy and
 M10's validated persistent-maintenance environment. It does not fit, tune, or
 select a policy. The exact deterministic M9 parameter fingerprint is pinned in
-`ecosystem_gym/m11.py`; an evaluation fails if the reconstructed policy differs.
+`ecosystem_gym/experiments/m11.py`; an evaluation fails if the reconstructed policy differs.
 
 ## Frozen evaluation
 

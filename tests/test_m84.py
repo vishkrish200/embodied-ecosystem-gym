@@ -6,7 +6,7 @@ import numpy as np
 
 from ecosystem_gym.actions import ActionKind
 from ecosystem_gym.env import EcosystemEnv
-from ecosystem_gym.m84 import (
+from ecosystem_gym.experiments.m84 import (
     M84_TRAIN_CONDITIONS,
     M84_TRAIN_SEEDS,
     M84_VALIDATION_CONDITIONS,

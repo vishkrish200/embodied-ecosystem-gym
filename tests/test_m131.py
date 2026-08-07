@@ -1,6 +1,6 @@
 from ecosystem_gym.config import EcosystemConfig
 from ecosystem_gym.env import EcosystemEnv
-from ecosystem_gym.m131 import (
+from ecosystem_gym.experiments.m131 import (
     M131_AUDIT_SEEDS,
     M131_DEVELOPMENT_CONDITIONS,
     M131_DEVELOPMENT_SEEDS,
@@ -12,7 +12,7 @@ from ecosystem_gym.m131 import (
     m131_protocol_fingerprint,
     replay_m131_trace,
 )
-from ecosystem_gym.m13 import ScriptedM13Oracle, m13_config, run_m13_episode
+from ecosystem_gym.experiments.m13 import ScriptedM13Oracle, m13_config, run_m13_episode
 
 
 def test_m131_reward_revision_is_cycle_only_and_legacy_defaults_are_zero() -> None:

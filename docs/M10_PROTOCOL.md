@@ -43,7 +43,7 @@ later successful consumption. This replaces M9.1's fixed-step trigger.
 Validation has four disjoint layouts: persistent reference, renewal plus visual
 morphology, event-triggered relocation, and a compound row with relocation and
 a visible blocked distractor. Development and audit layouts are frozen in
-`ecosystem_gym/m10.py` and share no layout ids with validation.
+`ecosystem_gym/experiments/m10.py` and share no layout ids with validation.
 
 ## Coverage and oracle gate
 

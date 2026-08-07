@@ -3,7 +3,7 @@ import pytest
 
 from ecosystem_gym.actions import ActionKind, ActionOutcome
 from ecosystem_gym.env import EcosystemEnv
-from ecosystem_gym.m13 import (
+from ecosystem_gym.experiments.m13 import (
     M13_AUDIT_SEEDS,
     M13_DEVELOPMENT_CONDITIONS,
     M13_DEVELOPMENT_SEEDS,

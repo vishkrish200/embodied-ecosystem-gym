@@ -4,8 +4,8 @@ import json
 
 import pytest
 
-from ecosystem_gym.m85 import M85_TEST_SEEDS
-from ecosystem_gym.m86 import (
+from ecosystem_gym.experiments.m85 import M85_TEST_SEEDS
+from ecosystem_gym.experiments.m86 import (
     M86_DIAGNOSTIC_SEEDS,
     m86_diagnostics,
     run_m86_viewer_demo,

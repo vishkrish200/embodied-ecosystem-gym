@@ -1,8 +1,8 @@
 import numpy as np
 
 from ecosystem_gym.env import EcosystemEnv
-from ecosystem_gym.m13 import M13Memory
-from ecosystem_gym.m132 import (
+from ecosystem_gym.experiments.m13 import M13Memory
+from ecosystem_gym.experiments.m132 import (
     M132_AUDIT_SEEDS,
     M132_DEVELOPMENT_CONDITIONS,
     M132_DEVELOPMENT_SEEDS,

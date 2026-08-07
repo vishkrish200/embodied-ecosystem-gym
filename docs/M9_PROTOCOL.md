@@ -15,8 +15,8 @@ an authored scan/retry control path; neither existing task requires food and
 toy completion in one episode.  The relevant seams are the RGB-only public
 observation contract in `ecosystem_gym/env.py:433-450`, the one-success task
 termination in `ecosystem_gym/env.py:350-385`, M7's fixed colour adapter and
-macro-to-skill mapping in `ecosystem_gym/m7.py:61-195`, and M8.7's learned
-food/agent grounder in `ecosystem_gym/m87.py:159-195`.
+macro-to-skill mapping in `ecosystem_gym/experiments/m7.py:61-195`, and M8.7's learned
+food/agent grounder in `ecosystem_gym/experiments/m87.py:159-195`.
 
 ## Frozen protocol
 
@@ -39,7 +39,7 @@ cycle. The policy makes the `scan` choice itself; this is a scored behavioural
 requirement, not a controller prelude. An offline MuJoCo-segmentation coverage audit may inspect
 food, toy, distractor, and agent geoms, but it runs before fitting/scoring and
 is unavailable to every policy method.  This follows the M8.4 visibility
-boundary in `ecosystem_gym/m84.py:159-207`.
+boundary in `ecosystem_gym/experiments/m84.py:159-207`.
 
 ### One policy definition
 

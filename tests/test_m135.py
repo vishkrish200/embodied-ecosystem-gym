@@ -1,8 +1,8 @@
 import numpy as np
 
 from ecosystem_gym.env import EcosystemEnv
-from ecosystem_gym.m13 import M13Macro
-from ecosystem_gym.m135 import (
+from ecosystem_gym.experiments.m13 import M13Macro
+from ecosystem_gym.experiments.m135 import (
     M135_AUDIT_SEEDS,
     M135_CANDIDATE_UPDATE_EVERY,
     M135_DEVELOPMENT_CONDITIONS,
@@ -20,7 +20,7 @@ from ecosystem_gym.m135 import (
     run_m135_episode,
     write_m135_policy,
 )
-from ecosystem_gym.m133 import m133_config
+from ecosystem_gym.experiments.m133 import m133_config
 
 
 def test_m135_update_cadence_is_the_only_policy_hyperparameter_change() -> None:
