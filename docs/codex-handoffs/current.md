@@ -69,11 +69,15 @@ task. Do not start another behavior-cloning or RGB policy variant first.
    replicas passes every survival/maintenance/safe-drive/recovery gate. Its
    3300–3419 validation/audit splits remain unopened. Do not retry M13.4 or
    silently widen the policy input.
-3. M13.5 implementation is frozen in `ecosystem_gym/m135.py`; its fresh
-   development-only paired update-ratio matrix is running unchanged. It uses
-   six independent spawned fit jobs (up to eight workers) with one numerical
-   thread per job. Do not touch M13.5 source or use splits 3600–3719 until its
-   development gates finish, and do not use M13.4 validation/audit.
+3. M13.5 development is complete and failed before validation. Its six
+   spawned training jobs used one numerical thread each; coverage and the
+   scripted ceiling passed 160/160 and all 1,600 development traces strictly
+   replayed. Update-every-4 substantially beat paired update-every-256 and
+   random controls, and seed 20260812 passed every row, but seed 20260813
+   collapsed in compound/persistent-reference and seed 20260814 missed the
+   renewal/morphology safe-drive gate. The all-replicas rule therefore fails.
+   Its 3600–3719 validation/audit splits remain unopened. Do not rerun M13.5,
+   select a seed, or silently widen the public interface.
 4. Only after a state-RL baseline passes should M14 hybrid RL and M15 RGB
    persistent maintenance proceed with the
    same task and policy objective.
