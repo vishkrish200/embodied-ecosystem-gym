@@ -78,7 +78,14 @@ task. Do not start another behavior-cloning or RGB policy variant first.
    renewal/morphology safe-drive gate. The all-replicas rule therefore fails.
    Its 3600–3719 validation/audit splits remain unopened. Do not rerun M13.5,
    select a seed, or silently widen the public interface.
-4. Only after a state-RL baseline passes should M14 hybrid RL and M15 RGB
+4. `docs/M13_6_PROTOCOL.md` freezes the next narrow test. Keep M13.5's
+   public interface, reward, mask, update-every-4 budget, target-copy cadence,
+   and all scored gates fixed; compare only duration-aware semi-MDP discounting
+   against unit per-decision discounting on fresh 3800–4019 splits. First run
+   its unscored 750-episode timing preflight on 3720–3723 and stop if the
+   conservative full-fit projection exceeds 35 minutes. Do not implement
+   policy/training code until that protocol is complete and reviewed.
+5. Only after a state-RL baseline passes should M14 hybrid RL and M15 RGB
    persistent maintenance proceed with the
    same task and policy objective.
 
