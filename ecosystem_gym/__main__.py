@@ -37,6 +37,7 @@ from .m132 import write_m132_training_report
 from .m133 import write_m133_training_report
 from .m134 import write_m134_training_report
 from .m135 import write_m135_training_report
+from .m136 import write_m136_training_report
 from .policies import evaluate_scripted_policy
 from .trajectory import replay_and_validate
 from .video import write_find_and_eat_regression_video
@@ -157,6 +158,8 @@ def main() -> None:
     m134_train.add_argument("--output", type=Path, required=True)
     m135_train = subparsers.add_parser("m135-train", help="run the parallel M13.5 update-ratio development diagnostic")
     m135_train.add_argument("--output", type=Path, required=True)
+    m136_train = subparsers.add_parser("m136-train", help="run the candidate-first M13.6 update-ratio stability replication")
+    m136_train.add_argument("--output", type=Path, required=True)
     viewer = subparsers.add_parser("viewer", help="start the thin local live Gym viewer")
     viewer.add_argument("--trace", type=Path)
     viewer.add_argument("--port", type=int, default=8765)
@@ -289,6 +292,9 @@ def main() -> None:
         print(json.dumps(report["gate"]))
     elif args.command == "m135-train":
         report = write_m135_training_report(args.output)
+        print(json.dumps(report["gate"]))
+    elif args.command == "m136-train":
+        report = write_m136_training_report(args.output)
         print(json.dumps(report["gate"]))
     elif args.command == "viewer":
         with ViewerSession(trace_path=args.trace) as session:
