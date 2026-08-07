@@ -227,7 +227,14 @@ def m133_policy_fingerprint(policy: CompactM133QPolicy) -> str:
 
 def m133_protocol_fingerprint() -> str:
     source_dir = Path(__file__).parent
-    source_hashes = {name: hashlib.sha256((source_dir / name).read_bytes()).hexdigest() for name in ("m133.py", "m132.py", "m13.py", "env.py", "config.py")}
+    sources = {
+        "m133.py": source_dir / "m133.py",
+        "m132.py": source_dir / "m132.py",
+        "m13.py": source_dir / "m13.py",
+        "env.py": source_dir.parent / "env.py",
+        "config.py": source_dir.parent / "config.py",
+    }
+    source_hashes = {name: hashlib.sha256(path.read_bytes()).hexdigest() for name, path in sources.items()}
     payload = {"version": M133_PROTOCOL_VERSION, "config": asdict(m133_config()), "development_seeds": M133_DEVELOPMENT_SEEDS, "validation_seeds": M133_VALIDATION_SEEDS, "audit_seeds": M133_AUDIT_SEEDS, "development_conditions": M133_DEVELOPMENT_CONDITIONS, "validation_conditions": M133_VALIDATION_CONDITIONS, "audit_conditions": M133_AUDIT_CONDITIONS, "features": M132_FEATURE_DIM, "network": [M132_FEATURE_DIM, M132_HIDDEN_DIM, M132_HIDDEN_DIM, len(M13Macro)], "source_hashes": source_hashes, "training": {"episodes": M13_TRAINING_EPISODES, "seed": M133_TRAINING_SEED, "epsilon": {"start": 1.0, "final": M13_EPSILON_FINAL, "inclusive_decay_episodes": M13_EPSILON_DECAY_EPISODES}, "gamma": M13_GAMMA, "replay_capacity": M132_REPLAY_CAPACITY, "warmup": M132_REPLAY_WARMUP, "batch": M132_BATCH_SIZE, "update_every": M132_UPDATE_EVERY, "target_update_every": M132_TARGET_UPDATE_EVERY, "learning_rate": M132_LEARNING_RATE, "adam": [0.9, 0.999, 1e-8], "huber_delta": 1.0}}
     return hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
 

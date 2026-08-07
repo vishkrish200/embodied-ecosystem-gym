@@ -168,7 +168,11 @@ def m137_policy_fingerprint(policy: CompactM137QPolicy) -> str:
 def m137_protocol_fingerprint() -> str:
     source_dir = Path(__file__).parent
     sources = ("m137.py", "m134.py", "m133.py", "m132.py", "m13.py", "env.py", "config.py")
-    payload = {"version": M137_PROTOCOL_VERSION, "config": asdict(m133_config()), "splits": {"screen_training": M137_DEVELOPMENT_SEEDS, "screen_probe": M137_VALIDATION_SEEDS, "confirmation_audit_reserved": M137_AUDIT_SEEDS}, "conditions": {"screen_training": M137_DEVELOPMENT_CONDITIONS, "screen_probe": M137_VALIDATION_CONDITIONS}, "training_seeds": M137_TRAINING_SEEDS, "arms": {arm: m137_target_update_every(arm) for arm in ("control", "target_250", "target_100")}, "workers": M137_WORKERS, "training": {"episodes": M137_SCREEN_EPISODES, "update_every": M137_UPDATE_EVERY, "epsilon_final": M13_EPSILON_FINAL, "epsilon_decay": M13_EPSILON_DECAY_EPISODES, "gamma": M13_GAMMA, "replay_capacity": M132_REPLAY_CAPACITY, "warmup": M132_REPLAY_WARMUP, "batch": M132_BATCH_SIZE}, "source_hashes": {name: hashlib.sha256((source_dir / name).read_bytes()).hexdigest() for name in sources}}
+    source_paths = {
+        name: source_dir.parent / name if name in {"env.py", "config.py"} else source_dir / name
+        for name in sources
+    }
+    payload = {"version": M137_PROTOCOL_VERSION, "config": asdict(m133_config()), "splits": {"screen_training": M137_DEVELOPMENT_SEEDS, "screen_probe": M137_VALIDATION_SEEDS, "confirmation_audit_reserved": M137_AUDIT_SEEDS}, "conditions": {"screen_training": M137_DEVELOPMENT_CONDITIONS, "screen_probe": M137_VALIDATION_CONDITIONS}, "training_seeds": M137_TRAINING_SEEDS, "arms": {arm: m137_target_update_every(arm) for arm in ("control", "target_250", "target_100")}, "workers": M137_WORKERS, "training": {"episodes": M137_SCREEN_EPISODES, "update_every": M137_UPDATE_EVERY, "epsilon_final": M13_EPSILON_FINAL, "epsilon_decay": M13_EPSILON_DECAY_EPISODES, "gamma": M13_GAMMA, "replay_capacity": M132_REPLAY_CAPACITY, "warmup": M132_REPLAY_WARMUP, "batch": M132_BATCH_SIZE}, "source_hashes": {name: hashlib.sha256(path.read_bytes()).hexdigest() for name, path in source_paths.items()}}
     return hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
 
 

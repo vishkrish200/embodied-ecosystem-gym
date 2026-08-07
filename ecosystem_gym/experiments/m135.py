@@ -170,7 +170,11 @@ def m135_policy_fingerprint(policy: CompactM135QPolicy) -> str:
 def m135_protocol_fingerprint() -> str:
     source_dir = Path(__file__).parent
     sources = ("m135.py", "m134.py", "m133.py", "m132.py", "m13.py", "env.py", "config.py")
-    payload = {"version": M135_PROTOCOL_VERSION, "config": asdict(m133_config()), "splits": {"development": M135_DEVELOPMENT_SEEDS, "validation": M135_VALIDATION_SEEDS, "audit": M135_AUDIT_SEEDS}, "conditions": {"development": M135_DEVELOPMENT_CONDITIONS, "validation": M135_VALIDATION_CONDITIONS, "audit": M135_AUDIT_CONDITIONS}, "training_seeds": M135_TRAINING_SEEDS, "candidate_update_every": M135_CANDIDATE_UPDATE_EVERY, "null_update_every": M135_NULL_UPDATE_EVERY, "workers": M135_WORKERS, "training": {"episodes": M13_TRAINING_EPISODES, "epsilon_final": M13_EPSILON_FINAL, "epsilon_decay": M13_EPSILON_DECAY_EPISODES, "gamma": M13_GAMMA, "replay_capacity": M132_REPLAY_CAPACITY, "warmup": M132_REPLAY_WARMUP, "batch": M132_BATCH_SIZE, "target_update_every": M132_TARGET_UPDATE_EVERY}, "source_hashes": {name: hashlib.sha256((source_dir / name).read_bytes()).hexdigest() for name in sources}}
+    source_paths = {
+        name: source_dir.parent / name if name in {"env.py", "config.py"} else source_dir / name
+        for name in sources
+    }
+    payload = {"version": M135_PROTOCOL_VERSION, "config": asdict(m133_config()), "splits": {"development": M135_DEVELOPMENT_SEEDS, "validation": M135_VALIDATION_SEEDS, "audit": M135_AUDIT_SEEDS}, "conditions": {"development": M135_DEVELOPMENT_CONDITIONS, "validation": M135_VALIDATION_CONDITIONS, "audit": M135_AUDIT_CONDITIONS}, "training_seeds": M135_TRAINING_SEEDS, "candidate_update_every": M135_CANDIDATE_UPDATE_EVERY, "null_update_every": M135_NULL_UPDATE_EVERY, "workers": M135_WORKERS, "training": {"episodes": M13_TRAINING_EPISODES, "epsilon_final": M13_EPSILON_FINAL, "epsilon_decay": M13_EPSILON_DECAY_EPISODES, "gamma": M13_GAMMA, "replay_capacity": M132_REPLAY_CAPACITY, "warmup": M132_REPLAY_WARMUP, "batch": M132_BATCH_SIZE, "target_update_every": M132_TARGET_UPDATE_EVERY}, "source_hashes": {name: hashlib.sha256(path.read_bytes()).hexdigest() for name, path in source_paths.items()}}
     return hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
 
 
