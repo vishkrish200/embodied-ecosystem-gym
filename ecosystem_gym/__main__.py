@@ -1,5 +1,11 @@
 from __future__ import annotations
 
+import os
+
+# Parallel M13.5 workers must not each create a nested BLAS thread pool.
+for _thread_env in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "VECLIB_MAXIMUM_THREADS", "NUMEXPR_NUM_THREADS"):
+    os.environ.setdefault(_thread_env, "1")
+
 import argparse
 import json
 from pathlib import Path
@@ -30,6 +36,7 @@ from .m131 import write_m131_report, write_m131_training_report
 from .m132 import write_m132_training_report
 from .m133 import write_m133_training_report
 from .m134 import write_m134_training_report
+from .m135 import write_m135_training_report
 from .policies import evaluate_scripted_policy
 from .trajectory import replay_and_validate
 from .video import write_find_and_eat_regression_video
@@ -148,6 +155,8 @@ def main() -> None:
     m133_train.add_argument("--output", type=Path, required=True)
     m134_train = subparsers.add_parser("m134-train", help="train and gate the public macro-precondition M13.4 development baseline")
     m134_train.add_argument("--output", type=Path, required=True)
+    m135_train = subparsers.add_parser("m135-train", help="run the parallel M13.5 update-ratio development diagnostic")
+    m135_train.add_argument("--output", type=Path, required=True)
     viewer = subparsers.add_parser("viewer", help="start the thin local live Gym viewer")
     viewer.add_argument("--trace", type=Path)
     viewer.add_argument("--port", type=int, default=8765)
@@ -277,6 +286,9 @@ def main() -> None:
         print(json.dumps(report["gate"]))
     elif args.command == "m134-train":
         report = write_m134_training_report(args.output)
+        print(json.dumps(report["gate"]))
+    elif args.command == "m135-train":
+        report = write_m135_training_report(args.output)
         print(json.dumps(report["gate"]))
     elif args.command == "viewer":
         with ViewerSession(trace_path=args.trace) as session:
