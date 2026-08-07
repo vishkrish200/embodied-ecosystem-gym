@@ -1,6 +1,6 @@
 # Codex Handoff: M13 persistent-maintenance RL reset
 
-Updated: 2026-08-06
+Updated: 2026-08-07
 Repo/path: `/Users/vishnukrishnan/Developer/embodied-ecosystem-gym`
 Branch/worktree: `main` with committed M8–M12 history, original M13 failure evidence, and M13.1 in progress.
 
@@ -51,17 +51,21 @@ task. Do not start another behavior-cloning or RGB policy variant first.
   semantics do not disincentivize blocked short actions under approximation.
   Its 2700–2819 validation/audit splits remain unopened. Do not introduce an
   action mask or blocked-action penalty without a newly frozen protocol.
-- `docs/M13_3_PROTOCOL.md` now freezes that new protocol: a `.10` blocked
-  penalty except the single forced stale pickup that triggers relocation,
-  reward-null and standard ablations, exact public-memory timing repairs, and
-  fresh 2900–2939 / 3000–3019 / 3100–3119 splits. Do not add an action mask.
+- M13.3 development is complete and failed before validation. Its fresh
+  2900–2939 coverage and scripted ceiling each pass 160/160, and strict replay
+  passes all 960 development traces. The full DQN completes zero maintenance
+  episodes in every condition; it removes the M13.2 repeated blocked-pickup
+  loop but does not learn the required maintenance schedule. Its 3000–3019
+  validation and 3100–3119 audit remain unopened. Do not retry M13.3
+  development or add an action mask retroactively.
 
 ## Next Steps
 
-1. Implement and test only the frozen M13.3 reward/memory/epsilon corrections,
-   fresh layouts, reward-null arm, and replay/audit tooling.
-2. Run its development gates before opening the 3000–3019 validation suite;
-   leave both M13.2 and M13.3 audits sealed unless their own validation passes.
+1. Preserve `artifacts/reports/m133-development.json` and its 960 replayed
+   development traces as a negative result; do not open M13.3 validation.
+2. Freeze a separately versioned next causal proposal before implementation.
+   It must explain why eliminating blocked loops did not yield cycle planning;
+   it may not reuse M13.3 validation/audit or silently widen the policy input.
 3. Only after a state-RL baseline passes should M14 hybrid RL and M15 RGB
    persistent maintenance proceed with the
    same task and policy objective.
