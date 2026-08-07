@@ -63,12 +63,12 @@ task. Do not start another behavior-cloning or RGB policy variant first.
 
 1. Preserve `artifacts/reports/m133-development.json` and its 960 replayed
    development traces as a negative result; do not open M13.3 validation.
-2. `docs/M13_4_PROTOCOL.md` is now the proposed next causal protocol, not
-   implementation authority. It constrains only public macro preconditions,
-   including redundant near-target `GO_*` actions, leaves drive scheduling
-   learned, and fixes fresh 3200–3419 splits. It must be reviewed and then
-   implemented exactly or replaced by a newly versioned protocol; do not reuse
-   M13.3 validation/audit or silently widen the policy input.
+2. M13.4 implementation is frozen in `ecosystem_gym/m134.py`: it constrains
+   only public macro preconditions, including redundant near-target `GO_*`
+   actions, leaves drive scheduling learned, and uses fresh 3200–3419 splits.
+   Its development-only 15-fit paired matrix is running or must be allowed to
+   finish unchanged. Do not reuse M13.3 validation/audit or silently widen the
+   policy input.
 3. Only after a state-RL baseline passes should M14 hybrid RL and M15 RGB
    persistent maintenance proceed with the
    same task and policy objective.
