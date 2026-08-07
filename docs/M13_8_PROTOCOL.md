@@ -4,8 +4,12 @@ Protocol version: `m13.8-bounded-maintenance-reward-r1`
 
 ## Status, diagnosis, and bounded question
 
-M13.8 is a prospective two-stage reward experiment. It does not report an
-implemented result, a passing screen, or a confirmed policy.
+**Status: frozen negative result (2026-08-07).** The one-shot screen is
+complete and rejected. Its fit and probe partitions are permanently opened;
+its confirmation and audit partitions remain unopened. See
+[`M13_8_SCREEN_RESULTS.md`](M13_8_SCREEN_RESULTS.md) and the sealed report for
+the result. This protocol remains immutable evidence for the rejected reward;
+it is not a template to retune against its opened probe.
 
 The primary diagnosis is reward misalignment. M13.6 showed that dense
 Double-DQN consistently beats its sparse and random controls, but only 2/8

@@ -152,6 +152,32 @@ Exit when the RL policy materially exceeds random, no-drive, and no-memory ablat
 
 **M13.7 status: screen rejected, no confirmation run (2026-08-07).** The fresh two-seed, 4,000-episode target-cadence screen passed its mechanics ceiling and strict replay (342 artifacts), but neither faster hard-copy cadence promoted. At cadence 250, both seeds were rejected for pooled probe maintenance/survival regressions; cadence 100 regressed more strongly. The result is a cheap negative result, not a validation failure: confirmation development 4500–4539, validation 4600–4619, and audit 4700–4719 remain unopened.
 
+**M13.8 status: screen rejected, no confirmation run (2026-08-07).** The
+fresh two-seed, 4,000-episode bounded-reward screen confirmed that uncapped
+cycle rewards can be farmed, but rejected the proposed remedy. The bounded
+candidate reduced feeds from roughly 28–36 to 8–13, yet it usually completed
+the `3/3/2` quota and then loitered: `WAIT` consumed roughly 51–66% of
+decisions in six of eight candidate condition cells. Across the fresh probe,
+it achieved 1/64 full-objective successes versus the contemporaneous legacy
+control's 40/64, with materially worse decision-safe (61.6% versus 88.8%) and
+duration-safe (63.4% versus 86.5%) occupancy. All 512 trace/replay checks
+passed, so this is a clean negative result rather than an implementation
+failure. M13.8's fit/probe partitions 4800–4827 are opened; its confirmation
+and audit partitions 4900–5119 remain unopened and may never be repurposed.
+M13.9 must use a fresh split family and test a different, duration-aware
+public-drive credit-assignment hypothesis.
+
+**M13.9 status: protocol frozen; no split opened (2026-08-07).** The next
+screen replaces M13.8's static safety integral with a bounded
+semi-Markov potential difference over permitted public drives, while retaining
+capped `3/3/2` milestones. Its paired static-cost control isolates that change;
+a freshly trained legacy guardrail prevents promoting a merely less-bad bounded
+policy. The fail-fast stage is six parallel 2,000-episode fits (12,000 learned
+episodes total) on newly reserved 5200–5227 partitions. It promotes only if
+both replicas improve safety/full-objective success over the static control and
+remain non-inferior to the legacy guardrail; otherwise M13 RL pauses rather
+than tuning M13.9. Confirmation and audit partitions 5300–5519 are untouched.
+
 ## M14 — Hybrid persistent-maintenance RL
 
 Hold M13's task, action interface, reward, and long-horizon evaluation fixed while replacing privileged object coordinates with the existing hybrid observation boundary. Train a policy that receives RGB, drives, holding state, prior outcome, and non-privileged visual detections only. Its purpose is to isolate whether the maintenance RL policy fails because of planning or because of perception.

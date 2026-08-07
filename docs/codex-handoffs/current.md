@@ -2,7 +2,7 @@
 
 Updated: 2026-08-07
 Repo/path: `/Users/vishnukrishnan/Developer/embodied-ecosystem-gym`
-Branch/worktree: `main` with committed M8–M12 history, original M13 failure evidence, and M13.1 in progress.
+Branch/worktree: `main` with committed M8–M13.8 history and a frozen M13.9 protocol; implementation has not started.
 
 ## Current Goal
 
@@ -92,7 +92,14 @@ task. Do not start another behavior-cloning or RGB policy variant first.
    control on its independent probe. It correctly stops here: no 12,000-episode
    confirmation, validation, or audit run is authorized; 4500–4719 remain
    unopened. Preserve the report as a fast negative result.
-5. Only after a state-RL baseline passes should M14 hybrid RL and M15 RGB
+6. M13.8's bounded-reward screen is a clean negative result. It prevented
+   uncapped feed farming but created quota-then-`WAIT` loitering: 1/64 full
+   objective successes versus 40/64 for the paired legacy controls, despite
+   all 512 replays passing. Its 4800–4827 fit/probe partitions are opened;
+   4900–5119 remain sealed and must not be reused. Do not tweak M13.8
+   coefficients. The next permitted experiment is M13.9's newly documented
+   public-drive potential, using a new split family.
+7. Only after a state-RL baseline passes should M14 hybrid RL and M15 RGB
    persistent maintenance proceed with the
    same task and policy objective.
 
