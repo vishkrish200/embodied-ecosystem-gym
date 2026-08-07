@@ -324,6 +324,10 @@ class EcosystemEnv(gym.Env[dict[str, Any], dict[str, np.ndarray | int]]):
         reward = -self.config.step_penalty_per_second * skill.duration_seconds
         if outcome not in {ActionOutcome.SUCCESS, ActionOutcome.BLOCKED}:
             reward -= self.config.invalid_action_penalty
+        if outcome is ActionOutcome.BLOCKED and not (
+            self.config.exempt_forced_relocation_blocked_penalty and event_disturbance == "food_relocated"
+        ):
+            reward -= self.config.blocked_action_penalty
         if task_success:
             reward += self.config.play_success_reward if self._active_task.success_condition == "relieve_boredom" else self.config.task_success_reward
         if recovery_action or post_disturbance_completion:

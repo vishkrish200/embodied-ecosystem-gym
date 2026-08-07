@@ -36,5 +36,7 @@ class EcosystemConfig:
     persistent_feed_cycle_reward: float = 0.0
     persistent_play_cycle_reward: float = 0.0
     persistent_rest_cycle_reward: float = 0.0
+    blocked_action_penalty: float = 0.0
+    exempt_forced_relocation_blocked_penalty: bool = False
     rgb_width: int = 64
     rgb_height: int = 64
