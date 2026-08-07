@@ -51,15 +51,17 @@ task. Do not start another behavior-cloning or RGB policy variant first.
   semantics do not disincentivize blocked short actions under approximation.
   Its 2700–2819 validation/audit splits remain unopened. Do not introduce an
   action mask or blocked-action penalty without a newly frozen protocol.
+- `docs/M13_3_PROTOCOL.md` now freezes that new protocol: a `.10` blocked
+  penalty except the single forced stale pickup that triggers relocation,
+  reward-null and standard ablations, exact public-memory timing repairs, and
+  fresh 2900–2939 / 3000–3019 / 3100–3119 splits. Do not add an action mask.
 
 ## Next Steps
 
-1. Do not open M13.2 validation or audit. Preserve its development artifacts
-   as a negative diagnostic.
-2. Before any M13.3 implementation, decide whether to change the macro/reward
-   contract: e.g. explicitly penalize blocked actions or restrict interaction
-   macros by public geometric preconditions. Either is a new causal experiment
-   and needs a fresh protocol, split family, ablation contract, and audit.
+1. Implement and test only the frozen M13.3 reward/memory/epsilon corrections,
+   fresh layouts, reward-null arm, and replay/audit tooling.
+2. Run its development gates before opening the 3000–3019 validation suite;
+   leave both M13.2 and M13.3 audits sealed unless their own validation passes.
 3. Only after a state-RL baseline passes should M14 hybrid RL and M15 RGB
    persistent maintenance proceed with the
    same task and policy objective.
