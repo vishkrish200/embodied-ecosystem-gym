@@ -87,6 +87,11 @@ task. Do not start another behavior-cloning or RGB policy variant first.
    strong but non-reproducible effect. Its 4200–4319 validation/audit splits
    remain unopened. Do not rerun M13.6, select a passing seed, or widen the
    public interface.
+5. M13.7's fresh two-seed, 4,000-episode target-cadence screen rejected both
+   faster hard-copy candidates (250 and 100 updates) against the 1,000-update
+   control on its independent probe. It correctly stops here: no 12,000-episode
+   confirmation, validation, or audit run is authorized; 4500–4719 remain
+   unopened. Preserve the report as a fast negative result.
 5. Only after a state-RL baseline passes should M14 hybrid RL and M15 RGB
    persistent maintenance proceed with the
    same task and policy objective.
