@@ -222,6 +222,14 @@ LAYOUTS: dict[str, LayoutSpec] = {
     "m136_audit_southwest": LayoutSpec("m136_audit_southwest", (0.74, 0.56), (-0.82, -0.78), (-0.44, -0.40), (-0.78, 0.60), (0.80, -0.54)),
     "m136_audit_northwest": LayoutSpec("m136_audit_northwest", (0.76, -0.56), (-0.84, 0.10), (-0.46, 0.66), (0.74, 0.60), (-0.76, -0.58)),
     "m136_audit_southeast": LayoutSpec("m136_audit_southeast", (-0.76, 0.56), (0.36, -0.84), (0.74, -0.46), (-0.76, -0.60), (0.74, 0.58)),
+    "m137_dev_northeast": LayoutSpec("m137_dev_northeast", (-0.10, -0.20), (0.30, 0.20), (0.60, 0.56), (0.54, -0.44), (-0.48, 0.38)),
+    "m137_dev_southwest": LayoutSpec("m137_dev_southwest", (0.10, 0.20), (-0.54, -0.66), (-0.20, -0.28), (-0.48, 0.38), (0.54, -0.44)),
+    "m137_dev_northwest": LayoutSpec("m137_dev_northwest", (0.24, -0.20), (-0.66, 0.18), (-0.32, 0.50), (0.42, 0.42), (-0.50, -0.36)),
+    "m137_dev_southeast": LayoutSpec("m137_dev_southeast", (-0.24, 0.20), (0.18, -0.66), (0.56, -0.32), (-0.50, -0.36), (0.42, 0.42)),
+    "m137_validation_northeast": LayoutSpec("m137_validation_northeast", (-0.42, -0.32), (0.38, 0.28), (0.70, 0.60), (0.66, -0.44), (-0.66, 0.46)),
+    "m137_validation_southwest": LayoutSpec("m137_validation_southwest", (0.42, 0.32), (-0.72, -0.64), (-0.36, -0.26), (-0.66, 0.46), (0.66, -0.44)),
+    "m137_validation_northwest": LayoutSpec("m137_validation_northwest", (0.56, -0.32), (-0.74, 0.16), (-0.40, 0.60), (0.64, 0.48), (-0.64, -0.46)),
+    "m137_validation_southeast": LayoutSpec("m137_validation_southeast", (-0.56, 0.32), (0.32, -0.74), (0.68, -0.40), (-0.64, -0.48), (0.64, 0.46)),
 }
 
 TASKS: dict[str, TaskSpec] = {
