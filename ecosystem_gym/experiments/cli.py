@@ -47,6 +47,7 @@ from .m139 import (
     write_m139_screen_report,
 )
 from .m1310 import write_m1310_screen_report
+from .m1311 import write_m1311_development_report, write_m1311_fit_smoke_report
 from ..policies import evaluate_scripted_policy
 from ..video import write_find_and_eat_regression_video
 
@@ -192,6 +193,10 @@ def main(argv: list[str] | None = None) -> None:
         "m1310-screen", help="run the frozen M13.10 imitation-initialized RL screen"
     )
     m1310_screen.add_argument("--output", type=Path, required=True)
+    m1311_smoke = subparsers.add_parser("m1311-fit-smoke", help="run only the non-promotional M13.11 fit smoke")
+    m1311_smoke.add_argument("--output", type=Path, required=True)
+    m1311_development = subparsers.add_parser("m1311-development", help="run the declared M13.11 development-only PPO/DQN bakeoff")
+    m1311_development.add_argument("--output", type=Path, required=True)
     args = parser.parse_args(argv)
     if args.command == "evaluate":
         result = evaluate_scripted_policy(trajectory_dir=args.trajectory_dir)
@@ -355,6 +360,12 @@ def main(argv: list[str] | None = None) -> None:
     elif args.command == "m1310-screen":
         report = write_m1310_screen_report(args.output)
         print(json.dumps(report["screen"]))
+    elif args.command == "m1311-fit-smoke":
+        report = write_m1311_fit_smoke_report(args.output)
+        print(json.dumps({"label": report["label"], "elapsed_seconds": report["elapsed_seconds"], "strict_replay_count": report["strict_replay_count"]}))
+    elif args.command == "m1311-development":
+        report = write_m1311_development_report(args.output)
+        print(json.dumps({"label": report["label"], "elapsed_seconds": report["elapsed_seconds"], "strict_replay_count": report["strict_replay_count"]}))
 
 
 if __name__ == "__main__":

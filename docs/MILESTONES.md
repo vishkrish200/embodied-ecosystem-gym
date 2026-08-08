@@ -146,64 +146,26 @@ Before training, version the reward, observation encoding, macro/action set, tra
 
 Exit when the RL policy materially exceeds random, no-drive, and no-memory ablations on each predeclared condition; completes the persistent cycle gate and forced-recovery chain at predeclared per-condition rates; and replays adverse trajectories exactly. A separately named scripted/state-oracle ceiling must still complete every condition. This milestone is the learning baseline for long-horizon maintenance, not an RGB result.
 
-**Status: M13.1 failed validation; M13.2, M13.3, M13.4, and M13.5 failed development (2026-08-07).** The original M13 sparse-reward tabular policy failed every maintenance gate. M13.1 retained its state boundary/action surface and added only guarded cycle-transition rewards on fresh 2300–2519 splits. Its development result was encouraging, but its one-shot validation passed coverage and replay while completing 0/20 maintenance episodes in every condition; its audit remains unopened. M13.2 retained M13.1 reward/interface/mechanics and replaced only tabular Q with a compact continuous-feature Double-DQN on new 2600–2819 splits. It completed 0 development maintenance episodes in all four conditions; a representative 160-step rollout selected only `PICK_UP`, yielding 160 `blocked` outcomes. Its validation/audit remain unopened. M13.3 froze the smallest causal repair: the same DQN/interface plus a recovery-safe `-0.10` blocked-action penalty, reward-null comparator, corrected public-memory/effect timing, and fresh 2900–3119 splits. Its 40-seed-per-row development coverage and scripted ceiling both passed 160/160. The full DQN had zero maintenance completions in every row; it survived 40/40 in three rows but only 17/40 compound, and its safe-drive fraction missed in compound (.716) and persistent-reference (.753). It did eliminate the pathological eight-or-more repeated ordinary blocked-action loops (zero full-policy episodes), so the changed reward fixed that narrow failure mode without producing the required maintenance behavior. M13.3 validation (3000–3019) and audit (3100–3119) remain unopened. M13.4 then constrained only public macro preconditions on fresh 3200–3419 splits, including redundant near-target `GO_*` choices, with interaction-only/unmasked controls and three paired seeds. Its 160/160 coverage and scripted-ceiling checks passed, and all 3,040 development traces strictly replayed with zero mask violations or redundant selected `GO_*` actions. Yet every full-policy replica failed the gate. Seed 20260809 survived compound 40/40 but completed zero maintenance episodes in every row and never rested; seed 20260810 survived zero episodes in every row; seed 20260811 completed 36/40 event-relocation maintenance checks but survived zero there, and no other row met both requirements. M13.4 therefore demonstrates that public macro preconditions remove those local action-selection errors without establishing stable long-horizon maintenance. Validation (3300–3419) remains unopened. M13.5 then changed only the training-dynamics bundle on fresh 3500–3719 splits: update every 4 decisions versus every 256, in six isolated spawned jobs with one numerical thread each. Coverage and the scripted ceiling passed 160/160 and all 1,600 development traces strictly replayed. The update-ratio candidate dominated its paired cadence-null and random comparators in every seed, and seed 20260812 passed every row (39–40/40 survival/maintenance, safe-drive .905–.943). But seed 20260813 failed compound (33/40 survival/maintenance, safe .767) and persistent-reference (8/40, safe .464), while seed 20260814 missed only renewal/morphology safe drive (.792 despite 40/40 survival/maintenance). Since all three predeclared replicas had to pass, M13.5 failed development. Its 3600–3619 validation and 3700–3719 audit splits remain unopened.
+**Status: M13 through M13.5 did not establish a stable state-oracle RL baseline.** Sparse reward, cycle shaping, continuous Double-DQN, recovery-safe memory timing, public masking, and dense updates each isolated useful local facts but failed the all-replica maintenance gate. Their exact partitions, results, and retry boundaries are retained in the [M13 learning index](M13_DQN_LEARNINGS.md).
 
-**M13.6 status: failed development (2026-08-07).** The unimplemented duration-discount proposal was withdrawn because it would reinterpret the existing per-macro discount as a per-second discount and thereby change the planning horizon. M13.6 ran an eight-seed fresh replication of M13.5's unchanged dense-update versus sparse-update comparison on 4100–4319 partitions, with all eight dense candidates submitted before sparse nulls. Coverage and the scripted ceiling passed 160/160, all 4,000 development traces strictly replayed, and every dense candidate materially beat its paired sparse null and random control. Only seeds 20260820 and 20260823 passed every condition, however. The remaining six missed maintenance, survival/recovery, or safe-drive gates in at least one row, usually renewal/morphology or persistent-reference. Dense update therefore has a strong mean effect but is not a reproducible M13 baseline. Validation 4200–4219 and audit 4300–4319 remain unopened.
+**M13.6–M13.7 status: development/screen negative results.** An eight-seed cadence replication was not reproducible, and the later target-cadence screen rejected every candidate despite passing mechanics and replay. Their unscored later partitions remain unavailable; see the [learning index](M13_DQN_LEARNINGS.md).
 
-**M13.7 status: screen rejected, no confirmation run (2026-08-07).** The fresh two-seed, 4,000-episode target-cadence screen passed its mechanics ceiling and strict replay (342 artifacts), but neither faster hard-copy cadence promoted. At cadence 250, both seeds were rejected for pooled probe maintenance/survival regressions; cadence 100 regressed more strongly. The result is a cheap negative result, not a validation failure: confirmation development 4500–4539, validation 4600–4619, and audit 4700–4719 remain unopened.
+**M13.8 status: screen rejected.** Bounded cycles produced quota-then-WAIT,
+not maintenance (1/64 full objective); all replay checks passed. Only 4800–4827
+opened. Confirmation/audit `4900–5119` remain sealed and may never be repurposed.
+See the [learning index](M13_DQN_LEARNINGS.md) and [screen result](M13_8_SCREEN_RESULTS.md).
 
-**M13.8 status: screen rejected, no confirmation run (2026-08-07).** The
-fresh two-seed, 4,000-episode bounded-reward screen confirmed that uncapped
-cycle rewards can be farmed, but rejected the proposed remedy. The bounded
-candidate reduced feeds from roughly 28–36 to 8–13, yet it usually completed
-the `3/3/2` quota and then loitered: `WAIT` consumed roughly 51–66% of
-decisions in six of eight candidate condition cells. Across the fresh probe,
-it achieved 1/64 full-objective successes versus the contemporaneous legacy
-control's 40/64, with materially worse decision-safe (61.6% versus 88.8%) and
-duration-safe (63.4% versus 86.5%) occupancy. All 512 trace/replay checks
-passed, so this is a clean negative result rather than an implementation
-failure. M13.8's fit/probe partitions 4800–4827 are opened; its confirmation
-and audit partitions 4900–5119 remain unopened and may never be repurposed.
-M13.9 must use a fresh split family and test a different, duration-aware
-public-drive credit-assignment hypothesis.
+**M13.9 status: screen rejected.** The duration-aware public-drive potential,
+coverage, and replay mechanics passed, but both replicas exceeded the frozen
+unsafe-WAIT limit. Only 5200–5227 opened; `5300–5519` remain sealed. See the
+[learning index](M13_DQN_LEARNINGS.md) and [screen result](M13_9_SCREEN_RESULTS.md).
 
-**M13.9 status: screen rejected; no confirmation run (2026-08-08).**
-The frozen protocol now has additive reward/learner/replay code, 20 fresh
-layouts, targeted tests, screen/confirmation/audit commands, and a separate
-non-promotional fit-only smoke command. The smoke used six spawned one-thread
-workers for 96 training episodes plus 24 strict-replay screen-fit evaluations,
-completed in 1.528 seconds internally (1.75 seconds external wall time), and
-opened only the `screen_fit` marker in a separate smoke-only non-protocol
-ledger. The canonical M13.9 ledger remains unopened. This is plumbing evidence,
-not a score or promotion; probe `5220–5227` and every `5300–5519` partition
-remain unopened. The full screen replaces
-M13.8's static safety integral with a bounded
-semi-Markov potential difference over permitted public drives, while retaining
-capped `3/3/2` milestones. Its paired static-cost control isolates that change;
-a freshly trained legacy guardrail prevents promoting a merely less-bad bounded
-policy. The fail-fast stage is six parallel 2,000-episode fits (12,000 learned
-episodes total) on newly reserved 5200–5227 partitions. It promotes only if
-both replicas improve safety/full-objective success over the static control and
-remain non-inferior to the legacy guardrail; otherwise M13 RL pauses rather
-than tuning M13.9. The exact six-worker screen then completed in 193.28 seconds
-and rejected both replicas. All 688 traces replayed, and coverage/ceiling gates
-passed, so this is a clean negative result. Unsafe-WAIT fractions remained
-43.3% and 62.2% pooled, and every candidate condition exceeded the frozen 15%
-limit. Seed 20260911 also failed the static-improvement bundle; seed 20260912
-showed a strong static-control improvement but failed legacy non-inferiority.
-Only 5200–5227 opened. Confirmation and audit partitions 5300–5519 remain
-untouched. See [`M13_9_SCREEN_RESULTS.md`](M13_9_SCREEN_RESULTS.md).
-
-**M13.10 status: frozen negative result (2026-08-08).** The six-worker screen
-completed in 321.52 seconds; all 368 traces replayed and every mechanics/fit
-gate passed. Both imitation-only policies achieved 32/32 fresh-probe full
-success with roughly 99% decision safety and below 0.1% unsafe waiting.
-However, 2,000 episodes of identical Double-DQN fine-tuning erased the
-strategy: both imitation-warmstart replicas fell to 0/32 full success and were
-worse than random-init RL. This cleanly isolates RL retention, not public
-representation or reward recomposition, as the remaining blocker. Only
-5600–5627 opened; 5700–5919 remain sealed. See
-[`M13_10_SCREEN_RESULTS.md`](M13_10_SCREEN_RESULTS.md).
+**M13.10 status: frozen negative result.** Imitation-only policies generalized
+at 32/32, while matched DQN fine-tuning fell to 0/32. This isolates learner
+retention rather than representation or reward recomposition. Only 5600–5627
+opened; `5700–5919` remain sealed. See the [learning index](M13_DQN_LEARNINGS.md)
+and [result](M13_10_SCREEN_RESULTS.md). M13.11 is development-only on fresh
+6000–6039 data and is not a milestone promotion.
 
 ## M14 — Hybrid persistent-maintenance RL
 

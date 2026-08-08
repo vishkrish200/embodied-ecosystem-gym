@@ -618,6 +618,16 @@ LAYOUTS: dict[str, LayoutSpec] = {
     "m1310_audit_southeast": LayoutSpec(
         "m1310_audit_southeast", (-0.565, 0.375), (0.395, -0.795), (0.755, -0.435), (-0.635, -0.515), (0.705, 0.565)
     ),
+    # M13.11 is a development-only PPO/DQN comparison.  Its eight layouts are
+    # fresh against every earlier M10/M13 coordinate and split into fit/check.
+    "m1311_fit_northeast": LayoutSpec("m1311_fit_northeast", (-0.117, -0.193), (0.347, 0.271), (0.657, 0.581), (0.587, -0.439), (-0.487, 0.371)),
+    "m1311_fit_southwest": LayoutSpec("m1311_fit_southwest", (0.157, 0.243), (-0.573, -0.683), (-0.243, -0.353), (-0.463, 0.413), (0.587, -0.453)),
+    "m1311_fit_northwest": LayoutSpec("m1311_fit_northwest", (0.287, -0.253), (-0.673, 0.173), (-0.343, 0.513), (0.477, 0.423), (-0.517, -0.413)),
+    "m1311_fit_southeast": LayoutSpec("m1311_fit_southeast", (-0.247, 0.213), (0.233, -0.713), (0.623, -0.333), (-0.527, -0.403), (0.507, 0.403)),
+    "m1311_check_northeast": LayoutSpec("m1311_check_northeast", (-0.413, -0.293), (0.397, 0.307), (0.717, 0.647), (0.667, -0.423), (-0.697, 0.507)),
+    "m1311_check_southwest": LayoutSpec("m1311_check_southwest", (0.367, 0.347), (-0.783, -0.643), (-0.433, -0.263), (-0.703, 0.517), (0.677, -0.433)),
+    "m1311_check_northwest": LayoutSpec("m1311_check_northwest", (0.527, -0.273), (-0.803, 0.193), (-0.453, 0.643), (0.627, 0.537), (-0.667, -0.433)),
+    "m1311_check_southeast": LayoutSpec("m1311_check_southeast", (-0.593, 0.367), (0.327, -0.773), (0.687, -0.413), (-0.677, -0.473), (0.637, 0.547)),
 }
 
 TASKS: dict[str, TaskSpec] = {
