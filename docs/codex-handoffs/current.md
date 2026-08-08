@@ -122,6 +122,14 @@ task. Do not start another behavior-cloning or RGB policy variant first.
    isolate imitation initialization from matched random initialization under a
    common screen-aligned exploration schedule. Do not run confirmation, retry
    M13.9, or tune against its probe.
+   M13.10 then ran that exact successor screen in 321.52 seconds with six
+   spawned one-thread workers. All 368 traces replayed. Both imitation-only
+   replicas generalized at 32/32 full success, roughly 99% decision safety,
+   and below 0.1% unsafe waiting. Double-DQN fine-tuning catastrophically
+   forgot the policy: both warm-start replicas scored 0/32 full success and
+   underperformed random-init RL. Preserve this as another clean negative
+   result. Only 5600–5627 opened; 5700–5919 remain sealed. Do not run M13.10
+   confirmation or tune a retention method against the opened probe.
 8. Only after a state-RL baseline passes should M14 hybrid RL and M15 RGB
    persistent maintenance proceed with the
    same task and policy objective.

@@ -194,17 +194,16 @@ showed a strong static-control improvement but failed legacy non-inferiority.
 Only 5200–5227 opened. Confirmation and audit partitions 5300–5519 remain
 untouched. See [`M13_9_SCREEN_RESULTS.md`](M13_9_SCREEN_RESULTS.md).
 
-**M13.10 status: protocol frozen; no split opened (2026-08-08).** Read-only
-M13.9 trace analysis showed that unsafe waits had negative immediate reward but
-positive learned Q margins, while the 2,000-episode fits retained 78.9–100%
-exploration under the inherited 9,000-episode decay. Five public-feature
-imitation diagnostics each achieved 80/80 full success on screen-fit cells,
-showing that representation is not the blocker. M13.10 therefore freezes a
-fresh 5600–5919 imitation-initialized RL experiment with matched random-init RL
-and imitation-only guardrails. It changes initialization and a common
-screen-aligned exploration schedule, not reward, environment, public inputs,
-mask, macros, or duration-aware backup. See
-[`M13_10_PROTOCOL.md`](M13_10_PROTOCOL.md).
+**M13.10 status: frozen negative result (2026-08-08).** The six-worker screen
+completed in 321.52 seconds; all 368 traces replayed and every mechanics/fit
+gate passed. Both imitation-only policies achieved 32/32 fresh-probe full
+success with roughly 99% decision safety and below 0.1% unsafe waiting.
+However, 2,000 episodes of identical Double-DQN fine-tuning erased the
+strategy: both imitation-warmstart replicas fell to 0/32 full success and were
+worse than random-init RL. This cleanly isolates RL retention, not public
+representation or reward recomposition, as the remaining blocker. Only
+5600–5627 opened; 5700–5919 remain sealed. See
+[`M13_10_SCREEN_RESULTS.md`](M13_10_SCREEN_RESULTS.md).
 
 ## M14 — Hybrid persistent-maintenance RL
 
