@@ -164,8 +164,20 @@ unsafe-WAIT limit. Only 5200–5227 opened; `5300–5519` remain sealed. See the
 at 32/32, while matched DQN fine-tuning fell to 0/32. This isolates learner
 retention rather than representation or reward recomposition. Only 5600–5627
 opened; `5700–5919` remain sealed. See the [learning index](M13_DQN_LEARNINGS.md)
-and [result](M13_10_SCREEN_RESULTS.md). M13.11 is development-only on fresh
-6000–6039 data and is not a milestone promotion.
+and [result](M13_10_SCREEN_RESULTS.md). The original M13.11 result on
+6000–6039 is invalid implementation-failure evidence: its PPO actor gradient
+was reversed and its declared rollout flushed at each episode.
+
+**M13.11-r2 status: development negative result (2026-08-08).** The additive
+correctness rerun fixed the actor-gradient sign and accumulated terminal rows
+inside 2,048-transition rollouts, retaining the original boundary, reward,
+hyperparameters, DQN control, and 400,000-decision budget. On fresh 6040–6079
+layouts/seeds, corrected PPO reached 33/320 full-objective episodes but failed
+replica stability: its four seed totals were 0/80, 3/80, 20/80, and 10/80.
+The unchanged DQN control reached 9/320. All 640 serialized-policy traces
+strictly replayed. The r2 fit/check ledger is now opened; screen, confirmation,
+and audit remain unopened, and 6080–6099 remain unused. This is a clean
+negative for corrected PPO, not a promotion or authorization for M14/M15.
 
 ## M14 — Hybrid persistent-maintenance RL
 
