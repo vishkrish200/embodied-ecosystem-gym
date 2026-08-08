@@ -46,6 +46,7 @@ from .m139 import (
     write_m139_fit_smoke_report,
     write_m139_screen_report,
 )
+from .m1310 import write_m1310_screen_report
 from ..policies import evaluate_scripted_policy
 from ..video import write_find_and_eat_regression_video
 
@@ -187,6 +188,10 @@ def main(argv: list[str] | None = None) -> None:
     )
     m139_audit.add_argument("--confirmation-report", type=Path, required=True)
     m139_audit.add_argument("--output", type=Path, required=True)
+    m1310_screen = subparsers.add_parser(
+        "m1310-screen", help="run the frozen M13.10 imitation-initialized RL screen"
+    )
+    m1310_screen.add_argument("--output", type=Path, required=True)
     args = parser.parse_args(argv)
     if args.command == "evaluate":
         result = evaluate_scripted_policy(trajectory_dir=args.trajectory_dir)
@@ -347,6 +352,9 @@ def main(argv: list[str] | None = None) -> None:
     elif args.command == "m139-audit":
         report = write_m139_audit_report(args.output, confirmation_report=args.confirmation_report)
         print(json.dumps(report["audit_result"]))
+    elif args.command == "m1310-screen":
+        report = write_m1310_screen_report(args.output)
+        print(json.dumps(report["screen"]))
 
 
 if __name__ == "__main__":

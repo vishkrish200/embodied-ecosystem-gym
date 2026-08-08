@@ -188,11 +188,23 @@ remain non-inferior to the legacy guardrail; otherwise M13 RL pauses rather
 than tuning M13.9. The exact six-worker screen then completed in 193.28 seconds
 and rejected both replicas. All 688 traces replayed, and coverage/ceiling gates
 passed, so this is a clean negative result. Unsafe-WAIT fractions remained
-43.3% and 62.2% pooled, and every candidate condition exceeded the frozen 10%
+43.3% and 62.2% pooled, and every candidate condition exceeded the frozen 15%
 limit. Seed 20260911 also failed the static-improvement bundle; seed 20260912
 showed a strong static-control improvement but failed legacy non-inferiority.
 Only 5200–5227 opened. Confirmation and audit partitions 5300–5519 remain
 untouched. See [`M13_9_SCREEN_RESULTS.md`](M13_9_SCREEN_RESULTS.md).
+
+**M13.10 status: protocol frozen; no split opened (2026-08-08).** Read-only
+M13.9 trace analysis showed that unsafe waits had negative immediate reward but
+positive learned Q margins, while the 2,000-episode fits retained 78.9–100%
+exploration under the inherited 9,000-episode decay. Five public-feature
+imitation diagnostics each achieved 80/80 full success on screen-fit cells,
+showing that representation is not the blocker. M13.10 therefore freezes a
+fresh 5600–5919 imitation-initialized RL experiment with matched random-init RL
+and imitation-only guardrails. It changes initialization and a common
+screen-aligned exploration schedule, not reward, environment, public inputs,
+mask, macros, or duration-aware backup. See
+[`M13_10_PROTOCOL.md`](M13_10_PROTOCOL.md).
 
 ## M14 — Hybrid persistent-maintenance RL
 

@@ -556,6 +556,68 @@ LAYOUTS: dict[str, LayoutSpec] = {
         (-0.644, -0.502),
         (0.696, 0.578),
     ),
+    # M13.10 tests imitation-initialized RL on a fresh split family.  Every
+    # tuple and every constituent point is disjoint from M10--M13.9.
+    "m1310_screen_northeast": LayoutSpec(
+        "m1310_screen_northeast", (-0.095, -0.211), (0.335, 0.189), (0.635, 0.539), (0.565, -0.461), (-0.465, 0.359)
+    ),
+    "m1310_screen_southwest": LayoutSpec(
+        "m1310_screen_southwest", (0.145, 0.169), (-0.545, -0.701), (-0.205, -0.321), (-0.475, 0.379), (0.575, -0.481)
+    ),
+    "m1310_screen_northwest": LayoutSpec(
+        "m1310_screen_northwest", (0.275, -0.221), (-0.655, 0.149), (-0.315, 0.489), (0.455, 0.399), (-0.495, -0.401)
+    ),
+    "m1310_screen_southeast": LayoutSpec(
+        "m1310_screen_southeast", (-0.225, 0.179), (0.205, -0.711), (0.595, -0.371), (-0.505, -0.391), (0.465, 0.389)
+    ),
+    "m1310_probe_northeast": LayoutSpec(
+        "m1310_probe_northeast", (-0.391, -0.271), (0.379, 0.299), (0.699, 0.639), (0.649, -0.431), (-0.681, 0.499)
+    ),
+    "m1310_probe_southwest": LayoutSpec(
+        "m1310_probe_southwest", (0.349, 0.329), (-0.771, -0.631), (-0.421, -0.251), (-0.691, 0.509), (0.659, -0.441)
+    ),
+    "m1310_probe_northwest": LayoutSpec(
+        "m1310_probe_northwest", (0.509, -0.291), (-0.791, 0.179), (-0.441, 0.629), (0.609, 0.519), (-0.651, -0.451)
+    ),
+    "m1310_probe_southeast": LayoutSpec(
+        "m1310_probe_southeast", (-0.571, 0.349), (0.309, -0.751), (0.669, -0.391), (-0.661, -0.461), (0.619, 0.529)
+    ),
+    "m1310_confirm_fit_northeast": LayoutSpec(
+        "m1310_confirm_fit_northeast", (-0.055, -0.207), (0.315, 0.253), (0.615, 0.613), (0.555, -0.457), (-0.435, 0.433)
+    ),
+    "m1310_confirm_fit_southwest": LayoutSpec(
+        "m1310_confirm_fit_southwest", (0.125, 0.253), (-0.555, -0.687), (-0.215, -0.307), (-0.445, 0.453), (0.565, -0.467)
+    ),
+    "m1310_confirm_fit_northwest": LayoutSpec(
+        "m1310_confirm_fit_northwest", (0.305, -0.207), (-0.675, 0.213), (-0.335, 0.563), (0.485, 0.473), (-0.505, -0.387)
+    ),
+    "m1310_confirm_fit_southeast": LayoutSpec(
+        "m1310_confirm_fit_southeast", (-0.235, 0.253), (0.245, -0.697), (0.625, -0.347), (-0.515, -0.377), (0.495, 0.463)
+    ),
+    "m1310_confirm_eval_northeast": LayoutSpec(
+        "m1310_confirm_eval_northeast", (-0.461, -0.371), (0.399, 0.299), (0.729, 0.639), (0.679, -0.521), (-0.711, 0.499)
+    ),
+    "m1310_confirm_eval_southwest": LayoutSpec(
+        "m1310_confirm_eval_southwest", (0.419, 0.329), (-0.801, -0.721), (-0.451, -0.341), (-0.721, 0.509), (0.689, -0.531)
+    ),
+    "m1310_confirm_eval_northwest": LayoutSpec(
+        "m1310_confirm_eval_northwest", (0.559, -0.381), (-0.821, 0.119), (-0.471, 0.619), (0.639, 0.519), (-0.681, -0.541)
+    ),
+    "m1310_confirm_eval_southeast": LayoutSpec(
+        "m1310_confirm_eval_southeast", (-0.621, 0.339), (0.339, -0.831), (0.699, -0.471), (-0.691, -0.551), (0.649, 0.529)
+    ),
+    "m1310_audit_northeast": LayoutSpec(
+        "m1310_audit_northeast", (-0.405, -0.335), (0.455, 0.335), (0.785, 0.675), (0.735, -0.485), (-0.655, 0.535)
+    ),
+    "m1310_audit_southwest": LayoutSpec(
+        "m1310_audit_southwest", (0.475, 0.365), (-0.745, -0.685), (-0.395, -0.305), (-0.665, 0.545), (0.745, -0.495)
+    ),
+    "m1310_audit_northwest": LayoutSpec(
+        "m1310_audit_northwest", (0.615, -0.345), (-0.763, 0.157), (-0.415, 0.655), (0.695, 0.555), (-0.625, -0.505)
+    ),
+    "m1310_audit_southeast": LayoutSpec(
+        "m1310_audit_southeast", (-0.565, 0.375), (0.395, -0.795), (0.755, -0.435), (-0.635, -0.515), (0.705, 0.565)
+    ),
 }
 
 TASKS: dict[str, TaskSpec] = {

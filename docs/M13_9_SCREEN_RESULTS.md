@@ -32,7 +32,7 @@ It is a clean negative result, not an implementation failure.
 | 20260912 | 93.8% | 93.8% | 56.2% | 87.2% | 87.4% | 43.3% | reject |
 
 Neither replica passed every per-condition gate. In particular, every
-candidate condition in both replicas exceeded the frozen 10% unsafe-WAIT
+candidate condition in both replicas exceeded the frozen 15% screen unsafe-WAIT
 limit. Seed `20260911` also failed compound maintenance, persistent-reference
 safety, and the static-control improvement bundle. Seed `20260912` failed
 persistent-reference survival and legacy non-inferiority: its pooled
@@ -44,7 +44,7 @@ its static-cost control: full-objective success increased from 0% to 56.2%,
 decision-safe occupancy by 11.0 points, duration-safe occupancy by 10.0 points,
 and unsafe-WAIT fraction improved by 17.3 points. But the protocol requires
 both replicas to pass every rule, and seed `20260911` did not reproduce that
-effect. The remaining unsafe-WAIT rates are also far above the declared limit.
+effect. The remaining unsafe-WAIT rates are also above the declared screen limit.
 
 ## Split state and conclusion
 
@@ -57,3 +57,7 @@ is justified.
 
 The full ignored report is at `artifacts/reports/m139-screen.json`; its content
 hash is `7d3e38d2bba8975c0abb7eed99b5f2eb4a40f21fb2820ff7782c40b788dc08ed`.
+
+See [`M13_9_FAILURE_ANALYSIS.md`](M13_9_FAILURE_ANALYSIS.md) for the read-only
+trace diagnosis and the evidence that the public network can represent the
+oracle strategy.

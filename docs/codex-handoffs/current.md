@@ -109,11 +109,19 @@ task. Do not start another behavior-cloning or RGB policy variant first.
    The subsequently authorized exact screen completed in 193.28 seconds using
    six spawned one-thread workers. Preflight and probe mechanics passed and all
    688 traces replayed, but both candidate replicas rejected. Unsafe-WAIT was
-   62.2% and 43.3% pooled and every condition exceeded the frozen 10% limit;
+   62.2% and 43.3% pooled and every condition exceeded the frozen 15% screen limit;
    seed 20260911 also failed static improvement, while seed 20260912 failed
    legacy non-inferiority despite a strong static-control effect. Preserve this
    as a clean negative result. Only canonical 5200–5227 opened; 5300–5519 remain
-   sealed. Do not run confirmation, retry the screen, or tune against the probe.
+   sealed. Read-only trace diagnosis found that unsafe `WAIT` had negative
+   immediate reward but a positive learned Q-margin, while the inherited
+   9,000-episode epsilon decay left the 2,000-episode fits at 78.9% exploration.
+   Five non-promotional oracle-imitation diagnostics using only screen-fit data
+   each achieved 80/80 full success with at most 0.08% unsafe waiting, showing
+   the public representation is sufficient. The next frozen successor should
+   isolate imitation initialization from matched random initialization under a
+   common screen-aligned exploration schedule. Do not run confirmation, retry
+   M13.9, or tune against its probe.
 8. Only after a state-RL baseline passes should M14 hybrid RL and M15 RGB
    persistent maintenance proceed with the
    same task and policy objective.
