@@ -1,6 +1,6 @@
 # M13.9 implementation and fit-only smoke
 
-Status: **implementation complete; full screen not launched**
+Status: **implementation complete; screen rejected; confirmation not launched**
 
 The frozen `m13.9-public-drive-potential-r1` protocol now has additive code,
 layouts, tests, and CLI entry points. M13.8 remains unchanged as a negative
@@ -71,6 +71,6 @@ ineligible for protocol use.
 - This result validates execution/reward/replay plumbing only. It makes no
   score, promotion, or policy-quality claim.
 
-Next action: review the implementation and smoke artifacts. Launch the exact
-full M13.9 screen only under a separate explicit instruction; do not infer a
-success claim from this smoke.
+The subsequently authorized full screen rejected both replicas under the
+frozen all-replicas rule. See [`M13_9_SCREEN_RESULTS.md`](M13_9_SCREEN_RESULTS.md).
+Confirmation and audit remain sealed; do not rerun or tune against the probe.

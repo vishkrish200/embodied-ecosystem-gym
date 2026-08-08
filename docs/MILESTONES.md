@@ -167,7 +167,7 @@ and audit partitions 4900–5119 remain unopened and may never be repurposed.
 M13.9 must use a fresh split family and test a different, duration-aware
 public-drive credit-assignment hypothesis.
 
-**M13.9 status: implementation complete; full screen not launched (2026-08-08).**
+**M13.9 status: screen rejected; no confirmation run (2026-08-08).**
 The frozen protocol now has additive reward/learner/replay code, 20 fresh
 layouts, targeted tests, screen/confirmation/audit commands, and a separate
 non-promotional fit-only smoke command. The smoke used six spawned one-thread
@@ -185,9 +185,14 @@ policy. The fail-fast stage is six parallel 2,000-episode fits (12,000 learned
 episodes total) on newly reserved 5200–5227 partitions. It promotes only if
 both replicas improve safety/full-objective success over the static control and
 remain non-inferior to the legacy guardrail; otherwise M13 RL pauses rather
-than tuning M13.9. Confirmation and audit partitions 5300–5519 are untouched.
-See [`M13_9_IMPLEMENTATION.md`](M13_9_IMPLEMENTATION.md) for the exact smoke
-boundary.
+than tuning M13.9. The exact six-worker screen then completed in 193.28 seconds
+and rejected both replicas. All 688 traces replayed, and coverage/ceiling gates
+passed, so this is a clean negative result. Unsafe-WAIT fractions remained
+43.3% and 62.2% pooled, and every candidate condition exceeded the frozen 10%
+limit. Seed 20260911 also failed the static-improvement bundle; seed 20260912
+showed a strong static-control improvement but failed legacy non-inferiority.
+Only 5200–5227 opened. Confirmation and audit partitions 5300–5519 remain
+untouched. See [`M13_9_SCREEN_RESULTS.md`](M13_9_SCREEN_RESULTS.md).
 
 ## M14 — Hybrid persistent-maintenance RL
 

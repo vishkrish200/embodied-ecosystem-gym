@@ -2,7 +2,7 @@
 
 Updated: 2026-08-08
 Repo/path: `/Users/vishnukrishnan/Developer/embodied-ecosystem-gym`
-Branch/worktree: M13.9 implementation worktree based exactly on `main` commit `2e2b45b`; implementation and fit-only smoke are complete, full screen has not run.
+Branch/worktree: `codex/m139-public-drive-potential`; M13.9 implementation commit `f9585e2`, followed by a completed rejected screen.
 
 ## Current Goal
 
@@ -105,10 +105,15 @@ task. Do not start another behavior-cloning or RGB policy variant first.
    workers. The fixed non-protocol smoke completed in 1.528 seconds internally
    (1.75 seconds external wall time) using 96 training and 24 evaluation
    episodes from screen-fit data only. Its separate smoke ledger contains only
-   `screen_fit`; the canonical protocol ledger is pristine. Probe 5220–5227 and
-   all 5300–5519 ranges remain unopened. The smoke is non-promotional and its
-   policies are ineligible. Review `docs/M13_9_IMPLEMENTATION.md`; do not launch
-   the full screen without a new explicit instruction.
+   `screen_fit`; the smoke was non-promotional and its policies are ineligible.
+   The subsequently authorized exact screen completed in 193.28 seconds using
+   six spawned one-thread workers. Preflight and probe mechanics passed and all
+   688 traces replayed, but both candidate replicas rejected. Unsafe-WAIT was
+   62.2% and 43.3% pooled and every condition exceeded the frozen 10% limit;
+   seed 20260911 also failed static improvement, while seed 20260912 failed
+   legacy non-inferiority despite a strong static-control effect. Preserve this
+   as a clean negative result. Only canonical 5200–5227 opened; 5300–5519 remain
+   sealed. Do not run confirmation, retry the screen, or tune against the probe.
 8. Only after a state-RL baseline passes should M14 hybrid RL and M15 RGB
    persistent maintenance proceed with the
    same task and policy objective.
