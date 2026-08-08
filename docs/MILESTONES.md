@@ -167,8 +167,17 @@ and audit partitions 4900–5119 remain unopened and may never be repurposed.
 M13.9 must use a fresh split family and test a different, duration-aware
 public-drive credit-assignment hypothesis.
 
-**M13.9 status: protocol frozen; no split opened (2026-08-07).** The next
-screen replaces M13.8's static safety integral with a bounded
+**M13.9 status: implementation complete; full screen not launched (2026-08-08).**
+The frozen protocol now has additive reward/learner/replay code, 20 fresh
+layouts, targeted tests, screen/confirmation/audit commands, and a separate
+non-promotional fit-only smoke command. The smoke used six spawned one-thread
+workers for 96 training episodes plus 24 strict-replay screen-fit evaluations,
+completed in 1.528 seconds internally (1.75 seconds external wall time), and
+opened only the `screen_fit` marker in a separate smoke-only non-protocol
+ledger. The canonical M13.9 ledger remains unopened. This is plumbing evidence,
+not a score or promotion; probe `5220–5227` and every `5300–5519` partition
+remain unopened. The full screen replaces
+M13.8's static safety integral with a bounded
 semi-Markov potential difference over permitted public drives, while retaining
 capped `3/3/2` milestones. Its paired static-cost control isolates that change;
 a freshly trained legacy guardrail prevents promoting a merely less-bad bounded
@@ -177,6 +186,8 @@ episodes total) on newly reserved 5200–5227 partitions. It promotes only if
 both replicas improve safety/full-objective success over the static control and
 remain non-inferior to the legacy guardrail; otherwise M13 RL pauses rather
 than tuning M13.9. Confirmation and audit partitions 5300–5519 are untouched.
+See [`M13_9_IMPLEMENTATION.md`](M13_9_IMPLEMENTATION.md) for the exact smoke
+boundary.
 
 ## M14 — Hybrid persistent-maintenance RL
 

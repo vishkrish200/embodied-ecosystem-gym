@@ -1,8 +1,8 @@
 # Codex Handoff: M13 persistent-maintenance RL reset
 
-Updated: 2026-08-07
+Updated: 2026-08-08
 Repo/path: `/Users/vishnukrishnan/Developer/embodied-ecosystem-gym`
-Branch/worktree: `main` with committed M8–M13.8 history and a frozen M13.9 protocol; implementation has not started.
+Branch/worktree: M13.9 implementation worktree based exactly on `main` commit `2e2b45b`; implementation and fit-only smoke are complete, full screen has not run.
 
 ## Current Goal
 
@@ -99,7 +99,17 @@ task. Do not start another behavior-cloning or RGB policy variant first.
    4900–5119 remain sealed and must not be reused. Do not tweak M13.8
    coefficients. The next permitted experiment is M13.9's newly documented
    public-drive potential, using a new split family.
-7. Only after a state-RL baseline passes should M14 hybrid RL and M15 RGB
+7. M13.9 is implemented additively with fresh 5200+ layouts, three screen
+   arms, duration-aware Double-DQN in every arm, strict replay, quota-then-wait
+   preflight, guarded confirmation/audit, and six spawned one-thread screen
+   workers. The fixed non-protocol smoke completed in 1.528 seconds internally
+   (1.75 seconds external wall time) using 96 training and 24 evaluation
+   episodes from screen-fit data only. Its separate smoke ledger contains only
+   `screen_fit`; the canonical protocol ledger is pristine. Probe 5220–5227 and
+   all 5300–5519 ranges remain unopened. The smoke is non-promotional and its
+   policies are ineligible. Review `docs/M13_9_IMPLEMENTATION.md`; do not launch
+   the full screen without a new explicit instruction.
+8. Only after a state-RL baseline passes should M14 hybrid RL and M15 RGB
    persistent maintenance proceed with the
    same task and policy objective.
 

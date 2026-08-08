@@ -40,6 +40,12 @@ from .m135 import write_m135_training_report
 from .m136 import write_m136_training_report
 from .m137 import write_m137_training_report
 from .m138 import write_m138_confirmation_report, write_m138_screen_report
+from .m139 import (
+    write_m139_audit_report,
+    write_m139_confirmation_report,
+    write_m139_fit_smoke_report,
+    write_m139_screen_report,
+)
 from ..policies import evaluate_scripted_policy
 from ..video import write_find_and_eat_regression_video
 
@@ -165,6 +171,22 @@ def main(argv: list[str] | None = None) -> None:
     m138_confirm = subparsers.add_parser("m138-confirm", help="run M13.8 confirmation after a promoted screen")
     m138_confirm.add_argument("--screen-report", type=Path, required=True)
     m138_confirm.add_argument("--output", type=Path, required=True)
+    m139_smoke = subparsers.add_parser(
+        "m139-fit-smoke", help="run the non-protocol M13.9 fit-only plumbing smoke"
+    )
+    m139_smoke.add_argument("--output", type=Path, required=True)
+    m139_screen = subparsers.add_parser("m139-screen", help="run the frozen fail-fast M13.9 potential screen")
+    m139_screen.add_argument("--output", type=Path, required=True)
+    m139_confirm = subparsers.add_parser(
+        "m139-confirm", help="run M13.9 confirmation after an authentic promotion"
+    )
+    m139_confirm.add_argument("--screen-report", type=Path, required=True)
+    m139_confirm.add_argument("--output", type=Path, required=True)
+    m139_audit = subparsers.add_parser(
+        "m139-audit", help="run the one-shot sealed M13.9 audit after confirmation"
+    )
+    m139_audit.add_argument("--confirmation-report", type=Path, required=True)
+    m139_audit.add_argument("--output", type=Path, required=True)
     args = parser.parse_args(argv)
     if args.command == "evaluate":
         result = evaluate_scripted_policy(trajectory_dir=args.trajectory_dir)
@@ -305,6 +327,26 @@ def main(argv: list[str] | None = None) -> None:
     elif args.command == "m138-confirm":
         report = write_m138_confirmation_report(args.output, screen_report=args.screen_report)
         print(json.dumps(report["confirmation"]))
+    elif args.command == "m139-fit-smoke":
+        report = write_m139_fit_smoke_report(args.output)
+        print(
+            json.dumps(
+                {
+                    "label": report["label"],
+                    "elapsed_seconds": report["elapsed_seconds"],
+                    "replay_pass": report["replay_pass"],
+                }
+            )
+        )
+    elif args.command == "m139-screen":
+        report = write_m139_screen_report(args.output)
+        print(json.dumps(report["screen"]))
+    elif args.command == "m139-confirm":
+        report = write_m139_confirmation_report(args.output, screen_report=args.screen_report)
+        print(json.dumps(report["confirmation"]))
+    elif args.command == "m139-audit":
+        report = write_m139_audit_report(args.output, confirmation_report=args.confirmation_report)
+        print(json.dumps(report["audit_result"]))
 
 
 if __name__ == "__main__":
