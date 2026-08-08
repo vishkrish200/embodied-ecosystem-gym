@@ -628,6 +628,15 @@ LAYOUTS: dict[str, LayoutSpec] = {
     "m1311_check_southwest": LayoutSpec("m1311_check_southwest", (0.367, 0.347), (-0.783, -0.643), (-0.433, -0.263), (-0.703, 0.517), (0.677, -0.433)),
     "m1311_check_northwest": LayoutSpec("m1311_check_northwest", (0.527, -0.273), (-0.803, 0.193), (-0.453, 0.643), (0.627, 0.537), (-0.667, -0.433)),
     "m1311_check_southeast": LayoutSpec("m1311_check_southeast", (-0.593, 0.367), (0.327, -0.773), (0.687, -0.413), (-0.677, -0.473), (0.637, 0.547)),
+    # M13.11-r2 retains M13.11's mechanics but owns fresh fit/check geometry.
+    "m1311r2_fit_northeast": LayoutSpec("m1311r2_fit_northeast", (-0.131, -0.211), (0.361, 0.289), (0.681, 0.609), (0.611, -0.421), (-0.461, 0.389)),
+    "m1311r2_fit_southwest": LayoutSpec("m1311r2_fit_southwest", (0.181, 0.267), (-0.601, -0.711), (-0.271, -0.381), (-0.491, 0.441), (0.611, -0.481)),
+    "m1311r2_fit_northwest": LayoutSpec("m1311r2_fit_northwest", (0.311, -0.281), (-0.701, 0.201), (-0.371, 0.541), (0.501, 0.451), (-0.541, -0.441)),
+    "m1311r2_fit_southeast": LayoutSpec("m1311r2_fit_southeast", (-0.271, 0.241), (0.261, -0.741), (0.651, -0.361), (-0.551, -0.431), (0.531, 0.431)),
+    "m1311r2_check_northeast": LayoutSpec("m1311r2_check_northeast", (-0.439, -0.321), (0.421, 0.331), (0.751, 0.671), (0.701, -0.451), (-0.671, 0.531)),
+    "m1311r2_check_southwest": LayoutSpec("m1311r2_check_southwest", (0.391, 0.371), (-0.811, -0.671), (-0.461, -0.291), (-0.731, 0.541), (0.701, -0.461)),
+    "m1311r2_check_northwest": LayoutSpec("m1311r2_check_northwest", (0.551, -0.301), (-0.831, 0.221), (-0.481, 0.671), (0.651, 0.561), (-0.691, -0.461)),
+    "m1311r2_check_southeast": LayoutSpec("m1311r2_check_southeast", (-0.621, 0.391), (0.361, -0.801), (0.721, -0.441), (-0.701, -0.501), (0.661, 0.571)),
 }
 
 TASKS: dict[str, TaskSpec] = {
