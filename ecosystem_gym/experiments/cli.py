@@ -50,6 +50,11 @@ from .m1310 import write_m1310_screen_report
 from .m1311 import write_m1311_development_report, write_m1311_fit_smoke_report
 from .m1311r2 import write_m1311r2_development_report, write_m1311r2_fit_smoke_report
 from .m1312 import write_m1312_development_report, write_m1312_fit_smoke_report
+from .m1313 import (
+    write_m1313_audit_report,
+    write_m1313_confirmation_report,
+    write_m1313_development_report,
+)
 from ..policies import evaluate_scripted_policy
 from ..video import write_find_and_eat_regression_video
 
@@ -207,6 +212,17 @@ def main(argv: list[str] | None = None) -> None:
     m1312_smoke.add_argument("--output", type=Path, required=True)
     m1312_development = subparsers.add_parser("m1312-development", help="run the frozen M13.12 paired PPO learning-rate comparison")
     m1312_development.add_argument("--output", type=Path, required=True)
+    m1313_development = subparsers.add_parser("m1313-development", help="run the frozen M13.13 independent policy-family development comparisons")
+    m1313_development.add_argument("--manifest", type=Path, required=True)
+    m1313_development.add_argument("--output", type=Path, required=True)
+    m1313_confirmation = subparsers.add_parser("m1313-confirmation", help="confirm only independently promoted M13.13 policy families")
+    m1313_confirmation.add_argument("--manifest", type=Path, required=True)
+    m1313_confirmation.add_argument("--development-report", type=Path, required=True)
+    m1313_confirmation.add_argument("--output", type=Path, required=True)
+    m1313_audit = subparsers.add_parser("m1313-audit", help="audit confirmed M13.13 policy families once without refitting")
+    m1313_audit.add_argument("--manifest", type=Path, required=True)
+    m1313_audit.add_argument("--confirmation-report", type=Path, required=True)
+    m1313_audit.add_argument("--output", type=Path, required=True)
     args = parser.parse_args(argv)
     if args.command == "evaluate":
         result = evaluate_scripted_policy(trajectory_dir=args.trajectory_dir)
@@ -388,6 +404,23 @@ def main(argv: list[str] | None = None) -> None:
     elif args.command == "m1312-development":
         report = write_m1312_development_report(args.output)
         print(json.dumps({"label": report["label"], "elapsed_seconds": report["elapsed_seconds"], "strict_replay_count": report["strict_replay_count"], "gate": report["gate"]}))
+    elif args.command == "m1313-development":
+        report = write_m1313_development_report(args.output, manifest_path=args.manifest)
+        print(json.dumps({"stage": report["stage"], "strict_replay_count": report["strict_replay_count"], "gate": report["gate"]}))
+    elif args.command == "m1313-confirmation":
+        report = write_m1313_confirmation_report(
+            args.output,
+            manifest_path=args.manifest,
+            development_report_path=args.development_report,
+        )
+        print(json.dumps({"stage": report["stage"], "strict_replay_count": report["strict_replay_count"], "gate": report["gate"]}))
+    elif args.command == "m1313-audit":
+        report = write_m1313_audit_report(
+            args.output,
+            manifest_path=args.manifest,
+            confirmation_report_path=args.confirmation_report,
+        )
+        print(json.dumps({"stage": report["stage"], "strict_replay_count": report["strict_replay_count"], "gate": report["gate"]}))
 
 
 if __name__ == "__main__":

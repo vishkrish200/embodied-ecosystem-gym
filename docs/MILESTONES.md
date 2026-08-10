@@ -188,6 +188,15 @@ traces strictly replayed. This is not a promotion: stop without a screen,
 confirmation, audit, M14, or M15. See the [frozen protocol](M13_12_DEVELOPMENT_PROTOCOL.md)
 and [result](M13_12_DEVELOPMENT_RESULTS.md).
 
+**M13.13 status: implemented and unopened (2026-08-10).** Three additive
+public-state policy families now isolate commitment, short-horizon planning,
+and a deterministic supervisor around byte-identical learned actors. Their
+fresh 6200--6519 partitions, one-factor controls, budgets, independent gates,
+manifest, ledger, and future commands are frozen in the
+[M13.13 protocol](M13_13_POLICY_FAMILIES_PROTOCOL.md). No M13.13 manifest,
+partition, fit, episode, comparison, confirmation, or audit has been run; each
+experimental stage requires separate explicit authorization.
+
 ## M14 — Hybrid persistent-maintenance RL
 
 Hold M13's task, action interface, reward, and long-horizon evaluation fixed while replacing privileged object coordinates with the existing hybrid observation boundary. Train a policy that receives RGB, drives, holding state, prior outcome, and non-privileged visual detections only. Its purpose is to isolate whether the maintenance RL policy fails because of planning or because of perception.

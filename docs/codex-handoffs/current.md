@@ -1,131 +1,149 @@
-# Codex Handoff: Alternative persistent-maintenance policies
+# Codex Handoff: M13.13 persistent-maintenance policy families
 
 Updated: 2026-08-10
-Repo/path: `/Users/vishnukrishnan/.codex/worktrees/dfab/embodied-ecosystem-gym`
-Branch/worktree: `codex/m1312-ppo-lr`; implementation commit `a7ceb9b`, result commit `06937d4`
+Repo/path: `/Users/vishnukrishnan/.codex/worktrees/f890/embodied-ecosystem-gym`
+Branch: `codex/m1313-policy-families`
+Base: `eafeb8a` (the M13.12 durable-handoff commit)
 
-## Current Goal
+## Outcome
 
-- Plan and implement several genuinely different persistent-maintenance policy
-  families that could succeed where random-initialized DQN/PPO was unstable.
-- Implement code, unit/numerical tests, frozen protocol documents, CLIs, and
-  future run manifests as appropriate.
-- Do **not** run training, fit smokes, canonical development comparisons,
-  screens, confirmations, audits, or new evaluation episodes in this task.
+M13.13 is implemented, documented, and verified, but deliberately unopened.
+No M13.13 manifest, split ledger, training artifact, episode, trace, comparison,
+confirmation, or audit was created or run.
 
-## Current State
+Three causally different policy families now share the existing public
+30-feature observation/eight-action contract:
 
-- The policy boundary is sufficient: 30 public features, eight maintenance
-  macros, complementary geometry mask, and policy-owned memory.
-- The public scripted oracle in `ecosystem_gym/experiments/m13.py` uses a simple
-  continuous drive scheduler: consume held food; rest at energy `<=.45`; feed
-  when cooldown is ready and satiety `<=.55`; play at boredom `>=.60`; otherwise
-  wait. It is a mechanics ceiling, not a learned result.
-- M13.10 imitation-only `30 -> 64 -> 64 -> 8` policies generalized at 32/32 per
-  seed using only the same public boundary. Subsequent Double-DQN fine-tuning
-  destroyed the policy. Representation and expressivity are therefore not the
-  main unresolved issue; discovery and retention are.
-- M13.11-r1 was implementation-invalid. M13.11-r2 corrected the actor-gradient
-  sign and multi-episode 2,048-row rollout, then failed stability at `33/320`
-  versus DQN `9/320` on 6040--6079.
-- M13.12 compared corrected PPO `3e-4` versus `1e-3` on fresh 6100--6139. The
-  higher-rate candidate scored `73,80,26,0` (`179/320`) versus baseline
-  `80,4,0,26` (`110/320`) and failed the predeclared all-replica gate. All 640
-  traces replayed. No later gate was opened.
+1. `UrgencySchedulerPolicy`: deterministic deadline margins, hysteresis,
+   bounded objective commitment, preemption, and continued maintenance after
+   minimum quotas.
+2. `ModelBasedSchedulerPolicy`: bounded receding-horizon search over an explicit
+   optimistic model of public drive dynamics and macro durations, scored
+   lexicographically for safety before quota progress.
+3. `ShieldedLearnedPolicy`: a corrected-PPO-compatible MLP actor whose choices
+   can be restricted by a deterministic safety/commitment supervisor. The
+   candidate/control comparison uses exactly the same actor bytes.
 
-## Policy-Logic Findings
+A supervised-anchor/retention family is intentionally deferred. It remains a
+separate possible hypothesis rather than being folded into the shielded-policy
+comparison.
 
-- Failed M13.12 candidate seed `20261324` reached feed quota in 80/80 episodes,
-  play in 75/80, and rest in 70/80, but only 3/80 episodes met each safety
-  fraction and none met the full objective.
-- Successful candidate seeds continued restorative cycles after quotas:
-  average feed/play/rest was `23.74/8.62/5.96` and `28.23/9.86/6.03`.
-  Zero-success seed `20261324` averaged `21.25/3.55/2.36`: it treated minimum
-  play/rest counts as if maintenance were finished.
-- Failed policies entered `WAIT` attractors, sometimes 40--56 consecutive
-  decisions while energy or boredom required intervention. WAIT frequency by
-  itself is not the issue; successful policies wait only while drive margins
-  remain safe and switch before danger.
-- The mask enforces geometric eligibility, not semantic usefulness. A learned
-  policy can legally play before boredom makes it productive or rest before
-  energy makes it productive.
-- Recovery passed 80/80 for every M13.12 candidate seed. The zero seed had no
-  invalid or ordinary blocked-action loop. Its failure was strategic scheduling.
-- Condition sensitivity remained large, suggesting the network entangles
-  scheduling with geometry/dynamics instead of learning an invariant drive rule.
+## Frozen Evidence State
 
-## Candidate Families To Consider
+- M13.10 imitation-only remained 32/32 per replica, while subsequent DQN
+  fine-tuning collapsed both replicas to 0%.
+- M13.11-r1 remains invalid. Corrected M13.11-r2 scored 33/320 versus DQN 9/320
+  and failed its stability gate.
+- M13.12 corrected PPO `3e-4` versus `1e-3` remains frozen at candidate
+  `73,80,26,0` (`179/320`) versus baseline `80,4,0,26` (`110/320`). All 640
+  traces replayed and the all-replica gate failed.
+- No M13--M13.12 source, protocol, result, ledger, artifact, or trace was
+  changed. Existing traces motivated policy families only; they were not used
+  to tune M13.13 thresholds or select a policy.
+- M13.13 reserves fresh 6200+ families. Seeds 6140--6199 and 6240--6299 remain
+  deliberately unused.
 
-The new task should critically choose and implement at least three distinct,
-testable hypotheses rather than cosmetic PPO variants. Strong candidates are:
+## Implementation Map
 
-1. A deterministic urgency scheduler with explicit safety margins, hysteresis,
-   objective commitment, productive cooldown use, and continuous maintenance
-   after quotas.
-2. A short-horizon model-based scheduler using public drive dynamics, compiled
-   macro durations, travel cost, and safety-margin prediction.
-3. A hierarchical or shielded learned policy: deterministic safety/commitment
-   supervisor plus a learned tie-breaker/residual that cannot select unsafe
-   waiting or semantically useless interactions.
-4. A supervised policy with a frozen teacher anchor or constrained retention
-   objective, planned as a separate hypothesis from pure behavior cloning.
+- `ecosystem_gym/maintenance/policy_state.py`: unencoded policy-owned memory,
+  public-dynamics signature, drive projection, deadlines, margins, and semantic
+  helpers. The public feature vector is still exactly length 30.
+- `ecosystem_gym/maintenance/urgency.py`: deterministic urgency family and its
+  commitment-disabled one-factor control.
+- `ecosystem_gym/maintenance/model_based.py`: depth-four candidate, depth-one
+  horizon control, public transition model, and deterministic search.
+- `ecosystem_gym/maintenance/shielded.py`: inference actor, shielded candidate,
+  unshielded geometry-only control, and actor-byte identity support.
+- `ecosystem_gym/maintenance/policy_artifacts.py`: versioned, hashed,
+  tamper-evident policy serialization with config/dynamics validation.
+- `ecosystem_gym/maintenance/policy_protocol.py`: machine-readable frozen
+  splits, arms, budgets, gates, source hashes, and exact commands.
+- `ecosystem_gym/experiments/m1313_support.py`: ordered append-only split ledger.
+- `ecosystem_gym/experiments/m1313.py`: future-only fit/development,
+  confirmation, audit, replay, reporting, and gate implementation.
+- `docs/M13_13_POLICY_FAMILIES_PROTOCOL.md`: human-readable frozen protocol,
+  rationale, risks, gates, commands, and authorization boundary.
+- `tests/test_maintenance_policies.py` and
+  `tests/test_m1313_policy_protocol.py`: synthetic unit, numerical,
+  serialization, tamper, gate, ledger, manifest, and CLI tests.
 
-Do not assume all four belong in one experiment. Prefer a small number of
-cleanly separated policy modules and future protocols with one causal change
-per comparison.
+The CLI registrations are:
 
-## Files And Evidence
+- `python -m ecosystem_gym maintenance-policy-manifest`
+- `python -m ecosystem_gym.experiments.cli m1313-development`
+- `python -m ecosystem_gym.experiments.cli m1313-confirmation`
+- `python -m ecosystem_gym.experiments.cli m1313-audit`
 
-- `docs/M13_12_DEVELOPMENT_PROTOCOL.md`: frozen one-factor LR protocol.
-- `docs/M13_12_DEVELOPMENT_RESULTS.md`: canonical M13.12 result and stop rule.
-- `artifacts/reports/m1312-development.json`: ignored canonical report.
-- `artifacts/reports/m1312-development-artifacts/traces/`: 640 replayed traces.
-- `docs/M13_10_PROTOCOL.md` and `docs/M13_10_SCREEN_RESULTS.md`: imitation and
-  catastrophic-retention evidence.
-- `ecosystem_gym/maintenance/contract.py`: current public feature/memory/mask
-  and macro compiler contract.
-- `ecosystem_gym/maintenance/ppo_r2.py`: corrected frozen PPO implementation.
-- `ecosystem_gym/experiments/m13.py`: scripted public scheduler ceiling.
+These commands exist for a separately authorized future run. Do not invoke the
+canonical commands merely to smoke-test them; registration is covered by tests.
 
-## Decisions And Constraints
+## Frozen M13.13 Protocol
 
-- Preserve every frozen M13--M13.12 source, protocol, report, ledger, artifact,
-  trace, and split. New work must be additive.
-- Do not tune on any opened evaluation/check data, including 5620--5627,
-  6060--6079, or 6120--6139.
-- `6080--6099` remain unused; do not opportunistically consume them. Reserve a
-  clearly fresh future family, preferably 6200+, in separately frozen protocols.
-- Planning and implementation are authorized. Unit tests, deterministic
-  numerical tests, serialization tests, CLI-registration tests, compilation,
-  full `pytest`, and `git diff --check` are authorized.
-- No training-like smoke is authorized, even if called non-promotional. No new
-  environment episode should be launched. Use fixtures/synthetic states for tests.
-- Do not implement several policies and then select one using existing traces.
-  Existing traces may motivate hypotheses, not tune thresholds or gates.
-- A future run must require a separate explicit user authorization after code,
-  tests, protocols, budgets, and stop rules are reviewed.
+- Development fit: 6200--6219.
+- Development check: 6220--6239.
+- Confirmation fit: 6300--6339.
+- Confirmation evaluation: 6400--6419.
+- Audit: 6500--6519.
+- Development budget ceiling: 1,120 evaluation traces.
+- Later confirmation/audit ceiling: 1,760 evaluation traces.
+- Every experimental episode must emit a trace and pass exact replay.
+- Each family has its own one-factor control and passes independently; there is
+  no cross-family winner selection.
+- Core hard gate: at least 18/20 successes per condition, safety fraction at
+  least 0.85, recovery at least 18/20, unsafe-wait rate at most 0.10, and zero
+  contract violations. Predeclared candidate/control deltas and safety
+  non-inferiority also apply.
+- The shield candidate/control must use byte-identical learned actors.
 
-## Next Steps
+Read `docs/M13_13_POLICY_FAMILIES_PROTOCOL.md` for the normative details and
+exact future commands. The machine-readable constants in
+`ecosystem_gym/maintenance/policy_protocol.py` are the executable counterpart.
 
-1. Read this handoff and inspect current Git/repo state plus the named evidence.
-2. Produce a skeptical design comparison of 3--4 policy families, including
-   invariants, failure modes, public-input compliance, and what each isolates.
-3. Choose a minimal implementable set of at least three distinct policies and
-   freeze their future evaluation protocols before any run.
-4. Implement additively with unit/numerical/serialization/CLI tests using only
-   synthetic fixtures; do not execute environment episodes or training.
-5. Run non-experimental verification only, document exact future commands but
-   never execute them, and commit the scoped implementation.
-6. Report what was implemented, what remains speculative, and the precise
-   authorization needed before any future experiment.
+## Verification
+
+- Final focused suite: 15 passed.
+- Final full repository suite: all 224 collected tests passed.
+- `python -m compileall`: passed.
+- `git diff --check`: passed.
+- Ruff was not available in the environment (`Failed to spawn: ruff`), so no
+  Ruff result is claimed.
+
+The tests use synthetic fixtures and temporary directories only. No canonical
+M13.13 experimental surface was touched.
+
+## What Remains Speculative
+
+- None of the three families has empirical M13.13 performance evidence.
+- The deterministic thresholds are mechanics-derived hypotheses, not tuned
+  results.
+- The model-based planner is intentionally optimistic about hidden travel and
+  manipulation costs; horizon four may still be too short or model-mismatched.
+- The shield may prevent known unsafe/semantically useless choices yet still
+  leave too little useful authority to the learned actor, or the future actor
+  fit may itself remain seed-unstable.
+- Passing a synthetic or ordinary repository test is not evidence of policy
+  success in environment episodes.
+
+## Authorization Boundary And Next Step
+
+The next permissible experimental action requires the user to explicitly say,
+in substance: **Authorize the exact M13.13 manifest and development run frozen
+in `docs/M13_13_POLICY_FAMILIES_PROTOCOL.md`.** That authorization would cover
+only manifest creation plus development fit/check on 6200--6239 within the
+declared budget and stop rules.
+
+Confirmation and audit each require later, separate explicit authorization
+after the preceding sealed report is reviewed. Development authorization does
+not authorize confirmation or audit. Editing the frozen protocol after a split
+is opened requires stopping and defining a new milestone/split family rather
+than silently retuning M13.13.
 
 ## Reactivation Prompt
 
-We are continuing from this handoff:
-`/Users/vishnukrishnan/.codex/worktrees/dfab/embodied-ecosystem-gym/docs/codex-handoffs/current.md`.
-Read it first, inspect the current repository and Git state, verify what still
-applies, summarize the state in five bullets, then plan and implement several
-distinct persistent-maintenance policy families. Do not run training, smokes,
-canonical comparisons, screens, confirmations, audits, or new environment
-episodes. Synthetic/unit/numerical tests and ordinary repository verification
-are allowed.
+Continue from
+`/Users/vishnukrishnan/.codex/worktrees/f890/embodied-ecosystem-gym/docs/codex-handoffs/current.md`.
+Read it and `docs/M13_13_POLICY_FAMILIES_PROTOCOL.md` completely, inspect Git
+state, and verify that M13.13 remains unopened. Do not create a manifest, ledger,
+artifact, trace, training run, or environment episode unless the user gives the
+specific development authorization above. Confirmation and audit remain
+separate authorization gates.

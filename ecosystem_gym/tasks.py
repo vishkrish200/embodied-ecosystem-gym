@@ -646,6 +646,28 @@ LAYOUTS: dict[str, LayoutSpec] = {
     "m1312_check_southwest": LayoutSpec("m1312_check_southwest", (0.409, 0.389), (-0.829, -0.689), (-0.479, -0.309), (-0.749, 0.559), (0.719, -0.479)),
     "m1312_check_northwest": LayoutSpec("m1312_check_northwest", (0.569, -0.319), (-0.849, 0.239), (-0.499, 0.689), (0.669, 0.579), (-0.709, -0.479)),
     "m1312_check_southeast": LayoutSpec("m1312_check_southeast", (-0.639, 0.409), (0.379, -0.819), (0.739, -0.459), (-0.719, -0.519), (0.679, 0.589)),
+    # M13.13 freezes five fresh partitions before any policy-family run.  The
+    # four-decimal points are disjoint from every earlier M10--M13.12 layout.
+    "m1313_fit_northeast": LayoutSpec("m1313_fit_northeast", (-0.1731, -0.2511), (0.4011, 0.3291), (0.7211, 0.6491), (0.6411, -0.3911), (-0.4211, 0.4191)),
+    "m1313_fit_southwest": LayoutSpec("m1313_fit_southwest", (0.2232, 0.3012), (-0.6412, -0.7472), (-0.3112, -0.4172), (-0.5312, 0.4772), (0.6472, -0.5172)),
+    "m1313_fit_northwest": LayoutSpec("m1313_fit_northwest", (0.3473, -0.3173), (-0.7373, 0.2373), (-0.4073, 0.5773), (0.5373, 0.4873), (-0.5773, -0.4773)),
+    "m1313_fit_southeast": LayoutSpec("m1313_fit_southeast", (-0.3074, 0.2774), (0.2974, -0.7774), (0.6874, -0.3974), (-0.5874, -0.4674), (0.5674, 0.4674)),
+    "m1313_check_northeast": LayoutSpec("m1313_check_northeast", (-0.4751, -0.3571), (0.4571, 0.3671), (0.7871, 0.7071), (0.7371, -0.4871), (-0.6351, 0.5671)),
+    "m1313_check_southwest": LayoutSpec("m1313_check_southwest", (0.4272, 0.4072), (-0.8472, -0.7072), (-0.4972, -0.3272), (-0.7672, 0.5772), (0.7372, -0.4972)),
+    "m1313_check_northwest": LayoutSpec("m1313_check_northwest", (0.5873, -0.3373), (-0.8673, 0.2573), (-0.5173, 0.7073), (0.6873, 0.5973), (-0.7273, -0.4973)),
+    "m1313_check_southeast": LayoutSpec("m1313_check_southeast", (-0.6574, 0.4274), (0.3974, -0.8374), (0.7574, -0.4774), (-0.7374, -0.5374), (0.6974, 0.6074)),
+    "m1313_confirm_fit_northeast": LayoutSpec("m1313_confirm_fit_northeast", (-0.1571, -0.2631), (0.4131, 0.3431), (0.7331, 0.6631), (0.6531, -0.3731), (-0.4091, 0.4331)),
+    "m1313_confirm_fit_southwest": LayoutSpec("m1313_confirm_fit_southwest", (0.2372, 0.3152), (-0.6572, -0.7332), (-0.3272, -0.4032), (-0.5472, 0.4912), (0.6632, -0.5032)),
+    "m1313_confirm_fit_northwest": LayoutSpec("m1313_confirm_fit_northwest", (0.3633, -0.3033), (-0.7533, 0.2513), (-0.4233, 0.5913), (0.5533, 0.5013), (-0.5933, -0.4633)),
+    "m1313_confirm_fit_southeast": LayoutSpec("m1313_confirm_fit_southeast", (-0.3234, 0.2914), (0.3134, -0.7634), (0.7034, -0.3834), (-0.6034, -0.4534), (0.5834, 0.4814)),
+    "m1313_confirm_eval_northeast": LayoutSpec("m1313_confirm_eval_northeast", (-0.4891, -0.3711), (0.4711, 0.3811), (0.8011, 0.7211), (0.7511, -0.5011), (-0.6211, 0.5811)),
+    "m1313_confirm_eval_southwest": LayoutSpec("m1313_confirm_eval_southwest", (0.4412, 0.4212), (-0.8332, -0.7212), (-0.4832, -0.3412), (-0.7532, 0.5912), (0.7512, -0.5112)),
+    "m1313_confirm_eval_northwest": LayoutSpec("m1313_confirm_eval_northwest", (0.6013, -0.3513), (-0.8533, 0.2713), (-0.5033, 0.7213), (0.7013, 0.6113), (-0.7413, -0.5113)),
+    "m1313_confirm_eval_southeast": LayoutSpec("m1313_confirm_eval_southeast", (-0.6714, 0.4414), (0.4114, -0.8234), (0.7714, -0.4634), (-0.7514, -0.5514), (0.7114, 0.6214)),
+    "m1313_audit_northeast": LayoutSpec("m1313_audit_northeast", (-0.4331, -0.3091), (0.4911, 0.3951), (0.8211, 0.7351), (0.7711, -0.5151), (-0.6071, 0.5951)),
+    "m1313_audit_southwest": LayoutSpec("m1313_audit_southwest", (0.4552, 0.4352), (-0.8192, -0.7352), (-0.4692, -0.3552), (-0.7392, 0.6052), (0.7652, -0.5252)),
+    "m1313_audit_northwest": LayoutSpec("m1313_audit_northwest", (0.6153, -0.3653), (-0.8393, 0.2853), (-0.4893, 0.7353), (0.7153, 0.6253), (-0.7553, -0.5253)),
+    "m1313_audit_southeast": LayoutSpec("m1313_audit_southeast", (-0.6854, 0.4554), (0.4254, -0.8094), (0.7854, -0.4494), (-0.7654, -0.5654), (0.7254, 0.6354)),
 }
 
 TASKS: dict[str, TaskSpec] = {
