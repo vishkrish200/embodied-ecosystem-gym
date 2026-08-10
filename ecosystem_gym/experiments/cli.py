@@ -49,6 +49,7 @@ from .m139 import (
 from .m1310 import write_m1310_screen_report
 from .m1311 import write_m1311_development_report, write_m1311_fit_smoke_report
 from .m1311r2 import write_m1311r2_development_report, write_m1311r2_fit_smoke_report
+from .m1312 import write_m1312_development_report, write_m1312_fit_smoke_report
 from ..policies import evaluate_scripted_policy
 from ..video import write_find_and_eat_regression_video
 
@@ -202,6 +203,10 @@ def main(argv: list[str] | None = None) -> None:
     m1311r2_smoke.add_argument("--output", type=Path, required=True)
     m1311r2_development = subparsers.add_parser("m1311r2-development", help="run the fresh corrected M13.11-r2 PPO/DQN development comparison")
     m1311r2_development.add_argument("--output", type=Path, required=True)
+    m1312_smoke = subparsers.add_parser("m1312-fit-smoke", help="run only the non-promotional M13.12 fit smoke")
+    m1312_smoke.add_argument("--output", type=Path, required=True)
+    m1312_development = subparsers.add_parser("m1312-development", help="run the frozen M13.12 paired PPO learning-rate comparison")
+    m1312_development.add_argument("--output", type=Path, required=True)
     args = parser.parse_args(argv)
     if args.command == "evaluate":
         result = evaluate_scripted_policy(trajectory_dir=args.trajectory_dir)
@@ -377,6 +382,12 @@ def main(argv: list[str] | None = None) -> None:
     elif args.command == "m1311r2-development":
         report = write_m1311r2_development_report(args.output)
         print(json.dumps({"label": report["label"], "elapsed_seconds": report["elapsed_seconds"], "strict_replay_count": report["strict_replay_count"]}))
+    elif args.command == "m1312-fit-smoke":
+        report = write_m1312_fit_smoke_report(args.output)
+        print(json.dumps({"label": report["label"], "elapsed_seconds": report["elapsed_seconds"], "strict_replay_count": report["strict_replay_count"]}))
+    elif args.command == "m1312-development":
+        report = write_m1312_development_report(args.output)
+        print(json.dumps({"label": report["label"], "elapsed_seconds": report["elapsed_seconds"], "strict_replay_count": report["strict_replay_count"], "gate": report["gate"]}))
 
 
 if __name__ == "__main__":

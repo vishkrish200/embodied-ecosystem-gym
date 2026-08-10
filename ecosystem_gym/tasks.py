@@ -637,6 +637,15 @@ LAYOUTS: dict[str, LayoutSpec] = {
     "m1311r2_check_southwest": LayoutSpec("m1311r2_check_southwest", (0.391, 0.371), (-0.811, -0.671), (-0.461, -0.291), (-0.731, 0.541), (0.701, -0.461)),
     "m1311r2_check_northwest": LayoutSpec("m1311r2_check_northwest", (0.551, -0.301), (-0.831, 0.221), (-0.481, 0.671), (0.651, 0.561), (-0.691, -0.461)),
     "m1311r2_check_southeast": LayoutSpec("m1311r2_check_southeast", (-0.621, 0.391), (0.361, -0.801), (0.721, -0.441), (-0.701, -0.501), (0.661, 0.571)),
+    # M13.12 owns fresh geometry for its one-factor PPO learning-rate test.
+    "m1312_fit_northeast": LayoutSpec("m1312_fit_northeast", (-0.149, -0.229), (0.379, 0.311), (0.699, 0.631), (0.629, -0.403), (-0.443, 0.407)),
+    "m1312_fit_southwest": LayoutSpec("m1312_fit_southwest", (0.199, 0.283), (-0.619, -0.729), (-0.289, -0.399), (-0.509, 0.459), (0.629, -0.499)),
+    "m1312_fit_northwest": LayoutSpec("m1312_fit_northwest", (0.329, -0.299), (-0.719, 0.219), (-0.389, 0.559), (0.519, 0.469), (-0.559, -0.459)),
+    "m1312_fit_southeast": LayoutSpec("m1312_fit_southeast", (-0.289, 0.259), (0.279, -0.759), (0.669, -0.379), (-0.569, -0.449), (0.549, 0.449)),
+    "m1312_check_northeast": LayoutSpec("m1312_check_northeast", (-0.457, -0.339), (0.439, 0.349), (0.769, 0.689), (0.719, -0.469), (-0.653, 0.549)),
+    "m1312_check_southwest": LayoutSpec("m1312_check_southwest", (0.409, 0.389), (-0.829, -0.689), (-0.479, -0.309), (-0.749, 0.559), (0.719, -0.479)),
+    "m1312_check_northwest": LayoutSpec("m1312_check_northwest", (0.569, -0.319), (-0.849, 0.239), (-0.499, 0.689), (0.669, 0.579), (-0.709, -0.479)),
+    "m1312_check_southeast": LayoutSpec("m1312_check_southeast", (-0.639, 0.409), (0.379, -0.819), (0.739, -0.459), (-0.719, -0.519), (0.679, 0.589)),
 }
 
 TASKS: dict[str, TaskSpec] = {
