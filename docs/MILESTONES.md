@@ -179,6 +179,15 @@ strictly replayed. The r2 fit/check ledger is now opened; screen, confirmation,
 and audit remain unopened, and 6080–6099 remain unused. This is a clean
 negative for corrected PPO, not a promotion or authorization for M14/M15.
 
+**M13.12 status: development negative result (2026-08-10).** A separately
+frozen one-factor comparison tested corrected PPO at `1e-3` against a fresh
+paired `3e-4` baseline on 6100–6139. The candidate increased aggregate full
+objectives to 179/320 versus 110/320, and engaged nonzero clipping, but failed
+all-replica stability with seed totals 73/80, 80/80, 26/80, and 0/80. All 640
+traces strictly replayed. This is not a promotion: stop without a screen,
+confirmation, audit, M14, or M15. See the [frozen protocol](M13_12_DEVELOPMENT_PROTOCOL.md)
+and [result](M13_12_DEVELOPMENT_RESULTS.md).
+
 ## M14 — Hybrid persistent-maintenance RL
 
 Hold M13's task, action interface, reward, and long-horizon evaluation fixed while replacing privileged object coordinates with the existing hybrid observation boundary. Train a policy that receives RGB, drives, holding state, prior outcome, and non-privileged visual detections only. Its purpose is to isolate whether the maintenance RL policy fails because of planning or because of perception.
