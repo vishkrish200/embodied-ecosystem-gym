@@ -188,14 +188,19 @@ traces strictly replayed. This is not a promotion: stop without a screen,
 confirmation, audit, M14, or M15. See the [frozen protocol](M13_12_DEVELOPMENT_PROTOCOL.md)
 and [result](M13_12_DEVELOPMENT_RESULTS.md).
 
-**M13.13 status: implemented and unopened (2026-08-10).** Three additive
-public-state policy families now isolate commitment, short-horizon planning,
-and a deterministic supervisor around byte-identical learned actors. Their
-fresh 6200--6519 partitions, one-factor controls, budgets, independent gates,
-manifest, ledger, and future commands are frozen in the
-[M13.13 protocol](M13_13_POLICY_FAMILIES_PROTOCOL.md). No M13.13 manifest,
-partition, fit, episode, comparison, confirmation, or audit has been run; each
-experimental stage requires separate explicit authorization.
+**M13.13 status: development aborted at public coverage (2026-08-18).** Three
+additive public-state policy families isolate commitment, short-horizon
+planning, and a deterministic supervisor around byte-identical learned actors.
+The exact frozen development command opened fit `6200--6219`, completed the
+four declared PPO actor fits, and then opened check `6220--6239`. The check's
+offline public scan audit failed before any policy-family evaluation, trace,
+replay, gate, or report was produced. This is an experiment-plumbing abort, not
+a policy success or negative. Both opened partitions are retired;
+confirmation/audit remain unopened, and M13.13 must not be rerun or repaired in
+place. See the [frozen protocol](M13_13_POLICY_FAMILIES_PROTOCOL.md) and
+[abort record](M13_13_DEVELOPMENT_ABORT.md). Any retry requires an additive
+fresh-split successor with persisted coverage before fitting and new explicit
+authorization.
 
 ## M14 — Hybrid persistent-maintenance RL
 

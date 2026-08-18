@@ -1,15 +1,17 @@
 # Codex Handoff: M13.13 persistent-maintenance policy families
 
-Updated: 2026-08-10
-Repo/path: `/Users/vishnukrishnan/.codex/worktrees/f890/embodied-ecosystem-gym`
-Branch: `codex/m1313-policy-families`
-Base: `eafeb8a` (the M13.12 durable-handoff commit)
+Updated: 2026-08-18
+Repo/path: `/Users/vishnukrishnan/Developer/embodied-ecosystem-gym`
+Branch: `codex/m1313-coverage-abort` from merged `main` `957accd`
 
 ## Outcome
 
-M13.13 is implemented, documented, and verified, but deliberately unopened.
-No M13.13 manifest, split ledger, training artifact, episode, trace, comparison,
-confirmation, or audit was created or run.
+M13.13 development was authorized and stopped at its first failing hard gate.
+Fit `6200--6219` passed public coverage and produced the four declared learned
+actors. Check `6220--6239` then failed public scan coverage before any policy
+evaluation. No development report, evaluation trace, replay result, family
+gate, confirmation, or audit exists. This is an aborted run, not a policy
+result. See `docs/M13_13_DEVELOPMENT_ABORT.md`.
 
 Three causally different policy families now share the existing public
 30-feature observation/eight-action contract:
@@ -40,8 +42,9 @@ comparison.
 - No M13--M13.12 source, protocol, result, ledger, artifact, or trace was
   changed. Existing traces motivated policy families only; they were not used
   to tune M13.13 thresholds or select a policy.
-- M13.13 reserves fresh 6200+ families. Seeds 6140--6199 and 6240--6299 remain
-  deliberately unused.
+- M13.13 fit/check `6200--6239` are opened and retired. Seeds `6140--6199` and
+  `6240--6299` remain unused. Confirmation/audit `6300--6519` remain unopened
+  but cannot proceed because no valid development report exists.
 
 ## Implementation Map
 
@@ -74,8 +77,8 @@ The CLI registrations are:
 - `python -m ecosystem_gym.experiments.cli m1313-confirmation`
 - `python -m ecosystem_gym.experiments.cli m1313-audit`
 
-These commands exist for a separately authorized future run. Do not invoke the
-canonical commands merely to smoke-test them; registration is covered by tests.
+The manifest and development commands were each invoked once under explicit
+authorization. Do not invoke them again. Confirmation and audit are blocked.
 
 ## Frozen M13.13 Protocol
 
@@ -108,8 +111,9 @@ exact future commands. The machine-readable constants in
 - Ruff was not available in the environment (`Failed to spawn: ruff`), so no
   Ruff result is claimed.
 
-The tests use synthetic fixtures and temporary directories only. No canonical
-M13.13 experimental surface was touched.
+The pre-run tests used synthetic fixtures and temporary directories. They did
+not exercise canonical M13.13 layout coverage; the authorized runtime gate
+caught that gap after fitting.
 
 ## What Remains Speculative
 
@@ -126,24 +130,22 @@ M13.13 experimental surface was touched.
 
 ## Authorization Boundary And Next Step
 
-The next permissible experimental action requires the user to explicitly say,
-in substance: **Authorize the exact M13.13 manifest and development run frozen
-in `docs/M13_13_POLICY_FAMILIES_PROTOCOL.md`.** That authorization would cover
-only manifest creation plus development fit/check on 6200--6239 within the
-declared budget and stop rules.
+M13.13 has stopped permanently. Do not rerun its fit/check, reconstruct missing
+coverage counts by reopening `6220--6239`, edit its frozen sources or layouts,
+fabricate a report, or invoke confirmation/audit.
 
-Confirmation and audit each require later, separate explicit authorization
-after the preceding sealed report is reviewed. Development authorization does
-not authorize confirmation or audit. Editing the frozen protocol after a split
-is opened requires stopping and defining a new milestone/split family rather
-than silently retuning M13.13.
+The next permissible implementation task is an additive fresh-split successor
+that preserves the same three hypotheses and independently persists public
+coverage for every development partition before learner fitting. No successor
+experiment is authorized yet. It requires a new frozen protocol, manifest,
+ledger, split family, review, and explicit development authorization.
 
 ## Reactivation Prompt
 
 Continue from
-`/Users/vishnukrishnan/.codex/worktrees/f890/embodied-ecosystem-gym/docs/codex-handoffs/current.md`.
-Read it and `docs/M13_13_POLICY_FAMILIES_PROTOCOL.md` completely, inspect Git
-state, and verify that M13.13 remains unopened. Do not create a manifest, ledger,
-artifact, trace, training run, or environment episode unless the user gives the
-specific development authorization above. Confirmation and audit remain
-separate authorization gates.
+`/Users/vishnukrishnan/Developer/embodied-ecosystem-gym/docs/codex-handoffs/current.md`.
+Read it, `docs/M13_13_POLICY_FAMILIES_PROTOCOL.md`, and
+`docs/M13_13_DEVELOPMENT_ABORT.md` completely. Verify the local artifact hashes
+and append-only ledger without executing an environment. Preserve M13.13 and
+design an additive coverage-first successor only if the user asks. Do not run
+new episodes or open any split without a new explicit authorization.
