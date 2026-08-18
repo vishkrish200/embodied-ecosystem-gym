@@ -224,7 +224,7 @@ The additive M13.14-r2 correction now exists separately with split validators an
 
 Hold the M13 task, action interface, reward, and long-horizon evaluation fixed while changing only the learner-side hypothesis: separate whole-dataset validation from sampled minibatch validation, keep the public boundary unchanged, and harden teacher/artifact isolation with fresh source hashes and a new runner.
 
-**Status: implemented, frozen, and unopened.** The corrected additive lane is present in source with separate full-dataset and minibatch validators, a regression suite that allows minibatches to omit one or more macros, and fresh `6720--6839` splits. No M13.14-r2 manifest, preflight report, ledger marker, teacher dataset collection, fit, evaluation, replay, confirmation, audit, or artifact command has been run. The next step is separate authorization for the r2 manifest and the development coverage preflight only.
+**Status: development coverage passed; corrected fit/evaluation unopened.** The corrected additive lane has separate full-dataset and minibatch validators, a regression suite that allows minibatches to omit one or more macros, and fresh `6720--6839` splits. Its exact development fit/check coverage preflight passed every row on `6720--6759`. No r2 ledger, teacher collection, fit, evaluation, replay, confirmation, audit, or learned artifact exists. See the [r2 preflight result](M13_14_R2_DEVELOPMENT_PREFLIGHT.md).
 
 ## M14 — Hybrid persistent-maintenance RL
 
