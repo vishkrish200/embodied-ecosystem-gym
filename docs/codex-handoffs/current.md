@@ -8,9 +8,14 @@ Branch: `codex/m1314r2-minibatch-fix` from M13.14 abort commit `d11dcf7`
 
 M13.14 remains a frozen warm-start abort. Its exact development coverage preflight passed all fit/check visibility rows on `6600--6639`. The separately authorized development stage then opened fit and wrote a valid public teacher dataset, but aborted during the first warm-start minibatch because minibatches were incorrectly required to contain all eight macro classes. No learner fit or policy evaluation completed.
 
-M13.14-r2 is the additive correction. It has separate whole-dataset and minibatch validators, fresh `6720--6839` splits, and a new protocol/runner. Its exact development coverage preflight passed every fit/check row on `6720--6759`. The r2 manifest and sealed preflight report now exist locally, but no r2 ledger, teacher collection, fit, policy evaluation, replay, confirmation, audit, or learned artifact exists.
+M13.14-r2 corrected the minibatch bug and advanced through fresh teacher
+collection, all 12 fits, policy serialization, 1,280 scored policy replays, and
+80 scripted-ceiling replays. It then aborted before report sealing because the
+first mask-random diagnostic trace omitted the `pcg64-<seed>` fingerprint
+required by strict replay. No official development gate exists. Confirmation
+and audit remain sealed.
 
-See `docs/M13_14_MODULAR_ANCHORED_PROTOCOL.md`, `docs/M13_14_DEVELOPMENT_PREFLIGHT.md`, `docs/M13_14_DEVELOPMENT_ABORT.md`, `docs/M13_14_R2_MODULAR_ANCHORED_PROTOCOL.md`, and `docs/M13_14_R2_DEVELOPMENT_PREFLIGHT.md`.
+See `docs/M13_14_MODULAR_ANCHORED_PROTOCOL.md`, `docs/M13_14_DEVELOPMENT_PREFLIGHT.md`, `docs/M13_14_DEVELOPMENT_ABORT.md`, `docs/M13_14_R2_MODULAR_ANCHORED_PROTOCOL.md`, `docs/M13_14_R2_DEVELOPMENT_PREFLIGHT.md`, and `docs/M13_14_R2_DEVELOPMENT_ABORT.md`.
 
 ## Frozen Evidence State
 
@@ -24,8 +29,12 @@ See `docs/M13_14_MODULAR_ANCHORED_PROTOCOL.md`, `docs/M13_14_DEVELOPMENT_PREFLIG
   `47e6f7b4d7bd508407e43f901d22bd72906c7efbaf24f926dd6e4df2270fd5a6`.
 - Every r2 development fit/check visibility row passed; sealed preflight hash:
   `98daea099f62f051c700933af46ffe028f034ba6a95056ffb56702de315a5928`.
-- No r2 ledger marker, teacher dataset, fit, evaluation, replay, confirmation,
-  audit, or learned artifact exists.
+- The r2 ledger contains `development_preflight -> development_fit ->
+  development_check`.
+- The r2 teacher dataset, 12 policy artifacts, 1,280 scored policy traces, 80
+  scripted-ceiling traces, and one incomplete random diagnostic trace exist
+  locally and are hashed in the abort record.
+- No sealed r2 development report/gate, confirmation, or audit exists.
 
 ## Current Map
 
@@ -34,6 +43,7 @@ See `docs/M13_14_MODULAR_ANCHORED_PROTOCOL.md`, `docs/M13_14_DEVELOPMENT_PREFLIG
 - `docs/M13_14_DEVELOPMENT_ABORT.md`: M13.14 warm-start abort record and preserved hashes.
 - `docs/M13_14_R2_MODULAR_ANCHORED_PROTOCOL.md`: unopened M13.14-r2 protocol and no-run boundary.
 - `docs/M13_14_R2_DEVELOPMENT_PREFLIGHT.md`: sealed passing r2 coverage preflight.
+- `docs/M13_14_R2_DEVELOPMENT_ABORT.md`: diagnostic replay abort and preserved hashes.
 - `ecosystem_gym/maintenance/policy_protocol_m1314.py`: frozen M13.14 manifest and splits.
 - `ecosystem_gym/maintenance/policy_protocol_m1314r2.py`: additive M13.14-r2 manifest, fresh splits, and preflight order.
 - `ecosystem_gym/maintenance/teacher_data_m1314r2.py`: public-only r2 teacher dataset helpers and minibatch validation split.
@@ -52,14 +62,14 @@ See `docs/M13_14_MODULAR_ANCHORED_PROTOCOL.md`, `docs/M13_14_DEVELOPMENT_PREFLIG
 - `git diff --check`: passed.
 - Independent Luna-max integrated review: approved after candidate-only audit
   and runner source-hash fixes.
-- Only the canonical r2 manifest and sealed preflight report exist; the r2
-  ledger, teacher data, learned policies, evaluation traces, confirmation, and
-  audit remain absent.
+- The ignored r2 manifest, preflight, ledger, teacher data, policy artifacts,
+  and partial development trace surface exist locally. The development report,
+  confirmation, and audit remain absent.
 
 ## Next Step
 
-Do not resume M13.14 under its frozen manifest. The next experimental action is
-the exact frozen `m1314r2-development` stage and requires separate explicit
-authorization. It would cover fresh r2 teacher collection, the declared fits,
-and one development evaluation only. Confirmation and audit remain separate
-later authorization gates.
+Do not resume M13.14 or r2 under their frozen manifests, and do not reconstruct
+an unofficial r2 result from traces. The next task is an additive successor
+that fixes random diagnostic fingerprint binding and uses fresh splits. Any
+corrected preflight or development stage requires new explicit authorization.
+Confirmation and audit remain blocked.
