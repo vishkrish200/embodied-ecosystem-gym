@@ -226,6 +226,12 @@ Hold the M13 task, action interface, reward, and long-horizon evaluation fixed w
 
 **Status: implementation abort during random diagnostic replay; no official policy result.** The corrected minibatch path worked: the fresh teacher dataset, all 12 fits, all policy artifacts, 1,280 scored policy replays, and 80 scripted-ceiling replays completed. The run stopped before report sealing when the first mask-random trace omitted its required `pcg64-<seed>` fingerprint. Development check is opened; confirmation and audit remain sealed. See the [r2 preflight](M13_14_R2_DEVELOPMENT_PREFLIGHT.md) and [r2 development abort](M13_14_R2_DEVELOPMENT_ABORT.md).
 
+## M13.14-r3 — Random-diagnostic fingerprint correction successor
+
+Hold the M13 task, action interface, reward, and long-horizon evaluation fixed while correcting the random-diagnostic fingerprint binding, keeping the frozen r2 learner classes unchanged, and adding a real trace/replay regression on fresh `6840--6959` splits.
+
+**Status: implemented, frozen, and unopened.** M13.14-r3 is the additive successor to r2, with new protocol, runner, artifact, teacher, and ledger identities. It fixes the strict-replay fingerprint mismatch, but no r3 manifest, preflight, ledger, teacher collection, fit, evaluation, replay, or artifact command has been run yet. The next step is separate authorization for the r3 manifest and development coverage preflight only. See [the unopened protocol](M13_14_R3_MODULAR_ANCHORED_PROTOCOL.md).
+
 ## M14 — Hybrid persistent-maintenance RL
 
 Hold M13's task, action interface, reward, and long-horizon evaluation fixed while replacing privileged object coordinates with the existing hybrid observation boundary. Train a policy that receives RGB, drives, holding state, prior outcome, and non-privileged visual detections only. Its purpose is to isolate whether the maintenance RL policy fails because of planning or because of perception.

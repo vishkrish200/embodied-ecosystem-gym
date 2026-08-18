@@ -712,6 +712,28 @@ LAYOUTS: dict[str, LayoutSpec] = {
     "m1314r2_audit_southwest": LayoutSpec("m1314r2_audit_southwest", (0.46560, 0.44560), (-0.81360, -0.73160), (-0.46360, -0.35160), (-0.73360, 0.61560), (0.77560, -0.51560)),
     "m1314r2_audit_northwest": LayoutSpec("m1314r2_audit_northwest", (0.62570, -0.35970), (-0.83370, 0.29570), (-0.48370, 0.74570), (0.72570, 0.63570), (-0.74570, -0.51570)),
     "m1314r2_audit_southeast": LayoutSpec("m1314r2_audit_southeast", (-0.67980, 0.46580), (0.43580, -0.80380), (0.79580, -0.44380), (-0.75580, -0.55580), (0.75380, 0.64580)),
+    # M13.14-r3 is an additive random-diagnostic-fingerprint correction.  It
+    # owns a fresh five-partition family and never reuses r2 coordinates.
+    "m1314r3_fit_northeast": LayoutSpec("m1314r3_fit_northeast", (-0.18502, -0.24502), (0.39302, 0.32102), (0.71302, 0.64102), (0.63302, -0.38302), (-0.41302, 0.43502)),
+    "m1314r3_fit_southwest": LayoutSpec("m1314r3_fit_southwest", (0.21913, 0.29713), (-0.63313, -0.73913), (-0.30313, -0.40913), (-0.52313, 0.49313), (0.66313, -0.50913)),
+    "m1314r3_fit_northwest": LayoutSpec("m1314r3_fit_northwest", (0.34324, -0.32924), (-0.72924, 0.22924), (-0.39924, 0.56924), (0.55324, 0.50324), (-0.56924, -0.46924)),
+    "m1314r3_fit_southeast": LayoutSpec("m1314r3_fit_southeast", (-0.31935, 0.28935), (0.28935, -0.76935), (0.67935, -0.38935), (-0.57935, -0.45935), (0.58335, 0.48335)),
+    "m1314r3_check_northeast": LayoutSpec("m1314r3_check_northeast", (-0.48706, -0.35306), (0.44906, 0.35906), (0.77906, 0.69906), (0.72906, -0.47906), (-0.62706, 0.58306)),
+    "m1314r3_check_southwest": LayoutSpec("m1314r3_check_southwest", (0.42317, 0.41917), (-0.83917, -0.69917), (-0.48917, -0.31917), (-0.75917, 0.59317), (0.75317, -0.48917)),
+    "m1314r3_check_northwest": LayoutSpec("m1314r3_check_northwest", (0.58328, -0.33328), (-0.85928, 0.24928), (-0.50928, 0.69928), (0.70328, 0.61328), (-0.71928, -0.48928)),
+    "m1314r3_check_southeast": LayoutSpec("m1314r3_check_southeast", (-0.65339, 0.43939), (0.38939, -0.82939), (0.74939, -0.46939), (-0.72939, -0.52939), (0.72739, 0.62339)),
+    "m1314r3_confirm_fit_northeast": LayoutSpec("m1314r3_confirm_fit_northeast", (-0.15350, -0.25950), (0.42550, 0.33550), (0.74550, 0.65550), (0.66550, -0.36550), (-0.40150, 0.44550)),
+    "m1314r3_confirm_fit_southwest": LayoutSpec("m1314r3_confirm_fit_southwest", (0.24961, 0.32761), (-0.65361, -0.72961), (-0.32361, -0.39961), (-0.54361, 0.50361), (0.67561, -0.49961)),
+    "m1314r3_confirm_fit_northwest": LayoutSpec("m1314r3_confirm_fit_northwest", (0.37572, -0.29972), (-0.74972, 0.26372), (-0.41972, 0.60372), (0.56572, 0.51372), (-0.58972, -0.45972)),
+    "m1314r3_confirm_fit_southeast": LayoutSpec("m1314r3_confirm_fit_southeast", (-0.31983, 0.30383), (0.32583, -0.75983), (0.71583, -0.37983), (-0.59983, -0.44983), (0.59583, 0.49383)),
+    "m1314r3_confirm_eval_northeast": LayoutSpec("m1314r3_confirm_eval_northeast", (-0.48551, -0.36751), (0.48351, 0.37351), (0.81351, 0.71351), (0.76351, -0.49351), (-0.61351, 0.59351)),
+    "m1314r3_confirm_eval_southwest": LayoutSpec("m1314r3_confirm_eval_southwest", (0.45362, 0.43362), (-0.82962, -0.71562), (-0.47962, -0.33562), (-0.74962, 0.60362), (0.76362, -0.50362)),
+    "m1314r3_confirm_eval_northwest": LayoutSpec("m1314r3_confirm_eval_northwest", (0.61373, -0.34773), (-0.84973, 0.28373), (-0.49973, 0.73373), (0.71373, 0.62373), (-0.73373, -0.50373)),
+    "m1314r3_confirm_eval_southeast": LayoutSpec("m1314r3_confirm_eval_southeast", (-0.66784, 0.45384), (0.42384, -0.81984), (0.78384, -0.45984), (-0.74384, -0.54384), (0.74184, 0.63384)),
+    "m1314r3_audit_northeast": LayoutSpec("m1314r3_audit_northeast", (-0.42955, -0.30555), (0.50355, 0.40755), (0.83355, 0.72755), (0.78355, -0.50755), (-0.59955, 0.60755)),
+    "m1314r3_audit_southwest": LayoutSpec("m1314r3_audit_southwest", (0.46766, 0.44766), (-0.81566, -0.73366), (-0.46566, -0.35366), (-0.73566, 0.61766), (0.77766, -0.51766)),
+    "m1314r3_audit_northwest": LayoutSpec("m1314r3_audit_northwest", (0.62777, -0.36177), (-0.83577, 0.29777), (-0.48577, 0.74777), (0.72777, 0.63777), (-0.74777, -0.51777)),
+    "m1314r3_audit_southeast": LayoutSpec("m1314r3_audit_southeast", (-0.68188, 0.46988), (0.43788, -0.80588), (0.79788, -0.44588), (-0.75788, -0.55788), (0.75588, 0.64788)),
 }
 
 TASKS: dict[str, TaskSpec] = {

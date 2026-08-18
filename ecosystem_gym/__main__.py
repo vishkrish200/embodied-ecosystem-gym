@@ -40,6 +40,11 @@ def main(argv: Sequence[str] | None = None) -> None:
         help="write the unopened M13.14-r2 modular-anchored successor manifest without running an environment",
     )
     manifest_m1314r2.add_argument("--output", type=Path, required=True)
+    manifest_m1314r3 = commands.add_parser(
+        "maintenance-policy-manifest-m1314r3",
+        help="write the unopened M13.14-r3 modular-anchored successor manifest without running an environment",
+    )
+    manifest_m1314r3.add_argument("--output", type=Path, required=True)
 
     args = parser.parse_args(argv)
     if args.command == "replay":
@@ -75,6 +80,18 @@ def main(argv: Sequence[str] | None = None) -> None:
         from .maintenance.policy_protocol_m1314r2 import write_m1314r2_policy_manifest
 
         payload = write_m1314r2_policy_manifest(args.output)
+        print(
+            json.dumps(
+                {
+                    "protocol_fingerprint": payload["protocol_fingerprint"],
+                    "status": payload["status"],
+                }
+            )
+        )
+    elif args.command == "maintenance-policy-manifest-m1314r3":
+        from .maintenance.policy_protocol_m1314r3 import write_m1314r3_policy_manifest
+
+        payload = write_m1314r3_policy_manifest(args.output)
         print(
             json.dumps(
                 {

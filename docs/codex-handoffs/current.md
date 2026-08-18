@@ -1,8 +1,8 @@
-# Codex Handoff: M13.14-r2 modular-anchored successor
+# Codex Handoff: M13.14-r3 random-diagnostic fingerprint successor
 
 Updated: 2026-08-19
 Repo/path: `/Users/vishnukrishnan/Developer/embodied-ecosystem-gym`
-Branch: `codex/m1314r2-minibatch-fix` from M13.14 abort commit `d11dcf7`
+Branch: `codex/m1314r3-random-fingerprint` from r2 abort commit `4f4ac46`
 
 ## Outcome
 
@@ -14,6 +14,15 @@ collection, all 12 fits, policy serialization, 1,280 scored policy replays, and
 first mask-random diagnostic trace omitted the `pcg64-<seed>` fingerprint
 required by strict replay. No official development gate exists. Confirmation
 and audit remain sealed.
+
+M13.14-r3 is implemented, frozen, and unopened. It corrects the random
+diagnostic fingerprint binding, adds a real trace/replay regression, and moves
+to fresh `6840--6959` splits with new protocol, runner, artifact, and teacher
+identities. No r3 manifest, preflight, ledger, teacher collection, fit,
+evaluation, replay, or artifact command has been run yet.
+
+The next authorized step is separate authorization for the r3 manifest and
+development coverage preflight only.
 
 See `docs/M13_14_MODULAR_ANCHORED_PROTOCOL.md`, `docs/M13_14_DEVELOPMENT_PREFLIGHT.md`, `docs/M13_14_DEVELOPMENT_ABORT.md`, `docs/M13_14_R2_MODULAR_ANCHORED_PROTOCOL.md`, `docs/M13_14_R2_DEVELOPMENT_PREFLIGHT.md`, and `docs/M13_14_R2_DEVELOPMENT_ABORT.md`.
 
@@ -35,6 +44,9 @@ See `docs/M13_14_MODULAR_ANCHORED_PROTOCOL.md`, `docs/M13_14_DEVELOPMENT_PREFLIG
   scripted-ceiling traces, and one incomplete random diagnostic trace exist
   locally and are hashed in the abort record.
 - No sealed r2 development report/gate, confirmation, or audit exists.
+- M13.14-r3 protocol, runner, artifact, teacher, and support modules exist, but
+  no r3 manifest, preflight report, stage ledger, teacher collection, fit,
+  evaluation, replay, or artifact output exists yet.
 
 ## Current Map
 
@@ -44,32 +56,40 @@ See `docs/M13_14_MODULAR_ANCHORED_PROTOCOL.md`, `docs/M13_14_DEVELOPMENT_PREFLIG
 - `docs/M13_14_R2_MODULAR_ANCHORED_PROTOCOL.md`: unopened M13.14-r2 protocol and no-run boundary.
 - `docs/M13_14_R2_DEVELOPMENT_PREFLIGHT.md`: sealed passing r2 coverage preflight.
 - `docs/M13_14_R2_DEVELOPMENT_ABORT.md`: diagnostic replay abort and preserved hashes.
+- `docs/M13_14_R3_MODULAR_ANCHORED_PROTOCOL.md`: unopened r3 protocol and no-run boundary.
 - `ecosystem_gym/maintenance/policy_protocol_m1314.py`: frozen M13.14 manifest and splits.
 - `ecosystem_gym/maintenance/policy_protocol_m1314r2.py`: additive M13.14-r2 manifest, fresh splits, and preflight order.
+- `ecosystem_gym/maintenance/policy_protocol_m1314r3.py`: additive M13.14-r3 manifest identity and fresh splits.
 - `ecosystem_gym/maintenance/teacher_data_m1314r2.py`: public-only r2 teacher dataset helpers and minibatch validation split.
+- `ecosystem_gym/maintenance/teacher_data_m1314r3.py`: public-only r3 teacher dataset helpers and validation split.
 - `ecosystem_gym/maintenance/modular_q_m1314r2.py`: modular and monolithic r2 learners with teacher minibatches.
 - `ecosystem_gym/maintenance/modular_q_artifacts_m1314r2.py`: r2 modular-Q artifact validation and legacy-path rejection.
+- `ecosystem_gym/maintenance/modular_q_artifacts_m1314r3.py`: r3 modular-Q artifact validation and path rejection.
 - `ecosystem_gym/experiments/m1314r2.py`: unopened r2 runner and future-stage CLI wiring.
+- `ecosystem_gym/experiments/m1314r3.py`: unopened r3 runner and future-stage CLI wiring.
 - `ecosystem_gym/experiments/m1314r2_support.py`: r2 ledger and preflight helpers.
+- `ecosystem_gym/experiments/m1314r3_support.py`: r3 ledger and preflight helpers.
 - `tests/test_m1314r2_policy_protocol.py`: r2 manifest, CLI, and unopened-stage tests.
 - `tests/test_maintenance_modular_q_m1314r2.py`: r2 teacher dataset and artifact tests.
+- `tests/test_m1314r3_policy_protocol.py`: r3 manifest, CLI, and unopened-stage tests.
 
 ## Verification
 
-- Focused M13.14-r2 plus frozen M13.14 suite: 40 passed.
-- Full repository suite: 264 collected tests passed.
+- Focused M13.14-r3/r2/legacy protocol suite: 51 passed.
+- Full repository suite: 282 collected tests passed.
 - `python -m compileall -q ecosystem_gym tests`: passed.
 - `git diff --check`: passed.
-- Independent Luna-max integrated review: approved after candidate-only audit
-  and runner source-hash fixes.
-- The ignored r2 manifest, preflight, ledger, teacher data, policy artifacts,
-  and partial development trace surface exist locally. The development report,
-  confirmation, and audit remain absent.
+- Independent Luna-max integrated review: approved after the r3-local learned
+  replay verifier was added and the accidental shared M13.9 edit was removed.
+- The r2 manifest, preflight, ledger, teacher data, policy artifacts, and
+  partial development trace surface remain locally preserved. The r3 manifest,
+  preflight report, ledger, teacher dataset, policy artifact, and replay outputs
+  remain uncreated.
 
 ## Next Step
 
 Do not resume M13.14 or r2 under their frozen manifests, and do not reconstruct
-an unofficial r2 result from traces. The next task is an additive successor
-that fixes random diagnostic fingerprint binding and uses fresh splits. Any
-corrected preflight or development stage requires new explicit authorization.
+an unofficial r2 result from traces. The next task is a separate authorization
+for the r3 manifest and development coverage preflight only. Do not advance to
+r3 teacher collection, fit, evaluation, replay, confirmation, or audit yet.
 Confirmation and audit remain blocked.
