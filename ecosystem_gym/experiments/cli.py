@@ -40,6 +40,21 @@ from .m135 import write_m135_training_report
 from .m136 import write_m136_training_report
 from .m137 import write_m137_training_report
 from .m138 import write_m138_confirmation_report, write_m138_screen_report
+from .m139 import (
+    write_m139_audit_report,
+    write_m139_confirmation_report,
+    write_m139_fit_smoke_report,
+    write_m139_screen_report,
+)
+from .m1310 import write_m1310_screen_report
+from .m1311 import write_m1311_development_report, write_m1311_fit_smoke_report
+from .m1311r2 import write_m1311r2_development_report, write_m1311r2_fit_smoke_report
+from .m1312 import write_m1312_development_report, write_m1312_fit_smoke_report
+from .m1313 import (
+    write_m1313_audit_report,
+    write_m1313_confirmation_report,
+    write_m1313_development_report,
+)
 from ..policies import evaluate_scripted_policy
 from ..video import write_find_and_eat_regression_video
 
@@ -165,6 +180,49 @@ def main(argv: list[str] | None = None) -> None:
     m138_confirm = subparsers.add_parser("m138-confirm", help="run M13.8 confirmation after a promoted screen")
     m138_confirm.add_argument("--screen-report", type=Path, required=True)
     m138_confirm.add_argument("--output", type=Path, required=True)
+    m139_smoke = subparsers.add_parser(
+        "m139-fit-smoke", help="run the non-protocol M13.9 fit-only plumbing smoke"
+    )
+    m139_smoke.add_argument("--output", type=Path, required=True)
+    m139_screen = subparsers.add_parser("m139-screen", help="run the frozen fail-fast M13.9 potential screen")
+    m139_screen.add_argument("--output", type=Path, required=True)
+    m139_confirm = subparsers.add_parser(
+        "m139-confirm", help="run M13.9 confirmation after an authentic promotion"
+    )
+    m139_confirm.add_argument("--screen-report", type=Path, required=True)
+    m139_confirm.add_argument("--output", type=Path, required=True)
+    m139_audit = subparsers.add_parser(
+        "m139-audit", help="run the one-shot sealed M13.9 audit after confirmation"
+    )
+    m139_audit.add_argument("--confirmation-report", type=Path, required=True)
+    m139_audit.add_argument("--output", type=Path, required=True)
+    m1310_screen = subparsers.add_parser(
+        "m1310-screen", help="run the frozen M13.10 imitation-initialized RL screen"
+    )
+    m1310_screen.add_argument("--output", type=Path, required=True)
+    m1311_smoke = subparsers.add_parser("m1311-fit-smoke", help="run only the non-promotional M13.11 fit smoke")
+    m1311_smoke.add_argument("--output", type=Path, required=True)
+    m1311_development = subparsers.add_parser("m1311-development", help="run the declared M13.11 development-only PPO/DQN bakeoff")
+    m1311_development.add_argument("--output", type=Path, required=True)
+    m1311r2_smoke = subparsers.add_parser("m1311r2-fit-smoke", help="run only the non-promotional corrected M13.11-r2 fit smoke")
+    m1311r2_smoke.add_argument("--output", type=Path, required=True)
+    m1311r2_development = subparsers.add_parser("m1311r2-development", help="run the fresh corrected M13.11-r2 PPO/DQN development comparison")
+    m1311r2_development.add_argument("--output", type=Path, required=True)
+    m1312_smoke = subparsers.add_parser("m1312-fit-smoke", help="run only the non-promotional M13.12 fit smoke")
+    m1312_smoke.add_argument("--output", type=Path, required=True)
+    m1312_development = subparsers.add_parser("m1312-development", help="run the frozen M13.12 paired PPO learning-rate comparison")
+    m1312_development.add_argument("--output", type=Path, required=True)
+    m1313_development = subparsers.add_parser("m1313-development", help="run the frozen M13.13 independent policy-family development comparisons")
+    m1313_development.add_argument("--manifest", type=Path, required=True)
+    m1313_development.add_argument("--output", type=Path, required=True)
+    m1313_confirmation = subparsers.add_parser("m1313-confirmation", help="confirm only independently promoted M13.13 policy families")
+    m1313_confirmation.add_argument("--manifest", type=Path, required=True)
+    m1313_confirmation.add_argument("--development-report", type=Path, required=True)
+    m1313_confirmation.add_argument("--output", type=Path, required=True)
+    m1313_audit = subparsers.add_parser("m1313-audit", help="audit confirmed M13.13 policy families once without refitting")
+    m1313_audit.add_argument("--manifest", type=Path, required=True)
+    m1313_audit.add_argument("--confirmation-report", type=Path, required=True)
+    m1313_audit.add_argument("--output", type=Path, required=True)
     args = parser.parse_args(argv)
     if args.command == "evaluate":
         result = evaluate_scripted_policy(trajectory_dir=args.trajectory_dir)
@@ -305,6 +363,64 @@ def main(argv: list[str] | None = None) -> None:
     elif args.command == "m138-confirm":
         report = write_m138_confirmation_report(args.output, screen_report=args.screen_report)
         print(json.dumps(report["confirmation"]))
+    elif args.command == "m139-fit-smoke":
+        report = write_m139_fit_smoke_report(args.output)
+        print(
+            json.dumps(
+                {
+                    "label": report["label"],
+                    "elapsed_seconds": report["elapsed_seconds"],
+                    "replay_pass": report["replay_pass"],
+                }
+            )
+        )
+    elif args.command == "m139-screen":
+        report = write_m139_screen_report(args.output)
+        print(json.dumps(report["screen"]))
+    elif args.command == "m139-confirm":
+        report = write_m139_confirmation_report(args.output, screen_report=args.screen_report)
+        print(json.dumps(report["confirmation"]))
+    elif args.command == "m139-audit":
+        report = write_m139_audit_report(args.output, confirmation_report=args.confirmation_report)
+        print(json.dumps(report["audit_result"]))
+    elif args.command == "m1310-screen":
+        report = write_m1310_screen_report(args.output)
+        print(json.dumps(report["screen"]))
+    elif args.command == "m1311-fit-smoke":
+        report = write_m1311_fit_smoke_report(args.output)
+        print(json.dumps({"label": report["label"], "elapsed_seconds": report["elapsed_seconds"], "strict_replay_count": report["strict_replay_count"]}))
+    elif args.command == "m1311-development":
+        report = write_m1311_development_report(args.output)
+        print(json.dumps({"label": report["label"], "elapsed_seconds": report["elapsed_seconds"], "strict_replay_count": report["strict_replay_count"]}))
+    elif args.command == "m1311r2-fit-smoke":
+        report = write_m1311r2_fit_smoke_report(args.output)
+        print(json.dumps({"label": report["label"], "elapsed_seconds": report["elapsed_seconds"], "strict_replay_count": report["strict_replay_count"]}))
+    elif args.command == "m1311r2-development":
+        report = write_m1311r2_development_report(args.output)
+        print(json.dumps({"label": report["label"], "elapsed_seconds": report["elapsed_seconds"], "strict_replay_count": report["strict_replay_count"]}))
+    elif args.command == "m1312-fit-smoke":
+        report = write_m1312_fit_smoke_report(args.output)
+        print(json.dumps({"label": report["label"], "elapsed_seconds": report["elapsed_seconds"], "strict_replay_count": report["strict_replay_count"]}))
+    elif args.command == "m1312-development":
+        report = write_m1312_development_report(args.output)
+        print(json.dumps({"label": report["label"], "elapsed_seconds": report["elapsed_seconds"], "strict_replay_count": report["strict_replay_count"], "gate": report["gate"]}))
+    elif args.command == "m1313-development":
+        report = write_m1313_development_report(args.output, manifest_path=args.manifest)
+        print(json.dumps({"stage": report["stage"], "strict_replay_count": report["strict_replay_count"], "gate": report["gate"]}))
+    elif args.command == "m1313-confirmation":
+        report = write_m1313_confirmation_report(
+            args.output,
+            manifest_path=args.manifest,
+            development_report_path=args.development_report,
+        )
+        print(json.dumps({"stage": report["stage"], "strict_replay_count": report["strict_replay_count"], "gate": report["gate"]}))
+    elif args.command == "m1313-audit":
+        report = write_m1313_audit_report(
+            args.output,
+            manifest_path=args.manifest,
+            confirmation_report_path=args.confirmation_report,
+        )
+        print(json.dumps({"stage": report["stage"], "strict_replay_count": report["strict_replay_count"], "gate": report["gate"]}))
 
 
 if __name__ == "__main__":

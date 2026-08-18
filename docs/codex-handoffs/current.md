@@ -1,113 +1,149 @@
-# Codex Handoff: M13 persistent-maintenance RL reset
+# Codex Handoff: M13.13 persistent-maintenance policy families
 
-Updated: 2026-08-07
-Repo/path: `/Users/vishnukrishnan/Developer/embodied-ecosystem-gym`
-Branch/worktree: `main` with committed M8–M13.8 history and a frozen M13.9 protocol; implementation has not started.
+Updated: 2026-08-10
+Repo/path: `/Users/vishnukrishnan/.codex/worktrees/f890/embodied-ecosystem-gym`
+Branch: `codex/m1313-policy-families`
+Base: `eafeb8a` (the M13.12 durable-handoff commit)
 
-## Current Goal
+## Outcome
 
-Re-center the project on the v1 observation ladder: scripted controller,
-state-oracle RL baseline, hybrid policy, then RGB policy. The immediate next
-milestone is M13, a state-oracle RL baseline for M10's persistent-maintenance
-task. Do not start another behavior-cloning or RGB policy variant first.
+M13.13 is implemented, documented, and verified, but deliberately unopened.
+No M13.13 manifest, split ledger, training artifact, episode, trace, comparison,
+confirmation, or audit was created or run.
 
-## Current State
+Three causally different policy families now share the existing public
+30-feature observation/eight-action contract:
 
-- M0–M5 provide the deterministic MuJoCo Gym, typed skills and outcomes,
-  state-oracle/hybrid/RGB observations, replayable JSONL traces, and a thin
-  viewer using the same environment loop.
-- M2 and M6 already demonstrate tabular state-oracle Q-learning, but only on
-  short Find-and-eat or food-versus-play tasks; neither is a long-horizon
-  persistent-maintenance RL result.
-- M8–M8.9 provide coverage-gated RGB grounding/recovery evidence and sealed
-  visual audits. They do not establish end-to-end visual control.
-- M10 validates the persistent environment and oracle ceiling in all four
-  conditions. M11 freezes M9 to expose its maintenance gap.
-- M12 is a committed exploratory structured-RGB behavior-cloning diagnostic:
-  it reaches 80/80 survival and full forced recovery, but only 3/20 compound
-  maintenance completions. Its validation rows were inspected during
-  diagnosis, so they are not a clean model-selection suite.
+1. `UrgencySchedulerPolicy`: deterministic deadline margins, hysteresis,
+   bounded objective commitment, preemption, and continued maintenance after
+   minimum quotas.
+2. `ModelBasedSchedulerPolicy`: bounded receding-horizon search over an explicit
+   optimistic model of public drive dynamics and macro durations, scored
+   lexicographically for safety before quota progress.
+3. `ShieldedLearnedPolicy`: a corrected-PPO-compatible MLP actor whose choices
+   can be restricted by a deterministic safety/commitment supervisor. The
+   candidate/control comparison uses exactly the same actor bytes.
 
-## Constraints
+A supervised-anchor/retention family is intentionally deferred. It remains a
+separate possible hypothesis rather than being folded into the shielded-policy
+comparison.
 
-- Preserve the authoritative Gym, deterministic replay, bounded typed skills,
-  and thin viewer boundary.
-- A state-oracle RL policy may use only the documented state-oracle observation
-  plus policy-owned memory. It must not receive task IDs, reset options,
-  `info`, or private environment access.
-- Keep M12 as an honest diagnostic. Do not merge it as the main project claim,
-  retune it against the old validation rows, or open a sealed M12 audit.
-- Original M13 validation is complete and failed: survival passed but no full
-  policy episode completed the required cycles. Its 2200–2219 audit remains
-  unopened. Do not reuse its validation rows as a development signal.
-- M13.1 validation is complete and failed cleanly. Coverage and 400 traces
-  passed/replayed, but full policy maintenance was 0/20 in every condition;
-  its `2500–2519` audit is sealed. The guarded reward helped development but
-  did not generalize. Do not rerun M13.1 validation or open its audit.
-- M13.2 development is complete but failed before validation. Its compact
-  Double-DQN completed no development maintenance episode in any condition;
-  a diagnostic rollout selected `PICK_UP` for all 160 decisions and received
-  160 cheap `blocked` outcomes. This exposes that the M13.1 reward/action
-  semantics do not disincentivize blocked short actions under approximation.
-  Its 2700–2819 validation/audit splits remain unopened. Do not introduce an
-  action mask or blocked-action penalty without a newly frozen protocol.
-- M13.3 development is complete and failed before validation. Its fresh
-  2900–2939 coverage and scripted ceiling each pass 160/160, and strict replay
-  passes all 960 development traces. The full DQN completes zero maintenance
-  episodes in every condition; it removes the M13.2 repeated blocked-pickup
-  loop but does not learn the required maintenance schedule. Its 3000–3019
-  validation and 3100–3119 audit remain unopened. Do not retry M13.3
-  development or add an action mask retroactively.
+## Frozen Evidence State
 
-## Next Steps
+- M13.10 imitation-only remained 32/32 per replica, while subsequent DQN
+  fine-tuning collapsed both replicas to 0%.
+- M13.11-r1 remains invalid. Corrected M13.11-r2 scored 33/320 versus DQN 9/320
+  and failed its stability gate.
+- M13.12 corrected PPO `3e-4` versus `1e-3` remains frozen at candidate
+  `73,80,26,0` (`179/320`) versus baseline `80,4,0,26` (`110/320`). All 640
+  traces replayed and the all-replica gate failed.
+- No M13--M13.12 source, protocol, result, ledger, artifact, or trace was
+  changed. Existing traces motivated policy families only; they were not used
+  to tune M13.13 thresholds or select a policy.
+- M13.13 reserves fresh 6200+ families. Seeds 6140--6199 and 6240--6299 remain
+  deliberately unused.
 
-1. Preserve `artifacts/reports/m133-development.json` and its 960 replayed
-   development traces as a negative result; do not open M13.3 validation.
-2. M13.4 development is complete and failed before validation. Its fresh
-   3200–3239 coverage/ceiling checks pass 160/160 and all 3,040 traces replay,
-   with zero public-mask violations; nevertheless none of its three full-policy
-   replicas passes every survival/maintenance/safe-drive/recovery gate. Its
-   3300–3419 validation/audit splits remain unopened. Do not retry M13.4 or
-   silently widen the policy input.
-3. M13.5 development is complete and failed before validation. Its six
-   spawned training jobs used one numerical thread each; coverage and the
-   scripted ceiling passed 160/160 and all 1,600 development traces strictly
-   replayed. Update-every-4 substantially beat paired update-every-256 and
-   random controls, and seed 20260812 passed every row, but seed 20260813
-   collapsed in compound/persistent-reference and seed 20260814 missed the
-   renewal/morphology safe-drive gate. The all-replicas rule therefore fails.
-   Its 3600–3719 validation/audit splits remain unopened. Do not rerun M13.5,
-   select a seed, or silently widen the public interface.
-4. M13.6 development is complete and failed before validation. Its fresh
-   eight-pair candidate-first matrix passed coverage/ceiling 160/160, strictly
-   replayed all 4,000 development traces, and every dense candidate beat its
-   sparse/null and random comparators. Only 20260820 and 20260823 passed every
-   per-condition gate; six of eight candidates failed at least one
-   maintenance/survival/recovery/safe-drive row. Dense update is therefore a
-   strong but non-reproducible effect. Its 4200–4319 validation/audit splits
-   remain unopened. Do not rerun M13.6, select a passing seed, or widen the
-   public interface.
-5. M13.7's fresh two-seed, 4,000-episode target-cadence screen rejected both
-   faster hard-copy candidates (250 and 100 updates) against the 1,000-update
-   control on its independent probe. It correctly stops here: no 12,000-episode
-   confirmation, validation, or audit run is authorized; 4500–4719 remain
-   unopened. Preserve the report as a fast negative result.
-6. M13.8's bounded-reward screen is a clean negative result. It prevented
-   uncapped feed farming but created quota-then-`WAIT` loitering: 1/64 full
-   objective successes versus 40/64 for the paired legacy controls, despite
-   all 512 replays passing. Its 4800–4827 fit/probe partitions are opened;
-   4900–5119 remain sealed and must not be reused. Do not tweak M13.8
-   coefficients. The next permitted experiment is M13.9's newly documented
-   public-drive potential, using a new split family.
-7. Only after a state-RL baseline passes should M14 hybrid RL and M15 RGB
-   persistent maintenance proceed with the
-   same task and policy objective.
+## Implementation Map
 
-## Do Not Repeat
+- `ecosystem_gym/maintenance/policy_state.py`: unencoded policy-owned memory,
+  public-dynamics signature, drive projection, deadlines, margins, and semantic
+  helpers. The public feature vector is still exactly length 30.
+- `ecosystem_gym/maintenance/urgency.py`: deterministic urgency family and its
+  commitment-disabled one-factor control.
+- `ecosystem_gym/maintenance/model_based.py`: depth-four candidate, depth-one
+  horizon control, public transition model, and deterministic search.
+- `ecosystem_gym/maintenance/shielded.py`: inference actor, shielded candidate,
+  unshielded geometry-only control, and actor-byte identity support.
+- `ecosystem_gym/maintenance/policy_artifacts.py`: versioned, hashed,
+  tamper-evident policy serialization with config/dynamics validation.
+- `ecosystem_gym/maintenance/policy_protocol.py`: machine-readable frozen
+  splits, arms, budgets, gates, source hashes, and exact commands.
+- `ecosystem_gym/experiments/m1313_support.py`: ordered append-only split ledger.
+- `ecosystem_gym/experiments/m1313.py`: future-only fit/development,
+  confirmation, audit, replay, reporting, and gate implementation.
+- `docs/M13_13_POLICY_FAMILIES_PROTOCOL.md`: human-readable frozen protocol,
+  rationale, risks, gates, commands, and authorization boundary.
+- `tests/test_maintenance_policies.py` and
+  `tests/test_m1313_policy_protocol.py`: synthetic unit, numerical,
+  serialization, tamper, gate, ledger, manifest, and CLI tests.
 
-- Do not use a behavior-cloning score as evidence that RL has solved
-  long-horizon maintenance.
-- Do not use aggregate survival to hide a cycle-completion failure.
-- Do not tune against a frozen validation or sealed-audit suite.
-- Do not add frontend state, contact-physics claims, or VLM/VLA integration
-  before the persistent-maintenance RL baseline is established.
+The CLI registrations are:
+
+- `python -m ecosystem_gym maintenance-policy-manifest`
+- `python -m ecosystem_gym.experiments.cli m1313-development`
+- `python -m ecosystem_gym.experiments.cli m1313-confirmation`
+- `python -m ecosystem_gym.experiments.cli m1313-audit`
+
+These commands exist for a separately authorized future run. Do not invoke the
+canonical commands merely to smoke-test them; registration is covered by tests.
+
+## Frozen M13.13 Protocol
+
+- Development fit: 6200--6219.
+- Development check: 6220--6239.
+- Confirmation fit: 6300--6339.
+- Confirmation evaluation: 6400--6419.
+- Audit: 6500--6519.
+- Development budget ceiling: 1,120 evaluation traces.
+- Later confirmation/audit ceiling: 1,760 evaluation traces.
+- Every experimental episode must emit a trace and pass exact replay.
+- Each family has its own one-factor control and passes independently; there is
+  no cross-family winner selection.
+- Core hard gate: at least 18/20 successes per condition, safety fraction at
+  least 0.85, recovery at least 18/20, unsafe-wait rate at most 0.10, and zero
+  contract violations. Predeclared candidate/control deltas and safety
+  non-inferiority also apply.
+- The shield candidate/control must use byte-identical learned actors.
+
+Read `docs/M13_13_POLICY_FAMILIES_PROTOCOL.md` for the normative details and
+exact future commands. The machine-readable constants in
+`ecosystem_gym/maintenance/policy_protocol.py` are the executable counterpart.
+
+## Verification
+
+- Final focused suite: 15 passed.
+- Final full repository suite: all 224 collected tests passed.
+- `python -m compileall`: passed.
+- `git diff --check`: passed.
+- Ruff was not available in the environment (`Failed to spawn: ruff`), so no
+  Ruff result is claimed.
+
+The tests use synthetic fixtures and temporary directories only. No canonical
+M13.13 experimental surface was touched.
+
+## What Remains Speculative
+
+- None of the three families has empirical M13.13 performance evidence.
+- The deterministic thresholds are mechanics-derived hypotheses, not tuned
+  results.
+- The model-based planner is intentionally optimistic about hidden travel and
+  manipulation costs; horizon four may still be too short or model-mismatched.
+- The shield may prevent known unsafe/semantically useless choices yet still
+  leave too little useful authority to the learned actor, or the future actor
+  fit may itself remain seed-unstable.
+- Passing a synthetic or ordinary repository test is not evidence of policy
+  success in environment episodes.
+
+## Authorization Boundary And Next Step
+
+The next permissible experimental action requires the user to explicitly say,
+in substance: **Authorize the exact M13.13 manifest and development run frozen
+in `docs/M13_13_POLICY_FAMILIES_PROTOCOL.md`.** That authorization would cover
+only manifest creation plus development fit/check on 6200--6239 within the
+declared budget and stop rules.
+
+Confirmation and audit each require later, separate explicit authorization
+after the preceding sealed report is reviewed. Development authorization does
+not authorize confirmation or audit. Editing the frozen protocol after a split
+is opened requires stopping and defining a new milestone/split family rather
+than silently retuning M13.13.
+
+## Reactivation Prompt
+
+Continue from
+`/Users/vishnukrishnan/.codex/worktrees/f890/embodied-ecosystem-gym/docs/codex-handoffs/current.md`.
+Read it and `docs/M13_13_POLICY_FAMILIES_PROTOCOL.md` completely, inspect Git
+state, and verify that M13.13 remains unopened. Do not create a manifest, ledger,
+artifact, trace, training run, or environment episode unless the user gives the
+specific development authorization above. Confirmation and audit remain
+separate authorization gates.

@@ -394,6 +394,280 @@ LAYOUTS: dict[str, LayoutSpec] = {
         (-0.765, -0.615),
         (0.775, 0.665),
     ),
+    # M13.9 is a fresh semi-Markov reward study. Every complete tuple and each
+    # constituent point is distinct from M10--M13.8 protocol geometry.
+    "m139_screen_northeast": LayoutSpec(
+        "m139_screen_northeast",
+        (-0.102, -0.202),
+        (0.328, 0.198),
+        (0.628, 0.548),
+        (0.558, -0.452),
+        (-0.472, 0.368),
+    ),
+    "m139_screen_southwest": LayoutSpec(
+        "m139_screen_southwest",
+        (0.138, 0.178),
+        (-0.552, -0.692),
+        (-0.212, -0.312),
+        (-0.482, 0.388),
+        (0.568, -0.472),
+    ),
+    "m139_screen_northwest": LayoutSpec(
+        "m139_screen_northwest",
+        (0.268, -0.212),
+        (-0.662, 0.158),
+        (-0.322, 0.498),
+        (0.448, 0.408),
+        (-0.502, -0.392),
+    ),
+    "m139_screen_southeast": LayoutSpec(
+        "m139_screen_southeast",
+        (-0.232, 0.188),
+        (0.198, -0.702),
+        (0.588, -0.362),
+        (-0.512, -0.382),
+        (0.458, 0.398),
+    ),
+    "m139_probe_northeast": LayoutSpec(
+        "m139_probe_northeast",
+        (-0.382, -0.282),
+        (0.388, 0.288),
+        (0.708, 0.628),
+        (0.658, -0.442),
+        (-0.672, 0.488),
+    ),
+    "m139_probe_southwest": LayoutSpec(
+        "m139_probe_southwest",
+        (0.358, 0.318),
+        (-0.762, -0.642),
+        (-0.412, -0.262),
+        (-0.682, 0.498),
+        (0.668, -0.452),
+    ),
+    "m139_probe_northwest": LayoutSpec(
+        "m139_probe_northwest",
+        (0.518, -0.302),
+        (-0.782, 0.168),
+        (-0.432, 0.618),
+        (0.618, 0.508),
+        (-0.642, -0.462),
+    ),
+    "m139_probe_southeast": LayoutSpec(
+        "m139_probe_southeast",
+        (-0.562, 0.338),
+        (0.318, -0.762),
+        (0.678, -0.402),
+        (-0.652, -0.472),
+        (0.628, 0.518),
+    ),
+    "m139_confirm_fit_northeast": LayoutSpec(
+        "m139_confirm_fit_northeast",
+        (-0.066, -0.214),
+        (0.304, 0.246),
+        (0.604, 0.606),
+        (0.544, -0.464),
+        (-0.446, 0.426),
+    ),
+    "m139_confirm_fit_southwest": LayoutSpec(
+        "m139_confirm_fit_southwest",
+        (0.114, 0.246),
+        (-0.566, -0.694),
+        (-0.226, -0.314),
+        (-0.456, 0.446),
+        (0.554, -0.474),
+    ),
+    "m139_confirm_fit_northwest": LayoutSpec(
+        "m139_confirm_fit_northwest",
+        (0.294, -0.214),
+        (-0.686, 0.206),
+        (-0.346, 0.556),
+        (0.474, 0.466),
+        (-0.516, -0.394),
+    ),
+    "m139_confirm_fit_southeast": LayoutSpec(
+        "m139_confirm_fit_southeast",
+        (-0.246, 0.246),
+        (0.234, -0.704),
+        (0.614, -0.354),
+        (-0.526, -0.384),
+        (0.484, 0.456),
+    ),
+    "m139_confirm_eval_northeast": LayoutSpec(
+        "m139_confirm_eval_northeast",
+        (-0.448, -0.364),
+        (0.412, 0.306),
+        (0.742, 0.646),
+        (0.692, -0.514),
+        (-0.698, 0.506),
+    ),
+    "m139_confirm_eval_southwest": LayoutSpec(
+        "m139_confirm_eval_southwest",
+        (0.432, 0.336),
+        (-0.788, -0.714),
+        (-0.438, -0.334),
+        (-0.708, 0.516),
+        (0.702, -0.524),
+    ),
+    "m139_confirm_eval_northwest": LayoutSpec(
+        "m139_confirm_eval_northwest",
+        (0.572, -0.374),
+        (-0.808, 0.126),
+        (-0.458, 0.626),
+        (0.652, 0.526),
+        (-0.668, -0.534),
+    ),
+    "m139_confirm_eval_southeast": LayoutSpec(
+        "m139_confirm_eval_southeast",
+        (-0.608, 0.346),
+        (0.352, -0.824),
+        (0.712, -0.464),
+        (-0.678, -0.544),
+        (0.662, 0.536),
+    ),
+    "m139_audit_northeast": LayoutSpec(
+        "m139_audit_northeast",
+        (-0.414, -0.322),
+        (0.446, 0.348),
+        (0.776, 0.688),
+        (0.726, -0.472),
+        (-0.664, 0.548),
+    ),
+    "m139_audit_southwest": LayoutSpec(
+        "m139_audit_southwest",
+        (0.466, 0.378),
+        (-0.754, -0.672),
+        (-0.404, -0.292),
+        (-0.674, 0.558),
+        (0.736, -0.482),
+    ),
+    "m139_audit_northwest": LayoutSpec(
+        "m139_audit_northwest",
+        (0.606, -0.332),
+        (-0.774, 0.168),
+        (-0.424, 0.668),
+        (0.686, 0.568),
+        (-0.634, -0.492),
+    ),
+    "m139_audit_southeast": LayoutSpec(
+        "m139_audit_southeast",
+        (-0.574, 0.388),
+        (0.386, -0.782),
+        (0.746, -0.422),
+        (-0.644, -0.502),
+        (0.696, 0.578),
+    ),
+    # M13.10 tests imitation-initialized RL on a fresh split family.  Every
+    # tuple and every constituent point is disjoint from M10--M13.9.
+    "m1310_screen_northeast": LayoutSpec(
+        "m1310_screen_northeast", (-0.095, -0.211), (0.335, 0.189), (0.635, 0.539), (0.565, -0.461), (-0.465, 0.359)
+    ),
+    "m1310_screen_southwest": LayoutSpec(
+        "m1310_screen_southwest", (0.145, 0.169), (-0.545, -0.701), (-0.205, -0.321), (-0.475, 0.379), (0.575, -0.481)
+    ),
+    "m1310_screen_northwest": LayoutSpec(
+        "m1310_screen_northwest", (0.275, -0.221), (-0.655, 0.149), (-0.315, 0.489), (0.455, 0.399), (-0.495, -0.401)
+    ),
+    "m1310_screen_southeast": LayoutSpec(
+        "m1310_screen_southeast", (-0.225, 0.179), (0.205, -0.711), (0.595, -0.371), (-0.505, -0.391), (0.465, 0.389)
+    ),
+    "m1310_probe_northeast": LayoutSpec(
+        "m1310_probe_northeast", (-0.391, -0.271), (0.379, 0.299), (0.699, 0.639), (0.649, -0.431), (-0.681, 0.499)
+    ),
+    "m1310_probe_southwest": LayoutSpec(
+        "m1310_probe_southwest", (0.349, 0.329), (-0.771, -0.631), (-0.421, -0.251), (-0.691, 0.509), (0.659, -0.441)
+    ),
+    "m1310_probe_northwest": LayoutSpec(
+        "m1310_probe_northwest", (0.509, -0.291), (-0.791, 0.179), (-0.441, 0.629), (0.609, 0.519), (-0.651, -0.451)
+    ),
+    "m1310_probe_southeast": LayoutSpec(
+        "m1310_probe_southeast", (-0.571, 0.349), (0.309, -0.751), (0.669, -0.391), (-0.661, -0.461), (0.619, 0.529)
+    ),
+    "m1310_confirm_fit_northeast": LayoutSpec(
+        "m1310_confirm_fit_northeast", (-0.055, -0.207), (0.315, 0.253), (0.615, 0.613), (0.555, -0.457), (-0.435, 0.433)
+    ),
+    "m1310_confirm_fit_southwest": LayoutSpec(
+        "m1310_confirm_fit_southwest", (0.125, 0.253), (-0.555, -0.687), (-0.215, -0.307), (-0.445, 0.453), (0.565, -0.467)
+    ),
+    "m1310_confirm_fit_northwest": LayoutSpec(
+        "m1310_confirm_fit_northwest", (0.305, -0.207), (-0.675, 0.213), (-0.335, 0.563), (0.485, 0.473), (-0.505, -0.387)
+    ),
+    "m1310_confirm_fit_southeast": LayoutSpec(
+        "m1310_confirm_fit_southeast", (-0.235, 0.253), (0.245, -0.697), (0.625, -0.347), (-0.515, -0.377), (0.495, 0.463)
+    ),
+    "m1310_confirm_eval_northeast": LayoutSpec(
+        "m1310_confirm_eval_northeast", (-0.461, -0.371), (0.399, 0.299), (0.729, 0.639), (0.679, -0.521), (-0.711, 0.499)
+    ),
+    "m1310_confirm_eval_southwest": LayoutSpec(
+        "m1310_confirm_eval_southwest", (0.419, 0.329), (-0.801, -0.721), (-0.451, -0.341), (-0.721, 0.509), (0.689, -0.531)
+    ),
+    "m1310_confirm_eval_northwest": LayoutSpec(
+        "m1310_confirm_eval_northwest", (0.559, -0.381), (-0.821, 0.119), (-0.471, 0.619), (0.639, 0.519), (-0.681, -0.541)
+    ),
+    "m1310_confirm_eval_southeast": LayoutSpec(
+        "m1310_confirm_eval_southeast", (-0.621, 0.339), (0.339, -0.831), (0.699, -0.471), (-0.691, -0.551), (0.649, 0.529)
+    ),
+    "m1310_audit_northeast": LayoutSpec(
+        "m1310_audit_northeast", (-0.405, -0.335), (0.455, 0.335), (0.785, 0.675), (0.735, -0.485), (-0.655, 0.535)
+    ),
+    "m1310_audit_southwest": LayoutSpec(
+        "m1310_audit_southwest", (0.475, 0.365), (-0.745, -0.685), (-0.395, -0.305), (-0.665, 0.545), (0.745, -0.495)
+    ),
+    "m1310_audit_northwest": LayoutSpec(
+        "m1310_audit_northwest", (0.615, -0.345), (-0.763, 0.157), (-0.415, 0.655), (0.695, 0.555), (-0.625, -0.505)
+    ),
+    "m1310_audit_southeast": LayoutSpec(
+        "m1310_audit_southeast", (-0.565, 0.375), (0.395, -0.795), (0.755, -0.435), (-0.635, -0.515), (0.705, 0.565)
+    ),
+    # M13.11 is a development-only PPO/DQN comparison.  Its eight layouts are
+    # fresh against every earlier M10/M13 coordinate and split into fit/check.
+    "m1311_fit_northeast": LayoutSpec("m1311_fit_northeast", (-0.117, -0.193), (0.347, 0.271), (0.657, 0.581), (0.587, -0.439), (-0.487, 0.371)),
+    "m1311_fit_southwest": LayoutSpec("m1311_fit_southwest", (0.157, 0.243), (-0.573, -0.683), (-0.243, -0.353), (-0.463, 0.413), (0.587, -0.453)),
+    "m1311_fit_northwest": LayoutSpec("m1311_fit_northwest", (0.287, -0.253), (-0.673, 0.173), (-0.343, 0.513), (0.477, 0.423), (-0.517, -0.413)),
+    "m1311_fit_southeast": LayoutSpec("m1311_fit_southeast", (-0.247, 0.213), (0.233, -0.713), (0.623, -0.333), (-0.527, -0.403), (0.507, 0.403)),
+    "m1311_check_northeast": LayoutSpec("m1311_check_northeast", (-0.413, -0.293), (0.397, 0.307), (0.717, 0.647), (0.667, -0.423), (-0.697, 0.507)),
+    "m1311_check_southwest": LayoutSpec("m1311_check_southwest", (0.367, 0.347), (-0.783, -0.643), (-0.433, -0.263), (-0.703, 0.517), (0.677, -0.433)),
+    "m1311_check_northwest": LayoutSpec("m1311_check_northwest", (0.527, -0.273), (-0.803, 0.193), (-0.453, 0.643), (0.627, 0.537), (-0.667, -0.433)),
+    "m1311_check_southeast": LayoutSpec("m1311_check_southeast", (-0.593, 0.367), (0.327, -0.773), (0.687, -0.413), (-0.677, -0.473), (0.637, 0.547)),
+    # M13.11-r2 retains M13.11's mechanics but owns fresh fit/check geometry.
+    "m1311r2_fit_northeast": LayoutSpec("m1311r2_fit_northeast", (-0.131, -0.211), (0.361, 0.289), (0.681, 0.609), (0.611, -0.421), (-0.461, 0.389)),
+    "m1311r2_fit_southwest": LayoutSpec("m1311r2_fit_southwest", (0.181, 0.267), (-0.601, -0.711), (-0.271, -0.381), (-0.491, 0.441), (0.611, -0.481)),
+    "m1311r2_fit_northwest": LayoutSpec("m1311r2_fit_northwest", (0.311, -0.281), (-0.701, 0.201), (-0.371, 0.541), (0.501, 0.451), (-0.541, -0.441)),
+    "m1311r2_fit_southeast": LayoutSpec("m1311r2_fit_southeast", (-0.271, 0.241), (0.261, -0.741), (0.651, -0.361), (-0.551, -0.431), (0.531, 0.431)),
+    "m1311r2_check_northeast": LayoutSpec("m1311r2_check_northeast", (-0.439, -0.321), (0.421, 0.331), (0.751, 0.671), (0.701, -0.451), (-0.671, 0.531)),
+    "m1311r2_check_southwest": LayoutSpec("m1311r2_check_southwest", (0.391, 0.371), (-0.811, -0.671), (-0.461, -0.291), (-0.731, 0.541), (0.701, -0.461)),
+    "m1311r2_check_northwest": LayoutSpec("m1311r2_check_northwest", (0.551, -0.301), (-0.831, 0.221), (-0.481, 0.671), (0.651, 0.561), (-0.691, -0.461)),
+    "m1311r2_check_southeast": LayoutSpec("m1311r2_check_southeast", (-0.621, 0.391), (0.361, -0.801), (0.721, -0.441), (-0.701, -0.501), (0.661, 0.571)),
+    # M13.12 owns fresh geometry for its one-factor PPO learning-rate test.
+    "m1312_fit_northeast": LayoutSpec("m1312_fit_northeast", (-0.149, -0.229), (0.379, 0.311), (0.699, 0.631), (0.629, -0.403), (-0.443, 0.407)),
+    "m1312_fit_southwest": LayoutSpec("m1312_fit_southwest", (0.199, 0.283), (-0.619, -0.729), (-0.289, -0.399), (-0.509, 0.459), (0.629, -0.499)),
+    "m1312_fit_northwest": LayoutSpec("m1312_fit_northwest", (0.329, -0.299), (-0.719, 0.219), (-0.389, 0.559), (0.519, 0.469), (-0.559, -0.459)),
+    "m1312_fit_southeast": LayoutSpec("m1312_fit_southeast", (-0.289, 0.259), (0.279, -0.759), (0.669, -0.379), (-0.569, -0.449), (0.549, 0.449)),
+    "m1312_check_northeast": LayoutSpec("m1312_check_northeast", (-0.457, -0.339), (0.439, 0.349), (0.769, 0.689), (0.719, -0.469), (-0.653, 0.549)),
+    "m1312_check_southwest": LayoutSpec("m1312_check_southwest", (0.409, 0.389), (-0.829, -0.689), (-0.479, -0.309), (-0.749, 0.559), (0.719, -0.479)),
+    "m1312_check_northwest": LayoutSpec("m1312_check_northwest", (0.569, -0.319), (-0.849, 0.239), (-0.499, 0.689), (0.669, 0.579), (-0.709, -0.479)),
+    "m1312_check_southeast": LayoutSpec("m1312_check_southeast", (-0.639, 0.409), (0.379, -0.819), (0.739, -0.459), (-0.719, -0.519), (0.679, 0.589)),
+    # M13.13 freezes five fresh partitions before any policy-family run.  The
+    # four-decimal points are disjoint from every earlier M10--M13.12 layout.
+    "m1313_fit_northeast": LayoutSpec("m1313_fit_northeast", (-0.1731, -0.2511), (0.4011, 0.3291), (0.7211, 0.6491), (0.6411, -0.3911), (-0.4211, 0.4191)),
+    "m1313_fit_southwest": LayoutSpec("m1313_fit_southwest", (0.2232, 0.3012), (-0.6412, -0.7472), (-0.3112, -0.4172), (-0.5312, 0.4772), (0.6472, -0.5172)),
+    "m1313_fit_northwest": LayoutSpec("m1313_fit_northwest", (0.3473, -0.3173), (-0.7373, 0.2373), (-0.4073, 0.5773), (0.5373, 0.4873), (-0.5773, -0.4773)),
+    "m1313_fit_southeast": LayoutSpec("m1313_fit_southeast", (-0.3074, 0.2774), (0.2974, -0.7774), (0.6874, -0.3974), (-0.5874, -0.4674), (0.5674, 0.4674)),
+    "m1313_check_northeast": LayoutSpec("m1313_check_northeast", (-0.4751, -0.3571), (0.4571, 0.3671), (0.7871, 0.7071), (0.7371, -0.4871), (-0.6351, 0.5671)),
+    "m1313_check_southwest": LayoutSpec("m1313_check_southwest", (0.4272, 0.4072), (-0.8472, -0.7072), (-0.4972, -0.3272), (-0.7672, 0.5772), (0.7372, -0.4972)),
+    "m1313_check_northwest": LayoutSpec("m1313_check_northwest", (0.5873, -0.3373), (-0.8673, 0.2573), (-0.5173, 0.7073), (0.6873, 0.5973), (-0.7273, -0.4973)),
+    "m1313_check_southeast": LayoutSpec("m1313_check_southeast", (-0.6574, 0.4274), (0.3974, -0.8374), (0.7574, -0.4774), (-0.7374, -0.5374), (0.6974, 0.6074)),
+    "m1313_confirm_fit_northeast": LayoutSpec("m1313_confirm_fit_northeast", (-0.1571, -0.2631), (0.4131, 0.3431), (0.7331, 0.6631), (0.6531, -0.3731), (-0.4091, 0.4331)),
+    "m1313_confirm_fit_southwest": LayoutSpec("m1313_confirm_fit_southwest", (0.2372, 0.3152), (-0.6572, -0.7332), (-0.3272, -0.4032), (-0.5472, 0.4912), (0.6632, -0.5032)),
+    "m1313_confirm_fit_northwest": LayoutSpec("m1313_confirm_fit_northwest", (0.3633, -0.3033), (-0.7533, 0.2513), (-0.4233, 0.5913), (0.5533, 0.5013), (-0.5933, -0.4633)),
+    "m1313_confirm_fit_southeast": LayoutSpec("m1313_confirm_fit_southeast", (-0.3234, 0.2914), (0.3134, -0.7634), (0.7034, -0.3834), (-0.6034, -0.4534), (0.5834, 0.4814)),
+    "m1313_confirm_eval_northeast": LayoutSpec("m1313_confirm_eval_northeast", (-0.4891, -0.3711), (0.4711, 0.3811), (0.8011, 0.7211), (0.7511, -0.5011), (-0.6211, 0.5811)),
+    "m1313_confirm_eval_southwest": LayoutSpec("m1313_confirm_eval_southwest", (0.4412, 0.4212), (-0.8332, -0.7212), (-0.4832, -0.3412), (-0.7532, 0.5912), (0.7512, -0.5112)),
+    "m1313_confirm_eval_northwest": LayoutSpec("m1313_confirm_eval_northwest", (0.6013, -0.3513), (-0.8533, 0.2713), (-0.5033, 0.7213), (0.7013, 0.6113), (-0.7413, -0.5113)),
+    "m1313_confirm_eval_southeast": LayoutSpec("m1313_confirm_eval_southeast", (-0.6714, 0.4414), (0.4114, -0.8234), (0.7714, -0.4634), (-0.7514, -0.5514), (0.7114, 0.6214)),
+    "m1313_audit_northeast": LayoutSpec("m1313_audit_northeast", (-0.4331, -0.3091), (0.4911, 0.3951), (0.8211, 0.7351), (0.7711, -0.5151), (-0.6071, 0.5951)),
+    "m1313_audit_southwest": LayoutSpec("m1313_audit_southwest", (0.4552, 0.4352), (-0.8192, -0.7352), (-0.4692, -0.3552), (-0.7392, 0.6052), (0.7652, -0.5252)),
+    "m1313_audit_northwest": LayoutSpec("m1313_audit_northwest", (0.6153, -0.3653), (-0.8393, 0.2853), (-0.4893, 0.7353), (0.7153, 0.6253), (-0.7553, -0.5253)),
+    "m1313_audit_southeast": LayoutSpec("m1313_audit_southeast", (-0.6854, 0.4554), (0.4254, -0.8094), (0.7854, -0.4494), (-0.7654, -0.5654), (0.7254, 0.6354)),
 }
 
 TASKS: dict[str, TaskSpec] = {
