@@ -207,12 +207,14 @@ authorization.
 Hold the M13 task, action interface, reward, and long-horizon evaluation fixed
 while changing the learning hypothesis to modular drive-specific Q heads,
 persistent teacher anchoring, and a deterministic acting-loop shield. M13.14
-owns fresh `6600--6719` splits and coverage-first preflights, but no manifest,
-preflight, ledger, teacher collection, fit, evaluation, replay, or artifact
-command has run yet. It is implemented, frozen, and unopened; it does not
-reopen M13.13, and M13.13 remains the frozen abort record.
+owns fresh `6600--6719` splits and coverage-first preflights. Its exact
+development fit/check coverage preflight passed every visibility row on
+`6600--6639`; no ledger, teacher collection, fit, evaluation, replay,
+confirmation, or audit has run. It does not reopen M13.13, and M13.13 remains
+the frozen abort record. See the
+[preflight result](M13_14_DEVELOPMENT_PREFLIGHT.md).
 
-**Status: implemented, frozen, unopened.**
+**Status: development coverage passed; fit/evaluation unopened.**
 
 ## M14 — Hybrid persistent-maintenance RL
 
