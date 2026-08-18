@@ -209,12 +209,15 @@ while changing the learning hypothesis to modular drive-specific Q heads,
 persistent teacher anchoring, and a deterministic acting-loop shield. M13.14
 owns fresh `6600--6719` splits and coverage-first preflights. Its exact
 development fit/check coverage preflight passed every visibility row on
-`6600--6639`; no ledger, teacher collection, fit, evaluation, replay,
-confirmation, or audit has run. It does not reopen M13.13, and M13.13 remains
-the frozen abort record. See the
-[preflight result](M13_14_DEVELOPMENT_PREFLIGHT.md).
+`6600--6639`. The separately authorized development stage then opened fit and
+serialized a valid 16,000-row public teacher dataset, but stopped before any
+learner fit because random minibatches were incorrectly subjected to the
+whole-dataset all-eight-macro coverage rule. Development check, confirmation,
+and audit remain unopened. See the
+[preflight result](M13_14_DEVELOPMENT_PREFLIGHT.md) and
+[development abort](M13_14_DEVELOPMENT_ABORT.md).
 
-**Status: development coverage passed; fit/evaluation unopened.**
+**Status: implementation abort during teacher warm-start; no policy result.**
 
 ## M14 — Hybrid persistent-maintenance RL
 
