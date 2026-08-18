@@ -218,6 +218,13 @@ and audit remain unopened. See the
 [development abort](M13_14_DEVELOPMENT_ABORT.md).
 
 **Status: implementation abort during teacher warm-start; no policy result.**
+The additive M13.14-r2 correction now exists separately with split validators and fresh `6720--6839` partitions, but it remains unopened.
+
+## M13.14-r2 — Corrected modular anchored persistent-maintenance RL successor
+
+Hold the M13 task, action interface, reward, and long-horizon evaluation fixed while changing only the learner-side hypothesis: separate whole-dataset validation from sampled minibatch validation, keep the public boundary unchanged, and harden teacher/artifact isolation with fresh source hashes and a new runner.
+
+**Status: implemented, frozen, and unopened.** The corrected additive lane is present in source with separate full-dataset and minibatch validators, a regression suite that allows minibatches to omit one or more macros, and fresh `6720--6839` splits. No M13.14-r2 manifest, preflight report, ledger marker, teacher dataset collection, fit, evaluation, replay, confirmation, audit, or artifact command has been run. The next step is separate authorization for the r2 manifest and the development coverage preflight only.
 
 ## M14 — Hybrid persistent-maintenance RL
 
@@ -225,7 +232,7 @@ Hold M13's task, action interface, reward, and long-horizon evaluation fixed whi
 
 Exit when the hybrid policy is compared fairly with M13 using the same frozen conditions and training budget, reports perception misses separately from planning failures, and preserves the policy-input boundary. Any performance gap is diagnostic evidence, not a reason to change M13's RL result.
 
-**Status: blocked. Depends on M13 and an authorized M13.14 successor run.**
+**Status: blocked. Depends on M13 and an authorized M13.14-r2 successor run.**
 
 ## M15 — RGB persistent-maintenance policy
 
@@ -233,7 +240,7 @@ Train and evaluate an RGB-only successor only after M13 and M14 establish that t
 
 Freeze a fresh protocol before fitting: public-visibility coverage, train/validation/audit splits, per-condition cycle/survival/recovery gates, ablations, a privileged ceiling, replay, and failure attribution. Compare the RGB policy against the M13 state-RL and M14 hybrid-RL baselines rather than a behavior-cloning-only successor.
 
-**Status: blocked. Depends on M13, M14, and an authorized M13.14 successor run.**
+**Status: blocked. Depends on M13, M14, and an authorized M13.14-r2 successor run.**
 
 ## M16 — Sealed audit and persistent virtual-toy release closure
 

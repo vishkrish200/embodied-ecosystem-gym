@@ -160,6 +160,105 @@ def replay_m1314_trace(
     )
 
 
+def _load_m1314r2_export(name: str, *fallback_names: str) -> Callable[..., Any]:
+    module = importlib.import_module(".m1314r2", __package__)
+    for candidate in (name, *fallback_names):
+        exported = getattr(module, candidate, None)
+        if callable(exported):
+            return exported
+    raise AttributeError(f"ecosystem_gym.experiments.m1314r2 has no callable export named {name!r}")
+
+
+def write_m1314r2_development_preflight_report(
+    output: str | Path,
+    *,
+    manifest_path: str | Path,
+) -> dict[str, Any]:
+    return _load_m1314r2_export("write_m1314r2_development_preflight_report")(output, manifest_path=manifest_path)
+
+
+def write_m1314r2_development_report(
+    output: str | Path,
+    *,
+    manifest_path: str | Path,
+    preflight_report_path: str | Path,
+) -> dict[str, Any]:
+    return _load_m1314r2_export("write_m1314r2_development_report")(
+        output,
+        manifest_path=manifest_path,
+        preflight_report_path=preflight_report_path,
+    )
+
+
+def write_m1314r2_confirmation_preflight_report(
+    output: str | Path,
+    *,
+    manifest_path: str | Path,
+    development_report_path: str | Path,
+) -> dict[str, Any]:
+    return _load_m1314r2_export("write_m1314r2_confirmation_preflight_report")(
+        output,
+        manifest_path=manifest_path,
+        development_report_path=development_report_path,
+    )
+
+
+def write_m1314r2_confirmation_report(
+    output: str | Path,
+    *,
+    manifest_path: str | Path,
+    preflight_report_path: str | Path,
+    development_report_path: str | Path,
+) -> dict[str, Any]:
+    return _load_m1314r2_export("write_m1314r2_confirmation_report")(
+        output,
+        manifest_path=manifest_path,
+        preflight_report_path=preflight_report_path,
+        development_report_path=development_report_path,
+    )
+
+
+def write_m1314r2_audit_preflight_report(
+    output: str | Path,
+    *,
+    manifest_path: str | Path,
+    confirmation_report_path: str | Path,
+) -> dict[str, Any]:
+    return _load_m1314r2_export("write_m1314r2_audit_preflight_report")(
+        output,
+        manifest_path=manifest_path,
+        confirmation_report_path=confirmation_report_path,
+    )
+
+
+def write_m1314r2_audit_report(
+    output: str | Path,
+    *,
+    manifest_path: str | Path,
+    preflight_report_path: str | Path,
+    confirmation_report_path: str | Path,
+) -> dict[str, Any]:
+    return _load_m1314r2_export("write_m1314r2_audit_report")(
+        output,
+        manifest_path=manifest_path,
+        preflight_report_path=preflight_report_path,
+        confirmation_report_path=confirmation_report_path,
+    )
+
+
+def replay_m1314r2_trace(
+    trace: str | Path,
+    *,
+    manifest_path: str | Path,
+    policy_path: str | Path,
+) -> Any:
+    return _load_m1314r2_export("replay_m1314r2_trace", "m1314r2_replay", "run_m1314r2_replay")(
+        trace_path=trace,
+        manifest_path=manifest_path,
+        policy_path=policy_path,
+    )
+
+
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description="Embodied Ecosystem Gym tools")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -374,6 +473,56 @@ def main(argv: list[str] | None = None) -> None:
     m1314_replay.add_argument("--manifest", type=Path, required=True)
     m1314_replay.add_argument("--trace", type=Path, required=True)
     m1314_replay.add_argument("--policy", type=Path, required=True)
+    m1314r2_development_preflight = subparsers.add_parser(
+        "m1314r2-development-preflight",
+        help="persist the unopened M13.14-r2 development coverage scan before any fit",
+    )
+    m1314r2_development_preflight.add_argument("--manifest", type=Path, required=True)
+    m1314r2_development_preflight.add_argument("--output", type=Path, required=True)
+    m1314r2_development = subparsers.add_parser(
+        "m1314r2-development",
+        help="run the unopened M13.14-r2 development stage only after a matching preflight",
+    )
+    m1314r2_development.add_argument("--manifest", type=Path, required=True)
+    m1314r2_development.add_argument("--preflight-report", type=Path, required=True)
+    m1314r2_development.add_argument("--output", type=Path, required=True)
+    m1314r2_confirmation_preflight = subparsers.add_parser(
+        "m1314r2-confirmation-preflight",
+        help="persist the unopened M13.14-r2 confirmation coverage scan before any refit",
+    )
+    m1314r2_confirmation_preflight.add_argument("--manifest", type=Path, required=True)
+    m1314r2_confirmation_preflight.add_argument("--development-report", type=Path, required=True)
+    m1314r2_confirmation_preflight.add_argument("--output", type=Path, required=True)
+    m1314r2_confirmation = subparsers.add_parser(
+        "m1314r2-confirmation",
+        help="run the unopened M13.14-r2 confirmation stage only after a matching preflight",
+    )
+    m1314r2_confirmation.add_argument("--manifest", type=Path, required=True)
+    m1314r2_confirmation.add_argument("--preflight-report", type=Path, required=True)
+    m1314r2_confirmation.add_argument("--development-report", type=Path, required=True)
+    m1314r2_confirmation.add_argument("--output", type=Path, required=True)
+    m1314r2_audit_preflight = subparsers.add_parser(
+        "m1314r2-audit-preflight",
+        help="persist the unopened M13.14-r2 audit coverage scan before the one-shot audit",
+    )
+    m1314r2_audit_preflight.add_argument("--manifest", type=Path, required=True)
+    m1314r2_audit_preflight.add_argument("--confirmation-report", type=Path, required=True)
+    m1314r2_audit_preflight.add_argument("--output", type=Path, required=True)
+    m1314r2_audit = subparsers.add_parser(
+        "m1314r2-audit",
+        help="run the unopened M13.14-r2 audit only after a matching audit preflight",
+    )
+    m1314r2_audit.add_argument("--manifest", type=Path, required=True)
+    m1314r2_audit.add_argument("--preflight-report", type=Path, required=True)
+    m1314r2_audit.add_argument("--confirmation-report", type=Path, required=True)
+    m1314r2_audit.add_argument("--output", type=Path, required=True)
+    m1314r2_replay = subparsers.add_parser(
+        "m1314r2-replay",
+        help="strictly replay one unopened M13.14-r2 trace against a frozen policy artifact",
+    )
+    m1314r2_replay.add_argument("--manifest", type=Path, required=True)
+    m1314r2_replay.add_argument("--trace", type=Path, required=True)
+    m1314r2_replay.add_argument("--policy", type=Path, required=True)
     args = parser.parse_args(argv)
     if args.command == "evaluate":
         result = evaluate_scripted_policy(trajectory_dir=args.trajectory_dir)
@@ -638,6 +787,77 @@ def main(argv: list[str] | None = None) -> None:
         print(json.dumps({"stage": report["stage"], "strict_replay_count": report["strict_replay_count"], "gate": report["gate"]}))
     elif args.command == "m1314-replay":
         result = replay_m1314_trace(
+            args.trace,
+            manifest_path=args.manifest,
+            policy_path=args.policy,
+        )
+        print(json.dumps(result) if isinstance(result, dict) else result)
+    elif args.command == "m1314r2-development-preflight":
+        report = write_m1314r2_development_preflight_report(args.output, manifest_path=args.manifest)
+        print(
+            json.dumps(
+                {
+                    "stage": report["stage"],
+                    "coverage_passes": report["coverage_passes"],
+                    "content_hash": report["content_hash"],
+                }
+            )
+        )
+    elif args.command == "m1314r2-development":
+        report = write_m1314r2_development_report(
+            args.output,
+            manifest_path=args.manifest,
+            preflight_report_path=args.preflight_report,
+        )
+        print(json.dumps({"stage": report["stage"], "strict_replay_count": report["strict_replay_count"], "gate": report["gate"]}))
+    elif args.command == "m1314r2-confirmation-preflight":
+        report = write_m1314r2_confirmation_preflight_report(
+            args.output,
+            manifest_path=args.manifest,
+            development_report_path=args.development_report,
+        )
+        print(
+            json.dumps(
+                {
+                    "stage": report["stage"],
+                    "coverage_passes": report["coverage_passes"],
+                    "content_hash": report["content_hash"],
+                }
+            )
+        )
+    elif args.command == "m1314r2-confirmation":
+        report = write_m1314r2_confirmation_report(
+            args.output,
+            manifest_path=args.manifest,
+            preflight_report_path=args.preflight_report,
+            development_report_path=args.development_report,
+        )
+        print(json.dumps({"stage": report["stage"], "strict_replay_count": report["strict_replay_count"], "gate": report["gate"]}))
+    elif args.command == "m1314r2-audit-preflight":
+        report = write_m1314r2_audit_preflight_report(
+            args.output,
+            manifest_path=args.manifest,
+            confirmation_report_path=args.confirmation_report,
+        )
+        print(
+            json.dumps(
+                {
+                    "stage": report["stage"],
+                    "coverage_passes": report["coverage_passes"],
+                    "content_hash": report["content_hash"],
+                }
+            )
+        )
+    elif args.command == "m1314r2-audit":
+        report = write_m1314r2_audit_report(
+            args.output,
+            manifest_path=args.manifest,
+            preflight_report_path=args.preflight_report,
+            confirmation_report_path=args.confirmation_report,
+        )
+        print(json.dumps({"stage": report["stage"], "strict_replay_count": report["strict_replay_count"], "gate": report["gate"]}))
+    elif args.command == "m1314r2-replay":
+        result = replay_m1314r2_trace(
             args.trace,
             manifest_path=args.manifest,
             policy_path=args.policy,
