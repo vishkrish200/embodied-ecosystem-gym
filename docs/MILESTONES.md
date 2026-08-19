@@ -232,6 +232,10 @@ Hold the M13 task, action interface, reward, and long-horizon evaluation fixed w
 
 **Status: development negative; confirmation/audit sealed.** M13.14-r3 completed all 12 fits, all 1,280 policy episodes, both 80-episode diagnostics, and 1,440/1,440 strict replays. The modular anchored candidate reached `258/320` full objectives versus `273/320` for the monolithic anchored control, and no candidate seed passed every per-condition hard gate. Persistent anchoring and shielding were strongly beneficial against their matched controls, but modular decomposition was not a stable improvement. A post-run verifier also rejects one extra valid artifact `schema_version` field omitted from its canonical reconstruction; this cannot change the failed gate or authorize confirmation. See the [r3 result](M13_14_R3_DEVELOPMENT_RESULTS.md).
 
+**M13 closure:** the state-oracle RL lane is closed as a negative result. Do not
+add another M13.x learner variant or open confirmation/audit. See the
+[final synthesis and decision](M13_FINAL_SYNTHESIS.md).
+
 ## M14 — Hybrid persistent-maintenance RL
 
 Hold M13's task, action interface, reward, and long-horizon evaluation fixed while replacing privileged object coordinates with the existing hybrid observation boundary. Train a policy that receives RGB, drives, holding state, prior outcome, and non-privileged visual detections only. Its purpose is to isolate whether the maintenance RL policy fails because of planning or because of perception.

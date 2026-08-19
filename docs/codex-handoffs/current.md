@@ -22,7 +22,13 @@ candidate scored `258/320` versus `273/320` for the monolithic anchored control,
 and no candidate replica passed every condition. Confirmation and audit remain
 sealed.
 
+The M13 state-oracle RL lane is now closed. Do not create another M13.x variant,
+open confirmation/audit, select a favorable seed, or tune on opened checks. See
+`docs/M13_FINAL_SYNTHESIS.md`.
+
 See `docs/M13_14_MODULAR_ANCHORED_PROTOCOL.md`, `docs/M13_14_DEVELOPMENT_PREFLIGHT.md`, `docs/M13_14_DEVELOPMENT_ABORT.md`, `docs/M13_14_R2_MODULAR_ANCHORED_PROTOCOL.md`, `docs/M13_14_R2_DEVELOPMENT_PREFLIGHT.md`, `docs/M13_14_R2_DEVELOPMENT_ABORT.md`, `docs/M13_14_R3_MODULAR_ANCHORED_PROTOCOL.md`, `docs/M13_14_R3_DEVELOPMENT_PREFLIGHT.md`, and `docs/M13_14_R3_DEVELOPMENT_RESULTS.md`.
+
+Final decision: `docs/M13_FINAL_SYNTHESIS.md`.
 
 ## Frozen Evidence State
 
@@ -94,7 +100,7 @@ See `docs/M13_14_MODULAR_ANCHORED_PROTOCOL.md`, `docs/M13_14_DEVELOPMENT_PREFLIG
 
 ## Next Step
 
-Do not resume M13.14/r2, tune on r3 check traces, select a favorable r3 seed, or
-open confirmation/audit. The r3 modular candidate failed and the monolithic
-anchored control is the stronger learned baseline. Any successor requires a new
-predeclared hypothesis and fresh splits.
+Do not resume M13.14/r2, tune on r3 check traces, select a favorable r3 seed,
+open confirmation/audit, or continue the M13.x ladder. The next decision is
+outside M13: either advance a teacher-distilled product path or design a new RL
+benchmark where learning has meaningful headroom.
