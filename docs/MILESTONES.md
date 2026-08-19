@@ -202,13 +202,47 @@ place. See the [frozen protocol](M13_13_POLICY_FAMILIES_PROTOCOL.md) and
 fresh-split successor with persisted coverage before fitting and new explicit
 authorization.
 
+## M13.14 — Modular anchored persistent-maintenance RL successor
+
+Hold the M13 task, action interface, reward, and long-horizon evaluation fixed
+while changing the learning hypothesis to modular drive-specific Q heads,
+persistent teacher anchoring, and a deterministic acting-loop shield. M13.14
+owns fresh `6600--6719` splits and coverage-first preflights. Its exact
+development fit/check coverage preflight passed every visibility row on
+`6600--6639`. The separately authorized development stage then opened fit and
+serialized a valid 16,000-row public teacher dataset, but stopped before any
+learner fit because random minibatches were incorrectly subjected to the
+whole-dataset all-eight-macro coverage rule. Development check, confirmation,
+and audit remain unopened. See the
+[preflight result](M13_14_DEVELOPMENT_PREFLIGHT.md) and
+[development abort](M13_14_DEVELOPMENT_ABORT.md).
+
+**Status: implementation abort during teacher warm-start; no policy result.**
+The additive M13.14-r2 correction now exists separately with split validators and fresh `6720--6839` partitions, but it remains unopened.
+
+## M13.14-r2 — Corrected modular anchored persistent-maintenance RL successor
+
+Hold the M13 task, action interface, reward, and long-horizon evaluation fixed while changing only the learner-side hypothesis: separate whole-dataset validation from sampled minibatch validation, keep the public boundary unchanged, and harden teacher/artifact isolation with fresh source hashes and a new runner.
+
+**Status: implementation abort during random diagnostic replay; no official policy result.** The corrected minibatch path worked: the fresh teacher dataset, all 12 fits, all policy artifacts, 1,280 scored policy replays, and 80 scripted-ceiling replays completed. The run stopped before report sealing when the first mask-random trace omitted its required `pcg64-<seed>` fingerprint. Development check is opened; confirmation and audit remain sealed. See the [r2 preflight](M13_14_R2_DEVELOPMENT_PREFLIGHT.md) and [r2 development abort](M13_14_R2_DEVELOPMENT_ABORT.md).
+
+## M13.14-r3 — Random-diagnostic fingerprint correction successor
+
+Hold the M13 task, action interface, reward, and long-horizon evaluation fixed while correcting the random-diagnostic fingerprint binding, keeping the frozen r2 learner classes unchanged, and adding a real trace/replay regression on fresh `6840--6959` splits.
+
+**Status: development negative; confirmation/audit sealed.** M13.14-r3 completed all 12 fits, all 1,280 policy episodes, both 80-episode diagnostics, and 1,440/1,440 strict replays. The modular anchored candidate reached `258/320` full objectives versus `273/320` for the monolithic anchored control, and no candidate seed passed every per-condition hard gate. Persistent anchoring and shielding were strongly beneficial against their matched controls, but modular decomposition was not a stable improvement. A post-run verifier also rejects one extra valid artifact `schema_version` field omitted from its canonical reconstruction; this cannot change the failed gate or authorize confirmation. See the [r3 result](M13_14_R3_DEVELOPMENT_RESULTS.md).
+
+**M13 closure:** the state-oracle RL lane is closed as a negative result. Do not
+add another M13.x learner variant or open confirmation/audit. See the
+[final synthesis and decision](M13_FINAL_SYNTHESIS.md).
+
 ## M14 — Hybrid persistent-maintenance RL
 
 Hold M13's task, action interface, reward, and long-horizon evaluation fixed while replacing privileged object coordinates with the existing hybrid observation boundary. Train a policy that receives RGB, drives, holding state, prior outcome, and non-privileged visual detections only. Its purpose is to isolate whether the maintenance RL policy fails because of planning or because of perception.
 
 Exit when the hybrid policy is compared fairly with M13 using the same frozen conditions and training budget, reports perception misses separately from planning failures, and preserves the policy-input boundary. Any performance gap is diagnostic evidence, not a reason to change M13's RL result.
 
-**Status: planned. Depends on M13.**
+**Status: blocked. Depends on M13 and an authorized M13.14-r2 successor run.**
 
 ## M15 — RGB persistent-maintenance policy
 
@@ -216,7 +250,7 @@ Train and evaluate an RGB-only successor only after M13 and M14 establish that t
 
 Freeze a fresh protocol before fitting: public-visibility coverage, train/validation/audit splits, per-condition cycle/survival/recovery gates, ablations, a privileged ceiling, replay, and failure attribution. Compare the RGB policy against the M13 state-RL and M14 hybrid-RL baselines rather than a behavior-cloning-only successor.
 
-**Status: planned. Depends on M13 and M14.**
+**Status: blocked. Depends on M13, M14, and an authorized M13.14-r2 successor run.**
 
 ## M16 — Sealed audit and persistent virtual-toy release closure
 
