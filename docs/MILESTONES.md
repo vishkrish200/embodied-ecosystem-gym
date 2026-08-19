@@ -230,7 +230,7 @@ Hold the M13 task, action interface, reward, and long-horizon evaluation fixed w
 
 Hold the M13 task, action interface, reward, and long-horizon evaluation fixed while correcting the random-diagnostic fingerprint binding, keeping the frozen r2 learner classes unchanged, and adding a real trace/replay regression on fresh `6840--6959` splits.
 
-**Status: development coverage passed; r3 fit/evaluation unopened.** M13.14-r3 is the additive successor to r2, with new protocol, runner, artifact, teacher, and ledger identities plus real random and learned replay regressions. Its exact development fit/check coverage preflight passed every row on `6840--6879`. No r3 ledger, teacher collection, fit, policy evaluation, confirmation, audit, or learned artifact exists. See the [r3 protocol](M13_14_R3_MODULAR_ANCHORED_PROTOCOL.md) and [r3 preflight](M13_14_R3_DEVELOPMENT_PREFLIGHT.md).
+**Status: development negative; confirmation/audit sealed.** M13.14-r3 completed all 12 fits, all 1,280 policy episodes, both 80-episode diagnostics, and 1,440/1,440 strict replays. The modular anchored candidate reached `258/320` full objectives versus `273/320` for the monolithic anchored control, and no candidate seed passed every per-condition hard gate. Persistent anchoring and shielding were strongly beneficial against their matched controls, but modular decomposition was not a stable improvement. A post-run verifier also rejects one extra valid artifact `schema_version` field omitted from its canonical reconstruction; this cannot change the failed gate or authorize confirmation. See the [r3 result](M13_14_R3_DEVELOPMENT_RESULTS.md).
 
 ## M14 — Hybrid persistent-maintenance RL
 

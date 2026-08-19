@@ -15,14 +15,14 @@ first mask-random diagnostic trace omitted the `pcg64-<seed>` fingerprint
 required by strict replay. No official development gate exists. Confirmation
 and audit remain sealed.
 
-M13.14-r3 corrects the random diagnostic fingerprint binding, adds real random
-and learned trace/replay regressions, and uses fresh `6840--6959` splits. Its
-exact development coverage preflight passed every fit/check row on
-`6840--6879`. The r3 manifest and sealed preflight now exist locally, but no r3
-ledger, teacher collection, fit, policy evaluation, confirmation, audit, or
-learned artifact exists.
+M13.14-r3 corrected the diagnostic fingerprint plumbing and completed all 12
+fits, 1,280 scored policy evaluations, 160 shared diagnostics, and 1,440/1,440
+strict replays. The official development gate failed: the modular anchored
+candidate scored `258/320` versus `273/320` for the monolithic anchored control,
+and no candidate replica passed every condition. Confirmation and audit remain
+sealed.
 
-See `docs/M13_14_MODULAR_ANCHORED_PROTOCOL.md`, `docs/M13_14_DEVELOPMENT_PREFLIGHT.md`, `docs/M13_14_DEVELOPMENT_ABORT.md`, `docs/M13_14_R2_MODULAR_ANCHORED_PROTOCOL.md`, `docs/M13_14_R2_DEVELOPMENT_PREFLIGHT.md`, `docs/M13_14_R2_DEVELOPMENT_ABORT.md`, `docs/M13_14_R3_MODULAR_ANCHORED_PROTOCOL.md`, and `docs/M13_14_R3_DEVELOPMENT_PREFLIGHT.md`.
+See `docs/M13_14_MODULAR_ANCHORED_PROTOCOL.md`, `docs/M13_14_DEVELOPMENT_PREFLIGHT.md`, `docs/M13_14_DEVELOPMENT_ABORT.md`, `docs/M13_14_R2_MODULAR_ANCHORED_PROTOCOL.md`, `docs/M13_14_R2_DEVELOPMENT_PREFLIGHT.md`, `docs/M13_14_R2_DEVELOPMENT_ABORT.md`, `docs/M13_14_R3_MODULAR_ANCHORED_PROTOCOL.md`, `docs/M13_14_R3_DEVELOPMENT_PREFLIGHT.md`, and `docs/M13_14_R3_DEVELOPMENT_RESULTS.md`.
 
 ## Frozen Evidence State
 
@@ -46,8 +46,11 @@ See `docs/M13_14_MODULAR_ANCHORED_PROTOCOL.md`, `docs/M13_14_DEVELOPMENT_PREFLIG
   `d4c309c0e9637727f555abc44064e206f6f11a29f58113da9884afd0cb3f38bb`.
 - Every r3 development fit/check visibility row passed; sealed preflight hash:
   `d6878992c24855a9a5122dc770512b6d93f4ad05928cd6ce7983c9b628bbb237`.
-- No r3 stage ledger, teacher collection, fit, evaluation, confirmation, audit,
-  or learned artifact exists.
+- The r3 ledger is opened through development check; the fresh teacher dataset,
+  12 policy artifacts, 1,440 traces, and sealed development report exist.
+- R3 development gate: failed. Candidate totals were `49/80`, `67/80`,
+  `73/80`, and `69/80`; no seed passed every condition.
+- Confirmation and audit remain unopened.
 
 ## Current Map
 
@@ -59,6 +62,7 @@ See `docs/M13_14_MODULAR_ANCHORED_PROTOCOL.md`, `docs/M13_14_DEVELOPMENT_PREFLIG
 - `docs/M13_14_R2_DEVELOPMENT_ABORT.md`: diagnostic replay abort and preserved hashes.
 - `docs/M13_14_R3_MODULAR_ANCHORED_PROTOCOL.md`: unopened r3 protocol and no-run boundary.
 - `docs/M13_14_R3_DEVELOPMENT_PREFLIGHT.md`: sealed passing r3 coverage preflight.
+- `docs/M13_14_R3_DEVELOPMENT_RESULTS.md`: failed development gate and preserved hashes.
 - `ecosystem_gym/maintenance/policy_protocol_m1314.py`: frozen M13.14 manifest and splits.
 - `ecosystem_gym/maintenance/policy_protocol_m1314r2.py`: additive M13.14-r2 manifest, fresh splits, and preflight order.
 - `ecosystem_gym/maintenance/policy_protocol_m1314r3.py`: additive M13.14-r3 manifest identity and fresh splits.
@@ -84,14 +88,13 @@ See `docs/M13_14_MODULAR_ANCHORED_PROTOCOL.md`, `docs/M13_14_DEVELOPMENT_PREFLIG
 - Independent Luna-max integrated review: approved after the r3-local learned
   replay verifier was added and the accidental shared M13.9 edit was removed.
 - The r2 manifest, preflight, ledger, teacher data, policy artifacts, and
-  partial development trace surface remain locally preserved. Only the r3
-  manifest and sealed preflight report exist; its ledger, teacher dataset,
-  policy artifacts, and evaluation outputs remain absent.
+  partial development trace surface remain locally preserved. The r3 manifest,
+  preflight, ledger, teacher dataset, 12 policies, 1,440 traces, and development
+  report now exist locally. R3 confirmation and audit remain absent.
 
 ## Next Step
 
-Do not resume M13.14 or r2 under their frozen manifests, and do not reconstruct
-an unofficial r2 result from traces. The next experimental action is the exact
-frozen `m1314r3-development` stage and requires separate explicit
-authorization. It would cover fresh teacher collection, the declared fits, and
-one development evaluation only. Confirmation and audit remain blocked.
+Do not resume M13.14/r2, tune on r3 check traces, select a favorable r3 seed, or
+open confirmation/audit. The r3 modular candidate failed and the monolithic
+anchored control is the stronger learned baseline. Any successor requires a new
+predeclared hypothesis and fresh splits.
